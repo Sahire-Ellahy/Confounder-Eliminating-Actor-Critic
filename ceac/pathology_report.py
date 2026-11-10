@@ -8,7 +8,7 @@ from .benchmarks import STRENGTH_PROFILES
 from .visualization import (ENVIRONMENT_LABELS, LABELS, STYLES, seed_summary,
                             trace_values, plot_seed_trace, band_description)
 
-METHODS = ("ucb_q", "pomd", "idac", "ids", "ceac", "oracle")
+METHODS = ("ucb_q", "pomd", "idac", "ids", "ids_zero", "ceac", "oracle")
 DOSE_COLORS = ("#0058c7", "#008747", "#df7400", "#c90078")
 DOSE_LINES = ("-", "--", "-.", ":")
 METRICS = ("regret", "last_gap", "success", "nuisance_visits", "lost_steps", "information")
@@ -145,11 +145,11 @@ def draw_method_overlay(groups, kind, context=0, mode=1, plt=None, band="sd", pr
         axis.tick_params(labelleft=True,labelbottom=True)
     for axis in list(axes.flat)[len(levels):]:
         axis.set_axis_off()
-    subtitle = ("Excluded Bayesian prior support is a separate assumption treatment" if prior else
-                "Optimism vs IDAC (frequentist) vs Bayesian IDS · matched finite training budget")
+    subtitle = (r"Bayesian priors: full support $p_0(1)=0.5$ vs excluded mode 1 $p_0(1)=0$" if prior else
+                "Optimism vs frequentist IDAC vs Bayesian IDS (full support and misspecified prior)")
     _title(fig,kind,context,mode,subtitle)
     _legend(fig,handles,present,band)
-    fig.tight_layout(rect=(0,.15,1,.92),h_pad=2.3,w_pad=1.5)
+    fig.tight_layout(rect=(0,.18,1,.92),h_pad=2.3,w_pad=1.5)
     return fig
 
 
@@ -158,7 +158,12 @@ def draw_strength_learning(groups, kind, context=0, mode=1, plt=None, band="sd",
     if plt is None:
         import matplotlib.pyplot as plt
     present=[m for m in METHODS if (kind,context,mode,m) in groups]
-    fig,axes=plt.subplots(2,3,figsize=(19,11),sharex=True,sharey=True,squeeze=False)
+    if not present:
+        raise ValueError("No recorded methods for the requested strength curves")
+    columns = 4 if len(present) > 6 else 3
+    rows = (len(present) + columns - 1) // columns
+    fig,axes=plt.subplots(rows,columns,figsize=(6*columns+1,5*rows+1),
+                          sharex=True,sharey=True,squeeze=False)
     handles={}
     maximum=0.
     minimum=0.
@@ -183,7 +188,7 @@ def draw_strength_learning(groups, kind, context=0, mode=1, plt=None, band="sd",
         if len(matrices)>1 and all(np.allclose(matrices[0],v,atol=1e-10,rtol=1e-10) for v in matrices[1:]):
             axis.text(.04,.93,"Strength curves coincide",transform=axis.transAxes,va="top",fontsize=11,
                       bbox=dict(fc="white",ec="none",alpha=.9))
-        axis.set(title=LABELS[method],xlabel="Training episode",
+        axis.set(title=LABELS[method].replace(": ", ":\n"),xlabel="Training episode",
                  ylabel="Added pseudo-regret\nvs mildest strength" if incremental else "Cumulative pseudo-regret")
         if incremental:axis.axhline(0,color="#555555",lw=.8)
         axis.tick_params(labelleft=True,labelbottom=True)
@@ -225,7 +230,7 @@ def draw_strength_diagnostics(rows, kind, context=0, mode=1, plt=None, band="sd"
             if metric=="success":axis.set_ylim(0,1)
     _title(fig,kind,context,mode,"Why performance differs: value gap, successful arrivals, wasted steps and useful evidence")
     _legend(fig,handles,METHODS,band,bottom=.045)
-    fig.tight_layout(rect=(0,.15,1,.92),h_pad=2.2,w_pad=1.7)
+    fig.tight_layout(rect=(0,.18,1,.92),h_pad=2.2,w_pad=1.7)
     return fig
 
 
@@ -255,8 +260,12 @@ def report_section(rows):
     if not rows:return []
     text=["", "## Physical pathology strength: matched method overlays", "",
           "The standard figures overlay UCB-Hoeffding Q-learning, optimistic softmax POMD, "
-          "IDAC (frequentist occupancy-information actor-critic), full-support Bayesian IDS, CEAC "
-          "and the offline oracle at each strength. IDAC optimizes an occupancy-entropy ratio; "
+          "IDAC (frequentist occupancy-information actor-critic), Bayesian IDS with full support, "
+          "Bayesian IDS with a misspecified prior, CEAC and the offline oracle at each strength. "
+          "Both Bayesian arms use the same algorithm: full support is p0=(0.5,0.5); "
+          "the restricted prior is p0=(1,0). The latter excludes the true model in mode 1; "
+          "mode 0 is its correctly specified negative control. Prior support is held fixed "
+          "while physical diversion strength varies. IDAC optimizes an occupancy-entropy ratio; "
           "it is not a frequentist implementation of the same posterior IDS objective.", "",
           "Only the mode-independent diversion probability rho changes (0.05, 0.25, 0.50, 0.75). "
           "Interior probabilities preserve the same reachable state/action domain. Geometry, "
@@ -289,5 +298,6 @@ def report_section(rows):
              "records lost progress/dwell; FINITE_BUDGET_VALUE_GAP means a final 32-episode mean "
              "expected gap above 0.01. A plateau already present at mild strength is not evidence "
              "that increasing pathology caused it. PRIOR_SUPPORT_EXCLUDED is the deliberately "
-             "misspecified zero-prior treatment, shown separately from full-support Bayesian IDS.", ""]
+             "misspecified zero-prior treatment, explicitly labeled alongside full-support Bayesian IDS "
+             "in every main figure. A dedicated prior comparison also isolates that assumption.", ""]
     return text

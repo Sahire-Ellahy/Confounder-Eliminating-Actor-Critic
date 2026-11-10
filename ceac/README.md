@@ -11,9 +11,12 @@ The default notebook uses the portable evidence export and needs no raw run cach
 
 The maintained notebook now reads the 336-cell physical-diversion sweep.
 The standard report overlays UCB Q-learning, optimistic POMD, frequentist IDAC,
-full-support Bayesian IDS, CEAC and the oracle at each strength. It also emits
-strength-colored training traces, paired added regret, mechanism diagnostics
-and separately labeled Bayesian support sensitivity. These are shared
+both full-support and misspecified-prior Bayesian IDS, CEAC and the oracle at
+each strength. Both Bayesian arms are also in the default runner slate. The
+priors are `(0.5, 0.5)` and `(1, 0)`; support exclusion is misspecified in mode 1
+and correctly specified in the mode-0 negative control. The report also emits
+strength-colored training traces for all seven methods, paired added regret,
+mechanism diagnostics and a dedicated Bayesian support comparison. These are shared
 rendering functions, not a separate notebook implementation.
 
 See the [current sweep protocol](../docs/pathology_sweep.md) for the complete

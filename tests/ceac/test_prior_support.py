@@ -119,6 +119,9 @@ class PriorSupportTests(unittest.TestCase):
             self.assertAlmostEqual(rows[0]['zero_support_prediction'],.4)
             tampered=deepcopy(run);tampered['metrics'][0]['diagnostics']['posterior'][1]=.001
             with self.assertRaises(ValueError):audit_prior_support([tampered],audits)
+            mislabeled=deepcopy(run);mislabeled["result"]["method"]="ids"
+            with self.assertRaisesRegex(ValueError,"method label disagrees"):
+                audit_prior_support([mislabeled],audits)
 
 
 if __name__=='__main__':unittest.main()

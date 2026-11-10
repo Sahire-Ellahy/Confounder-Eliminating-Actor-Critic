@@ -35,7 +35,8 @@ The notebook runs offline after installation and launches no training. Its
 portable evidence contains **336 physical-strength runs**: two environments,
 two stationary modes, four diversion probabilities, three seeds and seven
 methods, with 2,048 episodes per cell. It includes the source-backed optimism
-and IDAC controls alongside Bayesian IDS, CEAC and the oracle.
+and IDAC controls alongside both full-support and misspecified-prior Bayesian
+IDS, CEAC and the oracle (48 runs per method).
 
 For headless verification with the active interpreter:
 
@@ -54,11 +55,13 @@ python -m unittest discover -s tests/walkthrough -v
 - Preflight fixes the state/action domain, useful-route values, optimal values,
   reward range and diagnostic signal across strengths.
 - The main overlays compare greedy UCB Q-learning, optimistic softmax POMD,
-  frequentist IDAC, full-support Bayesian IDS, CEAC and the offline oracle.
+  frequentist IDAC, both full-support and misspecified-prior Bayesian IDS, CEAC
+  and the offline oracle. All seven methods appear in both environments.
 - Separate plots isolate paired additional regret and show value gaps,
   successful arrivals, nuisance exposure, wasted steps and useful information.
-- Zero-support Bayesian IDS is a separate misspecification control. It does
-  not stand in for correctly specified Bayesian IDS.
+- Bayesian priors are explicit: full support uses `(0.5, 0.5)`; the restricted
+  prior uses `(1, 0)`. The latter is misspecified when mode 1 is true; mode 0
+  is its negative control. Both are in the main plots and default run slate.
 
 The plotted CEAC is a single episode-loop, exact-model specialization. CEAC
 and Bayesian IDS know the declared candidate laws; the primitive controls
@@ -86,7 +89,7 @@ strength-sweep results, not renamed or pooled historical surrogate curves.
 
 ```bash
 python -m ceac.run --output runs/my_smoke --benchmarks weak_signal_m4 \
-  --environments deepsea frozenlake --methods ceac oracle ids idac ucb_q pomd \
+  --environments deepsea frozenlake --methods ceac oracle ids ids_zero idac ucb_q pomd \
   --modes 0 1 --seeds 0 --episodes 32 --workers 1
 python -m ceac.report --input runs/my_smoke
 ```

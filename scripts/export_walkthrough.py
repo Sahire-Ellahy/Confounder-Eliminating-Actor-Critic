@@ -125,7 +125,7 @@ def export_study(study_root, destination):
             result={k:run["result"][k] for k in RESULT_FIELDS if k in run["result"]},
             metrics=[{**{k:m[k] for k in METRIC_FIELDS if k in m},
                       "diagnostics":{k:m["diagnostics"][k] for k in
-                          ("posterior","all_optimistic_q_zero","actor_updates","gradient_norm")
+                          ("posterior","prior_support","all_optimistic_q_zero","actor_updates","gradient_norm")
                           if k in m["diagnostics"]}} for m in run["metrics"]]))
     environment_audit=json.loads((study_root/"environment_audit.json").read_text())
     statistics=json.loads((study_root/"pathology_statistics.json").read_text())
@@ -158,7 +158,7 @@ def export_study(study_root, destination):
         runtime_sources=study["sources"],runtime_archive="evidence/source_bundle.tar.gz",
         diagnostic_sources={k:v for k,v in study["sources"].items() if k not in {"run.py","comparators.py"}},
         excluded_method_ids=sorted(RETIRED_METHODS),excluded_runs=0,
-        scope="Matched physical-diversion sweep; primitive learners and full-support Bayesian IDS kept distinct",
+        scope="Matched physical-diversion sweep; full-support and misspecified-prior Bayesian IDS are explicit main controls",
         curves_benchmarks=study["configuration"]["study"]["benchmarks"],
         source_runs=len(runs),retained_runs=len(runs),curve_runs=len(curves),
         artifacts={str(p.relative_to(destination)):digest(p) for p in assets}))

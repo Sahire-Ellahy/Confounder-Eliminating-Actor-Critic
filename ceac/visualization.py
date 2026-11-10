@@ -14,13 +14,13 @@ LABELS = {
     "oracle": "Offline Graves–Lai oracle", "ids": "Bayesian IDS: full support",
     "idac": "IDAC (frequentist actor-critic)", "ucb_q": "UCB Q-learning (Jin et al.)",
     "pomd": "Optimistic POMD (softmax)",
-    "ids_rare": "IDS: rare prior (0.001)", "ids_zero": "IDS: zero shifted support",
+    "ids_rare": "IDS: rare prior (0.001)", "ids_zero": "Bayesian IDS: misspecified prior",
 }
 STYLES = {
     "ceac": ("#cf202f", "-", "o"), "ceac_actor": ("#8b3e2f", ":", "v"),
     "oracle": ("#161616", "--", "*"), "ucb_q": ("#07854d", "-.", "x"),
     "idac": ("#7c2fc5", "-", "^"), "pomd": ("#e87500", "--", "s"), "ids": ("#0058c7", "--", "D"),
-    "ids_rare": ("#bd319b", "-.", "s"), "ids_zero": ("#00a0a0", ":", "X"),
+    "ids_rare": ("#bd319b", "-.", "s"), "ids_zero": ("#c90078", ":", "X"),
 }
 
 

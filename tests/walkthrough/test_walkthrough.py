@@ -47,6 +47,26 @@ class WalkthroughTests(unittest.TestCase):
         self.assertEqual(sum(s["run_count"] for s in manifest["source_studies"]), 336)
         self.assertEqual(manifest["excluded_runs"], 0)
         self.assertEqual(len(bundle["strength_checks"]), 2)
+        # Require both Bayesian priors at every environment/mode/strength/seed.
+        paired = {}
+        for run in bundle["curves"]:
+            r = run["result"]
+            if r["method"] not in {"ids", "ids_zero"}:
+                continue
+            key = tuple(r[k] for k in ("benchmark", "environment", "context", "true_mode", "seed"))
+            paired.setdefault(key, set()).add(r["method"])
+            prior = .5 if r["method"] == "ids" else 0.
+            self.assertEqual(run["manifest"]["configuration"]["ids_prior"], prior)
+            expected_support = [True, True] if prior else [True, False]
+            for row in run["metrics"]:
+                self.assertEqual(row["diagnostics"]["prior_support"], expected_support)
+                posterior = row["diagnostics"]["posterior"][1]
+                if prior:
+                    self.assertGreater(posterior, 0.)
+                else:
+                    self.assertEqual(posterior, 0.)
+        self.assertEqual(len(paired), 48)
+        self.assertTrue(all(methods == {"ids", "ids_zero"} for methods in paired.values()))
         seen = set()
         for run in bundle["curves"]:
             r = run["result"]

@@ -48,10 +48,22 @@ robust. No desired ranking is encoded in the renderer.
 
 The initial sweep uses two environments, both stationary modes, three seeds,
 four strengths, 2,048 episodes and seven methods: CEAC, offline Graves–Lai,
-full-support Bayesian IDS, source-backed IDAC, UCB-Hoeffding Q-learning,
-optimistic POMD, and a separately labeled zero-support IDS sensitivity.
-This is 336 cells and 688,128 environment episodes. There is no
-outcome-dependent hyperparameter search.
+full-support Bayesian IDS, misspecified-prior Bayesian IDS, source-backed
+IDAC, UCB-Hoeffding Q-learning and optimistic POMD. Both Bayesian treatments
+are primary plotted controls and are included in the default runner slate.
+This is 336 cells and 688,128 environment episodes. Each Bayesian treatment
+has 48 runs: two environments × two modes × four strengths × three seeds.
+There is no outcome-dependent hyperparameter search.
+
+| Bayesian treatment | Method identifier | Prior on modes (0, 1) | Interpretation |
+|---|---|---|---|
+| Full support | `ids` | (0.5, 0.5) | True model has positive prior mass in both modes |
+| Misspecified prior | `ids_zero` | (1, 0) | Excludes the truth in mode 1; mode 0 is a negative control |
+
+The algorithm, likelihood family, budget and seed identities are otherwise
+matched. Exact zero mass is preserved by Bayesian updating; a small positive
+prior is a distinct treatment (`ids_rare`) and is not part of this slate.
+Physical strength and prior support are separate experimental factors.
 
 IDAC is a frequentist actor-critic for a cost/occupancy-entropy ratio. It is
 not a frequentist replacement for Bayesian IDS's posterior information
@@ -76,15 +88,17 @@ From the repository root:
 
 The report automatically creates, for each environment/mode:
 
-- Method overlays at each strength, with consistent colors and a labeled
-  symlog regret axis.
+- All seven methods in the main overlays at each strength, including both
+  Bayesian prior treatments, with consistent colors and a labeled symlog
+  regret axis. Full-support IDS is blue; misspecified-prior IDS is fuchsia.
 - STEERING-style training traces: one method per panel, strength-colored
   curves, and shared linear regret axes.
 - Paired added-regret traces relative to rho=0.05; subtraction happens within
   each seed before computing variation, and negative values are retained.
 - Strength diagnostics: cumulative regret, late expected value gap, terminal
   success, nuisance visits, lost progress/dwell, and useful task information.
-- Separate Bayesian prior-support overlays when the zero-prior arm is present.
+- Dedicated Bayesian prior-support overlays supplement the main figures;
+  the misspecified-prior arm also has its own strength-colored method panel.
 
 The file pathology_statistics.json retains per-seed endpoints, paired added
 regret and descriptive diagnostic flags. The compressed trace_statistics.csv.gz
@@ -114,10 +128,13 @@ cumulative pseudo-regret from rho=0.05 to rho=0.75 was:
 | Optimistic POMD | 40.14 ± 0.00 | 0.062 ± 0.000 |
 | IDAC | 35.94 ± 13.52 | -0.054 ± 0.171 |
 | Full-support Bayesian IDS | 0.00 ± 0.00 | 0.00 ± 0.00 |
+| Misspecified-prior Bayesian IDS | 0.00 ± 0.00 | 0.00 ± 0.00 |
 
 These are means ± one sample SD over three paired seeds, not confidence
 intervals. POMD's zero seed variation in evaluator regret comes from its
-unchanged uniform policy; sampled returns can still vary.
+unchanged uniform policy; sampled returns can still vary. Zero added regret
+for misspecified-prior IDS means its 102.4 cumulative regret is unchanged
+across physical strengths; it does not mean the policy has zero regret.
 
 The primitive controls already have large value gaps at mild strength.
 The new DeepSea effect adds to that baseline problem. The additional

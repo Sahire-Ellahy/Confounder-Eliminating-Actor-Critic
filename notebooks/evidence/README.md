@@ -3,8 +3,10 @@
 The maintained export contains 336 physical-strength seed curves and endpoints:
 two environments, both stationary modes, four diversion probabilities, three
 seeds, seven methods, and 2,048 episodes per cell. The main controls are CEAC,
-offline Graves-Lai, full-support Bayesian IDS, IDAC, UCB Q-learning and optimistic
-POMD; zero-support IDS is a separately labeled sensitivity arm.
+offline Graves-Lai, full-support Bayesian IDS, misspecified-prior Bayesian IDS,
+IDAC, UCB Q-learning and optimistic POMD. Each has 48 runs and appears in the
+main figures for both environments. The Bayesian priors are `(0.5, 0.5)` and
+`(1, 0)`; the latter excludes the truth in mode 1, with mode 0 as a negative control.
 
 The compressed curve bundle includes physical exposure counters, terminal
 success, evaluator regret and information traces, per-seed strength statistics,

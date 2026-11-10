@@ -3,7 +3,7 @@
 The maintained branch uses the repository-local Python 3.11 environment.
 The current physical-strength/reporting revision passed:
 
-- Core algorithm and reporting suite: 73 tests.
+- Core algorithm and reporting suite: 75 tests.
 - Walkthrough geometry and evidence suite: five tests.
 - Notebook: eleven code cells and fourteen rendered figures, with no training.
 - Physical-strength sweep: 336 completed matched cells, 2,048 episodes each,
@@ -14,7 +14,12 @@ The current physical-strength/reporting revision passed:
   DeepSea nuisance value; and actual beacon dwell/resumption.
 - Reporting checks: identical seed identities and budgets, no duplicate or
   missing strength cells, fixed non-strength configuration/runtime, and paired
-  subtraction before computing variation.
+  subtraction before computing variation. All seven methods, including both
+  Bayesian priors, appear in the primary figures for both environments.
+- Prior audit: 48 full-support and 48 restricted-prior runs, matched at every
+  environment/mode/strength/seed. Method labels are checked against actual
+  recorded priors; the notebook verifies posterior support and exact linear
+  exclusion regret, including the mode-0 negative control.
 
 The earlier 48-cell comparator integration audit remains a distinct historical
 validation. IDAC is checked numerically against the unmodified pinned upstream

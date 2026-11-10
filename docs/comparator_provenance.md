@@ -204,8 +204,11 @@ not convergence or systematic failure.
 ## Standard overlays and the physical-strength sweep
 
 The standard report and notebook now share one physical-strength renderer.
-Method overlays compare optimism, frequentist IDAC and Bayesian IDS with CEAC
-and the oracle. STEERING-style panels show training episode versus cumulative
+Method overlays compare optimism, frequentist IDAC, full-support Bayesian IDS
+and misspecified-prior Bayesian IDS with CEAC and the oracle. Both IDS arms
+use the same algorithm and likelihood family; their priors are `(0.5, 0.5)`
+and `(1, 0)`. The restricted prior excludes the truth in mode 1, with mode 0
+as a negative control. Both appear in the main figures and default runner slate. STEERING-style panels show training episode versus cumulative
 pseudo-regret with strength-colored curves; paired added-regret panels subtract
 the mildest strength within each seed before aggregation. Diagnostic panels
 separate value gaps, successful arrivals, nuisance visits, lost progress/dwell

@@ -21,7 +21,7 @@ from .benchmark_audit import audit_model, audit_strength_family
 
 
 METHODS = ("ceac", "ceac_actor", "ids", "ids_rare", "ids_zero", "oracle", "idac", "ucb_q", "pomd")
-DEFAULT_METHODS = ("ceac", "oracle", "ids", "idac", "ucb_q", "pomd")
+DEFAULT_METHODS = ("ceac", "oracle", "ids", "ids_zero", "idac", "ucb_q", "pomd")
 
 
 def primitive_specification(model):
@@ -212,7 +212,8 @@ def main(argv=None):
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--mass-bound", type=float)
     parser.add_argument("--report-pdf", action="store_true", help="Render verified figures and PDF after all cells finish")
-    parser.add_argument("--methods", nargs="+", choices=METHODS, default=list(DEFAULT_METHODS))
+    parser.add_argument("--methods", nargs="+", choices=METHODS, default=list(DEFAULT_METHODS),
+                        help="Default slate includes both full-support and misspecified-prior Bayesian IDS")
     parser.add_argument("--contexts", nargs="+", type=int, choices=(0, 1, 2), default=[0])
     parser.add_argument("--modes", nargs="+", type=int, choices=(0, 1), default=[0, 1])
     parser.add_argument("--seeds", nargs="+", type=int, default=[0])

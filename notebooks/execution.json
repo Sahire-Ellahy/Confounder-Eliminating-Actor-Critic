@@ -1,11 +1,11 @@
 {
   "code_cells": 11,
-  "evidence_manifest_sha256": "58411be0acc65895cabbe869f4c3ca83790a0dd54f2736cc72349deda4c81b47",
+  "evidence_manifest_sha256": "3bf93bd3ad8b57f2a4bb8c90d3859a1a400fa3e654d0d273d8468150efc0caf4",
   "explanatory_map_hashes": {
     "assets/false_beacon.png": "633758351b40cc969c40e861ff3e6386fc34849db6cbe1b2d9877af3e0d681c7",
     "assets/undertow.png": "cc37eee676e87b09b23f73c5529ae3794e30cf7f7f192e6aea4abd2b89081c84"
   },
-  "notebook_sha256": "44722e43eca5fe6b2ae951ec9514b6eec5671b6deb29a5fde26e682226354acd",
+  "notebook_sha256": "f57cd58b3b382c39d6b861684b5c465f626facab9664e52a1b3b53aa0de3c841",
   "packages": {
     "ipykernel": "7.4.0",
     "matplotlib": "3.11.2",

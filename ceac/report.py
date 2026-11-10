@@ -160,6 +160,9 @@ def audit_prior_support(runs, model_audits):
         safe=next(p for p in audit["policies"] if p["label"]==safe_label)
         gap=float(audit["optimal_returns"][mode]-safe["expected_return"][mode])
         prior=run["manifest"]["configuration"]["ids_prior"]
+        expected_prior={"ids":.5,"ids_rare":.001,"ids_zero":0.}[method]
+        if prior!=expected_prior:
+            raise ValueError("IDS method label disagrees with its recorded prior")
         metrics=run["metrics"]
         posterior=np.array([m["diagnostics"]["posterior"][1] for m in metrics])
         if prior==0:

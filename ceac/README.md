@@ -7,6 +7,19 @@ For an executed visual introduction and a fresh-clone installation, start with
 [the repository guide](../README.md) and [the notebook](../notebooks/Undertow_FalseBeacon.ipynb).
 The default notebook uses the portable evidence export and needs no raw run cache.
 
+## Current physical-strength comparison
+
+The maintained notebook now reads the 336-cell physical-diversion sweep.
+The standard report overlays UCB Q-learning, optimistic POMD, frequentist IDAC,
+full-support Bayesian IDS, CEAC and the oracle at each strength. It also emits
+strength-colored training traces, paired added regret, mechanism diagnostics
+and separately labeled Bayesian support sensitivity. These are shared
+rendering functions, not a separate notebook implementation.
+
+See the [current sweep protocol](../docs/pathology_sweep.md) for the complete
+launch and report/export commands. The historical sections below retain the
+provenance of the earlier alphabet-diversity and deployment studies.
+
 # Maintained finite-model CEAC experiments
 
 This package implements the corrected finite-model single-loop lane for Shifting
@@ -217,7 +230,7 @@ transitions, and checks all reported policy credits against physical episodes.
 Both files are hashed by `report_audit.json`. Raw run artifacts are unchanged.
 
 These curves validate cumulative history accounting and certified finite-model
-deployment. They **do not isolate learned-critic improvement**: in the full
+deployment. They **do not isolate learned-critic improvement**: in the archived alphabet-diversity
 336-run slate, 34 of 48 CEAC runs have zero actor/evidence-critic updates, and no
 learned actor proposal is admitted in any of the 48. Diagnostic design and
 response certification use exact declared-model evaluation. Retaining trajectory
@@ -228,15 +241,16 @@ ablations would be needed for that causal claim.
 
 ## Learning curves by condition
 
-The aggregate figures now show training episode versus cumulative pseudo-regret,
-with separate condition-colored curves and panels per method. The nuisance
-symbol-count sweep is explicitly labeled as a cached diversity control. It is
-not physical undertow strength. Coincident traces are not jittered apart.
+The physical-strength report emits one method overlay per strength and
+STEERING-style method panels with strength-colored curves. Paired added-regret
+curves subtract the mildest setting within each seed. Failure diagnostics show
+value gap, success, nuisance exposure, lost progress/dwell and useful evidence.
 
-Custom controls are excluded from plots, tables and portable evidence; their
-raw files remain unchanged. `idac` and `ucb_q` are distinct new method IDs, never
-aliases for `oir_idac` or `policy_ucb`. `pomd` is a separate softmax optimism
-control. All three have completed integration runs; performance sweeps require
-new evidence. The
-[comparator ledger](../docs/comparator_provenance.md) records their source and
-adapter contracts and proposes a physical-strength experiment separately.
+The historical symbol-count sweep remains an archived diversity control.
+Its curves are not relabeled as physical-strength evidence. Custom controls
+remain excluded from active plots; the source-backed IDAC, UCB-Q and optimistic
+POMD now have their own fresh strength-sweep trajectories.
+
+See the [comparator ledger](../docs/comparator_provenance.md) for source and
+adapter contracts and the [sweep protocol](../docs/pathology_sweep.md) for
+matched experimental conditions and interpretation limits.

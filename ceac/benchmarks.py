@@ -7,19 +7,22 @@ class Benchmark:
     name: str
     nuisance_bins: int
     route_signal: float
+    nuisance_probability: float | None = None
 
     def overrides(self, kind):
         if self.name == "legacy":
             return {}
+        physical = ({} if self.nuisance_probability is None else
+                    {"nuisance_probability": self.nuisance_probability})
         if kind == "deepsea":
-            return dict(terminal_reward=.5, challenge_scale=.5, probe_cost=.02,
+            return dict(**physical, terminal_reward=.5, challenge_scale=.5, probe_cost=.02,
                         challenge_prob_mode0=.5-self.route_signal,
                         challenge_prob_mode1=.5+self.route_signal,
                         tv_bins=self.nuisance_bins, distributed_nuisance=True)
         if kind == "frozenlake":
             # Outer route takes two extra steps. Offset its success mean by
             # .002 so its return gap is exactly +/- route_signal.
-            return dict(safe_reward=.3, inner_reward=1., outer_reward=1.,
+            return dict(**physical, safe_reward=.3, inner_reward=1., outer_reward=1.,
                         inner_success_normal=.5, inner_success_shifted=.5,
                         outer_success_normal=.502-self.route_signal,
                         outer_success_shifted=.502+self.route_signal,
@@ -34,6 +37,11 @@ BENCHMARKS = {
     "weak_signal_m16": Benchmark("weak_signal_m16", 16, .05),
     "weak_signal_m64": Benchmark("weak_signal_m64", 64, .05),
 }
+STRENGTH_PROFILES = {"pathology_rho005": .05, "pathology_rho025": .25,
+                     "pathology_rho050": .50, "pathology_rho075": .75}
+BENCHMARKS.update({name: Benchmark(name, 4, .05, rho)
+                   for name, rho in STRENGTH_PROFILES.items()})
+
 REFINED = tuple(name for name in BENCHMARKS if name != "legacy")
 
 
@@ -45,7 +53,8 @@ def specification(name, kind):
     return {"name": name, "environment": kind,
             "configuration_overrides": benchmark.overrides(kind),
             "shift_protocol": "paired_stationary_modes",
-            "nuisance_mechanism": "mode_independent_observation_alphabet",
+            "nuisance_mechanism": ("mode_independent_observation_alphabet" if benchmark.nuisance_probability is None
+                                   else "mode_independent_physical_diversion"),
             "seed_bank_rule": "constant_size_across_nuisance_alphabets"}
 
 

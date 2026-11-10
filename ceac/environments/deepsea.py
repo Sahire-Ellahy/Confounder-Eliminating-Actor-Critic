@@ -104,8 +104,11 @@ class DeepSeaConfig:
     challenge_prob_mode1: float = 0.75
     tv_bins: int = 8
     distributed_nuisance: bool = False
+    nuisance_probability: float | None = None
 
     def __post_init__(self) -> None:
+        if self.nuisance_probability is not None and not 0 < self.nuisance_probability < 1:
+            raise ValueError("Physical nuisance probability must be strictly between zero and one")
         if self.size < 3:
             raise ValueError("size must be at least three")
         if len(self.gates) != len(self.true_modes):
@@ -330,6 +333,7 @@ class ShiftingDeepSeaEnv(gym.Env):
         mode = self.mode_for_context(self.context)
         was_at_gate = self.at_gate()
         diagnostic_event = "none"
+        nuisance_activated = False
         diagnostic_outcome: int | None = None
         valid = bool(self.valid_action_mask()[action])
         reward = 0.0
@@ -359,7 +363,18 @@ class ShiftingDeepSeaEnv(gym.Env):
                 reward += self.config.challenge_scale * (2 * diagnostic_outcome - 1)
             elif action == TV:
                 diagnostic_event = "tv"
-                diagnostic_outcome = int(self.np_random.integers(self.config.tv_bins))
+                n = self.config.tv_bins
+                rho = self.config.nuisance_probability
+                if rho is None:
+                    diagnostic_outcome = int(self.np_random.integers(n))
+                    nuisance_activated = True
+                else:
+                    # One joint categorical draw: symbol and mode-independent drift.
+                    joint = int(self.np_random.choice(2*n, p=np.r_[np.full(n,(1-rho)/n),np.full(n,rho/n)]))
+                    diagnostic_outcome = joint % n
+                    nuisance_activated = joint >= n
+                    if not nuisance_activated:
+                        self.column = min(self.config.size, self.column + 1)
                 self.tv_symbol = diagnostic_outcome
                 self.row += 1
                 reward -= self.config.tv_cost
@@ -386,6 +401,8 @@ class ShiftingDeepSeaEnv(gym.Env):
                 "valid_action": valid,
                 "diagnostic_event": diagnostic_event,
                 "diagnostic_outcome": diagnostic_outcome,
+                "nuisance_activated": nuisance_activated,
+                "nuisance_delay_step": nuisance_activated,
                 "at_gate_before_action": was_at_gate,
                 "terminal_success": bool(terminated and self.column >= self.config.size),
                 "episode_return": float(self._episode_return),

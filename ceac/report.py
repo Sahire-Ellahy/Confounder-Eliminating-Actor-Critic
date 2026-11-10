@@ -10,6 +10,7 @@ import tarfile
 import hashlib
 import numpy as np
 from .evidence import atomic_json, digest, encoded, verify_run
+from .pathology_report import strength_statistics, report_section
 from .visualization import (LABELS, ENVIRONMENT_LABELS, make_figures, export_trace_statistics,
                             band_description, nuisance_sensitivity_rows, summarize_nuisance, RETIRED_METHODS)
 from .benchmarks import study_cells
@@ -219,10 +220,16 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
     atomic_json(root/"history_audit.json",{"schema":1,"study_identity":study["identity"],
                 "reference_study":reference_record,"rows":history_rows,
                 "scope":"cumulative likelihood and reported credits; no learned-critic or replay-resampling ablation"})
+    physical_rows=strength_statistics(runs)
+    physical=bool(physical_rows)
     sensitivity=nuisance_sensitivity_rows(runs)
     sensitivity_summary=summarize_nuisance(sensitivity,band)
     artifacts=make_figures(root,runs,band=band,sensitivity=sensitivity) if figures else []
     artifacts.extend([root/"history_audit.json",export_trace_statistics(root,runs,band)])
+    if physical:
+        atomic_json(root/"pathology_statistics.json", dict(schema=1, study_identity=study["identity"],
+            independent_unit="training_seed", band=band, paired_differences=True, rows=physical_rows))
+        artifacts.append(root/"pathology_statistics.json")
     if sensitivity:
         atomic_json(root/"nuisance_sensitivity.json",{
             "schema":1,"study_identity":study["identity"],"reference_study":reference_record,
@@ -238,7 +245,7 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
 
     refined=any(b != "legacy" for b in config.get("benchmarks",["legacy"]))
     prior_comparison=any(m in config["methods"] for m in ("ids_rare","ids_zero"))
-    heading="Undertow DeepSea and False Beacon Frozen Lake: "+("prior support" if prior_comparison else "directed exploration")
+    heading="Undertow DeepSea and False Beacon Frozen Lake: "+("physical pathology strength" if physical else "prior support" if prior_comparison else "directed exploration")
     text=["# "+(heading if refined else "CEAC deployment and exploration comparison"),"",
           f"Verified **{len(results)} runs and {sum(r['episodes'] for r in results):,} environment episodes**. The source, configuration, frozen behavior policies, trajectories and artifact hashes are recorded per cell.","",
           "This is a paired, stationary-context finite-model experiment. It tests the deployment correction and exploration behavior; it does not establish an asymptotic coefficient-one theorem or recovery from unannounced temporal changes.","",
@@ -265,7 +272,13 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
     for method in config["methods"]:text.append(f"| {LABELS[method]} | {ACCESS[method]} |")
     if reference_record is not None:
         text += ["", f"This report combines **{own_count} new runs with {reference_record['reused_runs']} reused controls**. Controls were read from `{reference_record['root']}` after verifying equal runtime sources, environment definitions, learner settings, seeds and episode budgets. Their saved trajectories were not rerun or copied.", ""]
-    if refined:
+    if physical:
+        environment_audit=json.loads((root/"environment_audit.json").read_text())
+        if environment_audit["study_identity"] != study["identity"] or not environment_audit.get("strength_checks"):
+            raise ValueError("Physical strength report requires its matched-domain preflight audit")
+        artifacts.append(root/"environment_audit.json")
+        text += report_section(physical_rows)
+    if refined and not physical:
         environment_audit=json.loads((root/"environment_audit.json").read_text())
         if environment_audit["study_identity"] != study["identity"]:
             raise ValueError("Environment audit identity mismatch")
@@ -323,10 +336,10 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
                     "reference_study":reference_record,"rows":prior_rows})
         artifacts.append(root/"prior_support_audit.json")
         text += ["", "## Prior support: delayed discovery versus permanent exclusion", "",
-                 "The same dynamics are evaluated under IDS priors P(mode 1)=0.5, 0.001 and 0. The zero arm is an explicit misspecified Bayesian support treatment. CEAC and confidence controls retain both candidate modes; this is an information-assumption difference, not a claim that CEAC can identify a model outside its own candidate family.", "",
+                 "The recorded IDS priors are listed below. The zero arm is an explicit misspecified Bayesian support treatment. CEAC and full-support IDS retain both candidate modes; this is an information-assumption difference, not a claim that CEAC can identify a model outside its own candidate family.", "",
                  "For positive observation likelihoods, Bayesian updating preserves zero prior mass:", "",
                  "$$", r"p_t(1)=\frac{p_0(1)L_t(1)}{p_0(0)L_t(0)+p_0(1)L_t(1)}=0\quad\text{if }p_0(1)=0.", "$$", "",
-                 "The selected old-route trajectory law is identical across modes. With mode 1 realized, its positive value gap is Delta=e. IDS assigns this old route zero subjective regret and zero information; under the declared IDS zero/zero convention it never requests a diagnostic. The exact prediction is R_T=T Delta: 128 at T=512 for strong_signal_m4, and 25.6 for weak_signal_m64. The audit checks the prediction at every episode, and also checks the mode-0 negative control. A small positive prior is different: it can recover, but diagnostic waiting times may exceed this finite budget.", "",
+                 "The selected old-route trajectory law is identical across modes. With mode 1 realized, its positive value gap is Delta=e. IDS assigns this old route zero subjective regret and zero information; under the declared IDS zero/zero convention it never requests a diagnostic. The exact prediction is R_T=T Delta, using each recorded episode budget and kernel value gap. The audit checks the prediction at every episode, and also checks the mode-0 negative control. A small positive prior is different: it can recover, but diagnostic waiting times may exceed this finite budget.", "",
                  "| Setting | Environment | Mode | IDS prior | Seeds | Final posterior for mode 1 | Cumulative regret | Diagnostic visits |",
                  "|---|---|---:|---:|---:|---:|---:|---:|"]
         prior_groups=defaultdict(list)
@@ -350,14 +363,14 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
     if primitive_runs:
         text += ["", "## Primitive learner update diagnostics", "",
                  "These runs validate the new primitive-action implementations. A short run is not a convergence claim or evidence of systematic failure under increasing pathology strength. In particular, the published POMD bonuses can leave every optimistic cost clipped to zero, so its softmax policy stays uniform.", "",
-                 "| Environment | Mode | Method | Seed | Episodes | Actor / Q updates | Episodes with all POMD costs zero |",
-                 "|---|---:|---|---:|---:|---:|---:|"]
+                 "| Setting | Environment | Mode | Method | Seed | Episodes | Actor / Q updates | Episodes with all POMD costs zero |",
+                 "|---|---|---:|---|---:|---:|---:|---:|"]
         for run in primitive_runs:
             r=run["result"];d=r["diagnostics"]
             updates=d.get("actor_updates",d.get("updates",0))
             zero=(sum(m["diagnostics"]["all_optimistic_q_zero"] for m in run["metrics"])
                   if r["method"] == "pomd" else "n/a")
-            text.append(f"| {r['environment']} | {r['true_mode']} | {LABELS[r['method']]} | {r['seed']} | {r['episodes']} | {updates} | {zero} |")
+            text.append(f"| {r.get('benchmark','legacy')} | {r['environment']} | {r['true_mode']} | {LABELS[r['method']]} | {r['seed']} | {r['episodes']} | {updates} | {zero} |")
         text += ["", "IDAC updates both its cost critic and shadow critic at each reported actor update. UCB-Q counts updates on the analytically padded horizon; physical simulator steps remain separately charged. All three controls use the public finite domain and reward envelope, while CEAC/IDS additionally use declared candidate-model laws. That information-access difference must accompany any ranking.", ""]
     text += ["", "## Comparator provenance", "",
              f"Excluded {len(retired_runs)} historical custom-control runs from these comparisons. Raw run hashes and source archives remain unchanged. Active primitive-action controls are IDAC (the upstream tabular two-critic/softmax update), UCB Q-learning (Jin et al., 2018, Algorithm 1), and optimistic POMD with a softmax policy (Shani et al., 2020, Algorithm 2). Their exact source, update equations, reward normalization and reset/padding adapter are documented in [the comparator ledger](../../docs/comparator_provenance.md). No cached policy-mixture OIR or policy-bank UCB curve is relabeled as a new algorithm.", "",
@@ -420,7 +433,7 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
                 "descriptive_band":band,"independent_unit":"training_seed","expected_return_smoothing":16,
                 "run_manifest_hashes":manifests,"excluded_retired_runs":len(retired_runs),
                 "excluded_method_ids":sorted(RETIRED_METHODS),"report_sha256":digest(root/"report.md"),
-                "renderer_sources":{p.name:digest(p) for p in (renderer/"report.py",renderer/"visualization.py")},
+                "renderer_sources":{p.name:digest(p) for p in (renderer/"report.py",renderer/"visualization.py",renderer/"pathology_report.py")},
                 "artifacts":{str(p.relative_to(root)):digest(p) for p in artifacts}})
     return root/"report.md"
 

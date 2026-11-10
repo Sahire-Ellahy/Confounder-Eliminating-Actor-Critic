@@ -24,6 +24,12 @@ class OutcomeRNG:
         self.calls += 1
         return 0.0 if self.outcome == 1 else np.nextafter(1., 0.)
 
+    def choice(self, upper, p):
+        self.calls += 1
+        if len(p) != upper or not 0 <= self.outcome < upper:
+            raise ValueError("Invalid enumerated categorical outcome")
+        return self.outcome
+
     def integers(self, upper):
         self.calls += 1
         if not 0 <= self.outcome < upper:
@@ -84,7 +90,9 @@ class FiniteModel:
         event = info["diagnostic_event"]
         if event in ("tv", "reeds"):
             n = self.cfg.tv_bins if event == "tv" else self.cfg.reed_bins
-            outcomes = [(j, 1. / n) for j in range(n)]
+            rho = self.cfg.nuisance_probability
+            outcomes = ([(j, 1. / n) for j in range(n)] if rho is None else
+                        [(j, ((1-rho) if j < n else rho)/n) for j in range(2*n)])
         else:
             probs = ({"probe": self.cfg.probe_probability, "challenge": self.cfg.challenge_probability}
                      if self.kind == "deepsea" else
@@ -282,7 +290,7 @@ class FiniteModel:
             for s, obs in enumerate(self.state_ids):
                 state = self._models[0].decode(int(obs))
                 a = (deepsea.policy_action(name, state, self.cfg) if self.kind == "deepsea"
-                     else frozenlake.policy_action(name, state))
+                     else frozenlake.policy_action(name, state, self.cfg))
                 if not self.mask[s, a]:
                     a = int(np.flatnonzero(self.mask[s])[0])
                 probabilities[s, a] = 1.

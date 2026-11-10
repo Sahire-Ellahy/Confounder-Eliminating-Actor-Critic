@@ -31,10 +31,11 @@ The notebook dependencies include `ipykernel`; installing inside a different
 Python environment does not repair the selected kernel. Windows activation is
 `.venv\Scripts\Activate.ps1` in PowerShell.
 
-The notebook runs offline after installation and launches no training. A compact,
-hash-verified evidence export is included; raw local training caches are not
-required. It verifies 336 base runs and 48 additional prior-support runs, retaining 192
-CEAC/oracle/IDS runs after excluding the retired custom controls. There are three seeds per plotted condition.
+The notebook runs offline after installation and launches no training. Its
+portable evidence contains **336 physical-strength runs**: two environments,
+two stationary modes, four diversion probabilities, three seeds and seven
+methods, with 2,048 episodes per cell. It includes the source-backed optimism
+and IDAC controls alongside Bayesian IDS, CEAC and the oracle.
 
 For headless verification with the active interpreter:
 
@@ -44,28 +45,31 @@ python -m unittest discover -s tests/ceac -v
 python -m unittest discover -s tests/walkthrough -v
 ```
 
-## What these benchmarks establish
+## What the comparisons measure
 
-- **Undertow:** nuisance moves consume the navigation horizon without progress.
-  Their symbols are diverse but have zero likelihood information about the task.
-- **False Beacon:** reeds and shallow surveys can attract coverage while the
-  inner route hides a profitable outer alternative. A deep survey reveals the mode.
-- The retained CEAC and full-support IDS curves are stable across nuisance
-  alphabets. This is not yet a physical undertow/false-beacon strength sweep.
-- Custom policy-bank UCB, model optimism, uniform-bank sampling and the
-  finite-policy OIR surrogate are retired. Their curves do not establish
-  failures of published coverage/optimism algorithms.
-- Zero-prior IDS is an explicitly misspecified support treatment. It does not
-  refute full-support IDS or show that CEAC discovers undeclared models.
+- **Undertow:** increasing nuisance diversion probability makes a noisy move
+  more likely to lose rightward progress.
+- **False Beacon:** increasing activation probability makes the reed detour
+  more likely to require a forced physical dwell step.
+- Preflight fixes the state/action domain, useful-route values, optimal values,
+  reward range and diagnostic signal across strengths.
+- The main overlays compare greedy UCB Q-learning, optimistic softmax POMD,
+  frequentist IDAC, full-support Bayesian IDS, CEAC and the offline oracle.
+- Separate plots isolate paired additional regret and show value gaps,
+  successful arrivals, nuisance exposure, wasted steps and useful information.
+- Zero-support Bayesian IDS is a separate misspecification control. It does
+  not stand in for correctly specified Bayesian IDS.
 
-The plotted CEAC is a **single episode-loop, exact-model specialization**. The
-realized mode is unknown to CEAC; candidate laws, evaluation and policy separation
-are available. Certified deployment requires a reward-optimal response for every
-currently plausible model. The offline Graves–Lai oracle additionally knows the
-realized mode from the outset. These runs do not isolate learned-critic causality:
-34/48 CEAC runs made zero actor/critic updates and no learned actor proposal was
-admitted. See the [implementation ledger](audits/ceac_v90_corrections_20261110.md)
-and [benchmark ledger](audits/ceac_undertow_design_20261110.md).
+The plotted CEAC is a single episode-loop, exact-model specialization. CEAC
+and Bayesian IDS know the declared candidate laws; the primitive controls
+learn from observed transitions. The offline oracle also knows the realized
+mode. Exact-model deployment and learned actor convergence remain distinct.
+The report diagnoses finite-budget plateaus; it does not assume that every
+alternative deteriorates monotonically with nuisance strength.
+
+See the [physical-strength protocol](docs/pathology_sweep.md),
+[implementation ledger](audits/ceac_v90_corrections_20261110.md) and
+[historical benchmark ledger](audits/ceac_undertow_design_20261110.md).
 
 ## Source-backed comparators
 
@@ -74,9 +78,9 @@ and [benchmark ledger](audits/ceac_undertow_design_20261110.md).
 (2018), Algorithm 1, at primitive state/action level. `pomd` implements optimistic softmax mirror descent from Shani et al. (2020),
 Algorithm 2. None uses the old policy bank. See the [source and adaptation ledger](docs/comparator_provenance.md) for
 exact equations, parity checks, reward normalization and reset semantics.
-The 48-cell [integration audit](audits/comparator_validation.json) verifies all
-three replacements. Historical notebook plots remain distinct from those short
-smoke results; they are not relabeled or pooled across source versions.
+The earlier 48-cell [integration audit](audits/comparator_validation.json)
+checks all three replacements. The notebook now contains fresh matched
+strength-sweep results, not renamed or pooled historical surrogate curves.
 
 ## Run new experiments
 
@@ -88,10 +92,20 @@ python -m ceac.report --input runs/my_smoke
 ```
 
 This short run checks integration, not convergence. Always choose a new output
-folder. See [ceac/README.md](ceac/README.md) for the complete multi-seed slate,
-cache identity, scientific assumptions and report controls. Core dependencies are
-NumPy and SciPy; `pip install -e '.[report]'` adds plotting without Jupyter.
-PDF report export additionally requires system `pandoc` and `pdflatex`.
+folder. The [sweep guide](docs/pathology_sweep.md) gives the full launch command.
+The standard report automatically emits all method overlays, strength curves,
+paired additional-cost plots and failure diagnostics. The notebook imports
+the same renderer and displays the selected audited study.
+
+To regenerate its evidence and executed outputs from a completed study:
+
+    python -m ceac.report --input runs/pathology_strength_20261110 --pdf
+    python scripts/export_walkthrough.py --study runs/pathology_strength_20261110
+    python scripts/verify_notebook.py --write
+
+Core dependencies are NumPy and SciPy; the report extra adds Matplotlib.
+PDF export additionally requires system pandoc and pdflatex. Historical raw
+studies remain local and keep their original source identities.
 
 ## Layout
 

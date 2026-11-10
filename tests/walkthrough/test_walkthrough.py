@@ -40,20 +40,21 @@ class WalkthroughTests(unittest.TestCase):
 
     def test_published_export_has_unique_complete_seed_curves(self):
         bundle, manifest = verified_bundle(ROOT / "notebooks")
-        self.assertEqual(len(bundle["endpoints"]), 192)
-        self.assertEqual(len(bundle["curves"]), 132)
+        self.assertEqual(len(bundle["endpoints"]), 336)
+        self.assertEqual(len(bundle["curves"]), 336)
         self.assertEqual(set(manifest["curves_benchmarks"]),
-                         {"weak_signal_m4", "weak_signal_m16", "weak_signal_m64"})
-        self.assertEqual(sum(s["run_count"] for s in manifest["source_studies"]), 384)
-        self.assertEqual(manifest["excluded_runs"], 192)
+                         {"pathology_rho005", "pathology_rho025", "pathology_rho050", "pathology_rho075"})
+        self.assertEqual(sum(s["run_count"] for s in manifest["source_studies"]), 336)
+        self.assertEqual(manifest["excluded_runs"], 0)
+        self.assertEqual(len(bundle["strength_checks"]), 2)
         seen = set()
         for run in bundle["curves"]:
             r = run["result"]
             key = tuple(r[k] for k in ("benchmark", "environment", "context", "true_mode", "method", "seed"))
             self.assertNotIn(key, seen); seen.add(key)
-            self.assertEqual([m["episode"] for m in run["metrics"]], list(range(512)))
+            self.assertEqual([m["episode"] for m in run["metrics"]], list(range(2048)))
         self.assertEqual({r["result"]["method"] for r in bundle["curves"]},
-                         {"ceac", "oracle", "ids", "ids_rare", "ids_zero"})
+                         {"ceac", "oracle", "ids", "idac", "ucb_q", "pomd", "ids_zero"})
 
     def test_corrupted_export_is_rejected_before_display(self):
         with tempfile.TemporaryDirectory() as temp:

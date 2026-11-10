@@ -1,23 +1,23 @@
 # Portable evidence
 
-`curves.json.gz` contains 132 verified per-seed curves for weak-signal M=4,16,64,
-endpoints for 192 retained runs from 384 verified unique source runs, environment preflight facts and saved-history
-audit summaries. Per-curve configurations allow the same matched-condition audit
-used by the raw-cache report. These are nuisance-diversity controls, not a
-physical undertow/false-beacon strength sweep. It is an explicit derived export, not a replacement for raw
-policy snapshots and trajectories.
+The maintained export contains 336 physical-strength seed curves and endpoints:
+two environments, both stationary modes, four diversion probabilities, three
+seeds, seven methods, and 2,048 episodes per cell. The main controls are CEAC,
+offline Graves-Lai, full-support Bayesian IDS, IDAC, UCB Q-learning and optimistic
+POMD; zero-support IDS is a separately labeled sensitivity arm.
 
-`manifest.json` records source study identities, individual run-manifest hashes,
-training-source hashes and SHA-256 hashes of the exported bundle and plot assets.
-The loader verifies these before the notebook displays results. No authentication,
-external download, local absolute path, or raw training cache is needed.
+The compressed curve bundle includes physical exposure counters, terminal
+success, evaluator regret and information traces, per-seed strength statistics,
+history audits and matched-domain preflight facts. The manifest records run,
+study, source archive and figure hashes. No authentication, download, local
+absolute path, raw cache, or legacy package is needed to execute the notebook.
 
-Maintainers can regenerate it with `python scripts/export_walkthrough.py` when
-the original completed studies are present under `runs/`. A new experiment must
-use a new run folder and must not overwrite the bundled historical evidence.
+Regenerate this maintained export with:
 
-The 192 retired custom-control runs are excluded from display. Their source run
-hashes remain in the manifest. `source_bundle.tar.gz` pins the exact historical
-training source. The loader checks that archive and the current diagnostic
-kernels separately; replacing the runner does not change historical evidence.
-No historical OIR-surrogate curve is relabeled as IDAC.
+    python scripts/export_walkthrough.py --study runs/pathology_strength_20261110
+
+The exporter first verifies the complete study and every recorded report
+artifact. The notebook verifies the source archive and live diagnostic kernels
+separately before displaying results. The original historical studies remain
+under their local run folders and Git history; none of their surrogate curves
+has been renamed as IDAC or a published optimism algorithm.

@@ -2,7 +2,13 @@
 
 Raw immutable studies stay here and are excluded from Git.
 
-Current comparator integration check: `primitive_comparator_validation_20261110`
+Current physical-strength sweep: pathology_strength_20261110.
+It contains 336 cells at 2,048 episodes per cell, with method overlays,
+strength traces, paired added regret and mechanism diagnostics emitted by the
+standard report renderer. The notebook export points to this study.
+See the [protocol](../docs/pathology_sweep.md) for the exact controls.
+
+Earlier comparator integration check: `primitive_comparator_validation_20261110`
 (48 runs, 128 episodes, two environments, two modes, two seeds; CEAC, offline
 oracle, IDS, IDAC, UCB Q-learning and optimistic POMD). Its report includes
 update counters and POMD bonus-saturation diagnostics. This is not a convergence

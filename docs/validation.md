@@ -1,39 +1,39 @@
 # Publication validation
 
-The maintained branch uses the repository-local Python 3.11 environment,
-installed with `python -m pip install -e '.[notebook]'`. The current comparator
-revision passed:
+The maintained branch uses the repository-local Python 3.11 environment.
+The current physical-strength/reporting revision passed:
 
-- Core algorithm and reporting suite: 65 tests.
+- Core algorithm and reporting suite: 73 tests.
 - Walkthrough geometry and evidence suite: five tests.
-- Notebook: all ten code cells executed, with eight rendered figures and no errors.
-- Default notebook execution launched no training.
-- Comparator integration: 48 completed cells covering two environments, two
-  stationary modes, two seeds and six methods, with 128 episodes per cell.
-- Portable historical export: 132 complete seed traces and 192 retained endpoints
-  from 384 verified source runs. The 192 retired custom-control runs are excluded
-  from display and retain their original provenance.
+- Notebook: eleven code cells and fourteen rendered figures, with no training.
+- Physical-strength sweep: 336 completed matched cells, 2,048 episodes each,
+  totaling 688,128 environment episodes. All seven recorded methods are in
+  the portable notebook export.
+- Scientific controls: fixed useful-route values/KL, optimal values, reward
+  range and state/action domain; simulator/enumerator parity; closed-form
+  DeepSea nuisance value; and actual beacon dwell/resumption.
+- Reporting checks: identical seed identities and budgets, no duplicate or
+  missing strength cells, fixed non-strength configuration/runtime, and paired
+  subtraction before computing variation.
 
-The primitive IDAC update is compared numerically against the unmodified pinned
-upstream class. UCB-Q and optimistic POMD have published-equation checks;
-additional tests verify information isolation, update ordering and episodic
-padding. See [comparator provenance](comparator_provenance.md) for the source
-references and declared adapters, and
-[the integration audit](../audits/comparator_validation.json) for run hashes and
-update counters.
+The earlier 48-cell comparator integration audit remains a distinct historical
+validation. IDAC is checked numerically against the unmodified pinned upstream
+class; UCB-Q and optimistic POMD have published-equation checks. Additional
+tests verify information isolation, update ordering and episodic padding.
+See [comparator provenance](comparator_provenance.md) and
+[the physical-strength protocol](pathology_sweep.md).
 
-`notebooks/execution.json` records the executed notebook digest, figure digests
-and exact package versions. `notebooks/evidence/manifest.json` records export
-hashes and historical source provenance. Its archived runtime is verified
-separately from the current diagnostic kernels: the new comparator runtime is
-not represented as the source of old results. New studies archive their source
-at launch. The GitHub workflow repeats tests and headless notebook execution
-from the published tree, without requiring raw local caches or the legacy package.
+The notebook execution record stores the executed notebook digest, figure
+digests and package versions. Its evidence manifest stores source identities
+and export hashes. The runtime archive and current diagnostic kernels are
+verified separately. New studies archive their training source at launch.
+Reports and the notebook share the same rendering functions; the GitHub
+workflow repeats tests and notebook execution without local raw caches.
 
-The integration runs validate execution, not convergence. In these short runs,
-POMD's published bonuses leave all optimistic costs zero and the policy uniform.
-The historical figures vary nuisance alphabet size, not physical strength.
-The requested physical-strength sweep is not yet implemented or launched.
-Neither study is a learned-critic causal ablation or a hidden-change-point
-experiment; seed bands are descriptive standard deviations, not confidence
-intervals. These limits remain explicit in the notebook and mathematical ledgers.
+The new physical-strength sweep is distinct from the archived nuisance-alphabet
+experiments. No historical surrogate curve is relabeled. The report explicitly
+separates POMD bonus saturation, finite-budget value gaps, nuisance exposure,
+and deliberately excluded Bayesian prior support. Full-support Bayesian IDS
+remains a separate control. These are not learned-critic causal ablations or
+hidden-change-point experiments; seed bands are descriptive standard deviations,
+not confidence intervals or asymptotic impossibility claims.

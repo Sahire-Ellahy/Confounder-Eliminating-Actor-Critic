@@ -201,37 +201,40 @@ model-informed CEAC/IDS have different information access; that distinction
 must accompany any performance claim. A short smoke run validates execution,
 not convergence or systematic failure.
 
-## Corrected figure and the next pathology experiment
+## Standard overlays and the physical-strength sweep
 
-The requested [STEERING](https://arxiv.org/pdf/2301.12038)-style layout has
-training time on x, cumulative pseudo-regret on y, and one curve per pathology
-level inside each method panel. Environments and realized modes stay separate.
-Bands summarize seeds, not episodes. An executed Graves–Lai allocation is not
-the regret reference: regret is to the true-mode optimal value.
+The standard report and notebook now share one physical-strength renderer.
+Method overlays compare optimism, frequentist IDAC and Bayesian IDS with CEAC
+and the oracle. STEERING-style panels show training episode versus cumulative
+pseudo-regret with strength-colored curves; paired added-regret panels subtract
+the mildest strength within each seed before aggregation. Diagnostic panels
+separate value gaps, successful arrivals, nuisance visits, lost progress/dwell
+and useful task information.
 
-The existing M=4,16,64 sweep changes **irrelevant symbol diversity**, not
-physical strength. It is retained only as an accurately labeled cached control.
-The old surrogate's deterioration is not attributed to the new IDAC algorithm.
+The new physical-strength sweep fixes geometry, state/action domain, horizon,
+four nuisance symbols, useful-route values and KL, optimal values and reward
+range, and varies rho = 0.05, 0.25, 0.50, 0.75:
 
-A physical-strength experiment should keep map size, horizon, nuisance alphabet,
-useful probe quality, rewards and hidden-mode prior fixed, and vary an explicit
-nuisance-trigger probability rho. A possible local construction is
+$$P_{m,\rho}=(1-\rho)P_{\rm pass}+\rho P_{\rm divert}.$$
 
-$$P_{m,\rho}(\cdot\mid s,a_N)=
-(1-\rho)P_{\rm pass}(\cdot\mid s)+\rho P_{\rm diversion}(\cdot\mid s),$$
+Both branches are mode independent. DeepSea diversion loses rightward progress;
+False Beacon activation requires one charged physical dwell step. Interior
+probabilities keep the state/action domain fixed. The simulator and exact
+enumerator use the same joint categorical draw, and preflight checks the
+matched task invariants. Details and the reproducible launch command are in
+[the sweep protocol](pathology_sweep.md).
 
-where both branches are independent of m. In Undertow, diversion loses a fixed
-amount of progress; in False Beacon, it consumes a fixed detour/dwell budget.
-A nuisance observation remains mode independent, so its task KL remains zero.
-The useful probe and viable route bypass this transition. Preflight must verify
-that their values and diagnostic laws stay fixed as rho varies. The proposed
-levels are rho = 0, 0.25, 0.5, 0.75; they are not implemented or measured by the
-cached M sweep.
+This changes only the declared environment settings and evaluator annotations;
+the three source-backed comparator updates remain as specified above.
+IDAC is a frequentist occupancy-information actor-critic, not the same objective
+as Bayesian posterior IDS. The old M=4,16,64 sweep remains an archived
+symbol-diversity control and is not relabeled as a physical-strength sweep.
 
-Stronger harm need not make every sound optimistic algorithm worse: it may
-learn to avoid the nuisance. That is an experimental outcome to measure, not a
-ranking to enforce through comparator choices or plot labels. Source-faithful
-controls and their smoke checks come before this new sweep.
+Stronger harm need not defeat every sound exploration method. The reported
+failure diagnostics describe observations at the finite recorded budget, not
+causal ablations or imposed rankings. A baseline plateau is distinguished from
+additional strength-dependent regret. The zero-prior IDS arm remains a separate
+information-assumption treatment.
 
 ## Completed integration validation
 

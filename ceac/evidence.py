@@ -38,7 +38,7 @@ def atomic_json(path, value):
 
 def source_identity():
     root = Path(__file__).resolve().parent
-    renderers = {"report.py", "visualization.py"}
+    renderers = {"report.py", "visualization.py", "pathology_report.py"}
     return {str(p.relative_to(root)): digest(p) for p in sorted(root.rglob("*.py"))
             if str(p.relative_to(root)) not in renderers}
 

@@ -1,5 +1,6 @@
 """Pre-training scientific checks on public benchmark kernels and objectives."""
 from __future__ import annotations
+import hashlib
 import numpy as np
 from .comparators import public_comparison_bank, trajectory_return_range
 from .design import PolicyBank, bounded_design
@@ -90,6 +91,8 @@ def audit_model(model, mass_bound=None):
             raise ValueError("Targeted diagnosis is not cheaper than optimistic route trials")
     return {"benchmark": model.benchmark, "environment": model.kind, "context": model.context,
             "specification": model.specification, "reachable_states": model.n,
+            "state_domain_sha256": hashlib.sha256(model.state_ids.tobytes()).hexdigest(),
+            "action_mask_sha256": hashlib.sha256(model.mask.tobytes()).hexdigest(),
             "design_mass_bound": mass_bound, "seed_policies": len(seed), "public_bank_size": len(bank.policies),
             "return_range": [low,high], "optimal_returns": model.optimal_returns.tolist(),
             "safe_route_kl_zero": True, "nuisance_route_kl_zero": True,
@@ -99,3 +102,39 @@ def audit_model(model, mass_bound=None):
             "oracle_design_costs": [d.cost for d in designs],
             "risky_to_optimal_information_cost_ratio_mode0": float(risky_cost_per_nat/designs[0].cost),
             "design_certificates": [d.record() for d in designs], "policies": rows}
+
+
+def audit_strength_family(audits):
+    """Reject a strength sweep that also changes useful signals or the domain."""
+    from .benchmarks import STRENGTH_PROFILES
+    from collections import defaultdict
+    groups = defaultdict(list)
+    for row in audits:
+        if row["benchmark"] in STRENGTH_PROFILES:
+            groups[row["environment"], row["context"]].append(row)
+    checked = []
+    for (kind, context), rows in sorted(groups.items()):
+        rows = sorted(rows, key=lambda r: STRENGTH_PROFILES[r["benchmark"]])
+        reference = rows[0]
+        useful = (("exploit", "challenge", "probe", "probe-adaptive") if kind == "deepsea" else
+                  ("shore", "inner-bridge", "outer-causeway", "deep-survey"))
+        def fingerprint(row):
+            override = dict(row["specification"]["configuration_overrides"])
+            override.pop("nuisance_probability")
+            return (override, row["reachable_states"], row["seed_policies"],
+                    row["state_domain_sha256"], row["action_mask_sha256"])
+        ref_policies = {p["label"]: p for p in reference["policies"]}
+        for row in rows:
+            if fingerprint(row) != fingerprint(reference):
+                raise ValueError("Physical strength comparison changes another setting or state/action domain")
+            np.testing.assert_allclose(row["optimal_returns"], reference["optimal_returns"], atol=1e-10, rtol=0)
+            np.testing.assert_allclose(row["return_range"], reference["return_range"], atol=1e-10, rtol=0)
+            policies = {p["label"]: p for p in row["policies"]}
+            for label in useful:
+                for metric in ("expected_return", "task_kl"):
+                    np.testing.assert_allclose(policies[label][metric], ref_policies[label][metric], atol=1e-10, rtol=0)
+        checked.append(dict(environment=kind, context=context,
+                            strengths=[STRENGTH_PROFILES[r["benchmark"]] for r in rows],
+                            fixed_domain=True, fixed_useful_route_values_and_KL=True,
+                            fixed_optimum=True, fixed_return_range=True))
+    return checked

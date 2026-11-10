@@ -102,8 +102,11 @@ class FrozenShoreConfig:
     reeds_fee: float = 0.005
     reed_bins: int = 12
     invalid_cost: float = 0.020
+    nuisance_probability: float | None = None
 
     def __post_init__(self) -> None:
+        if self.nuisance_probability is not None and not 0 < self.nuisance_probability < 1:
+            raise ValueError("Physical nuisance probability must be strictly between zero and one")
         if len(self.true_modes) != 3:
             raise ValueError("the default benchmark expects three visible shore contexts")
         if any(mode not in (0, 1) for mode in self.true_modes):
@@ -212,7 +215,7 @@ class ShiftingShoreFrozenLakeEnv(gym.Env):
             self.config.cols,
             3,
             3,
-            self.config.reed_bins + 1,
+            self.config.reed_bins * (3 if self.config.nuisance_probability is not None else 1) + 1,
             self.config.max_steps + 1,
         )
         self._n_states = int(np.prod(self._dims, dtype=np.int64))
@@ -282,6 +285,10 @@ class ShiftingShoreFrozenLakeEnv(gym.Env):
     def valid_action_mask(self, observation: int | None = None) -> np.ndarray:
         state = self._state() if observation is None else self.decode(observation)
         mask = np.zeros(4, dtype=np.int8)
+        if (self.config.nuisance_probability is not None
+                and self.config.reed_bins <= state.reed_symbol < 2*self.config.reed_bins):
+            mask[RIGHT] = 1  # The next physical step is the forced beacon dwell.
+            return mask
         for action, (dr, dc) in {
             LEFT: (0, -1),
             DOWN: (1, 0),
@@ -348,7 +355,13 @@ class ShiftingShoreFrozenLakeEnv(gym.Env):
         event = "none"
         outcome: int | None = None
         invalid = not bool(action_mask_before[action])
-        if invalid:
+        dwell = (self.config.nuisance_probability is not None
+                 and self.config.reed_bins <= self.reed_symbol < 2*self.config.reed_bins)
+        activated = False
+        if dwell:
+            self.reed_symbol += self.config.reed_bins  # Retain that the dwell was completed.
+            event = "beacon_dwell"
+        elif invalid:
             reward -= self.config.invalid_cost
         else:
             if action == LEFT:
@@ -378,8 +391,12 @@ class ShiftingShoreFrozenLakeEnv(gym.Env):
             reward -= self.config.deep_fee
         elif position == REEDS and self.reed_symbol < 0:
             event = "reeds"
-            self.reed_symbol = int(self.np_random.integers(self.config.reed_bins))
-            outcome = self.reed_symbol
+            n = self.config.reed_bins
+            rho = self.config.nuisance_probability
+            self.reed_symbol = (int(self.np_random.integers(n)) if rho is None else
+                int(self.np_random.choice(2*n, p=np.r_[np.full(n,(1-rho)/n),np.full(n,rho/n)])))
+            activated = rho is not None and self.reed_symbol >= n
+            outcome = self.reed_symbol % n
             reward -= self.config.reeds_fee
 
         terminal_success = False
@@ -412,6 +429,8 @@ class ShiftingShoreFrozenLakeEnv(gym.Env):
                 "invalid_action": invalid,
                 "diagnostic_event": event,
                 "diagnostic_outcome": outcome,
+                "nuisance_activated": activated,
+                "nuisance_delay_step": dwell,
                 "terminal_success": terminal_success,
                 "shore_label": "shifted" if self.mode == 1 else "normal",
                 "optimal_policy": optimal_policy_name(self.config, self.mode),
@@ -450,13 +469,16 @@ class ShiftingShoreFrozenLakeEnv(gym.Env):
         return "\n".join(rows)
 
 
-def policy_action(policy_name: str, state: DecodedState) -> int:
+def policy_action(policy_name: str, state: DecodedState, cfg: FrozenShoreConfig | None = None) -> int:
     actions = POLICY_ACTIONS[policy_name]
-    if state.elapsed >= len(actions):
+    completed_dwell = (cfg is not None and cfg.nuisance_probability is not None
+                       and state.reed_symbol >= 2*cfg.reed_bins)
+    route_index = state.elapsed - int(completed_dwell)
+    if route_index >= len(actions):
         # The only way to exceed a fixed route is an invalid external action;
         # continue toward the safe dock rather than introducing hidden logic.
         return RIGHT
-    return int(actions[state.elapsed])
+    return int(actions[route_index])
 
 
 def bernoulli_kl(p: float, q: float) -> float:

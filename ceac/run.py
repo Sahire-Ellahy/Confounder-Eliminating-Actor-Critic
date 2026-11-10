@@ -17,7 +17,7 @@ from .evidence import RunWriter, atomic_json, jsonable, manifest, verify_run
 from .ids import BayesianIDS
 from .model import FiniteModel, environment
 from .benchmarks import BENCHMARKS, specification, study_cells
-from .benchmark_audit import audit_model
+from .benchmark_audit import audit_model, audit_strength_family
 
 
 METHODS = ("ceac", "ceac_actor", "ids", "ids_rare", "ids_zero", "oracle", "idac", "ucb_q", "pomd")
@@ -46,7 +46,7 @@ def collect_episode(env, model, policy, episode_index, behavior, action_rng, sim
     observation, _ = env.reset(seed=simulation_seed,
                                options={"episode_index": model.context*env.config.block_length})
     transitions = []
-    events = {"diagnostic": 0, "nuisance": 0, "risky": 0}
+    events = {"diagnostic": 0, "nuisance": 0, "risky": 0, "diversions": 0, "lost_steps": 0}
     locations = set()
     for _ in range(model.cfg.max_steps):
         decoded = env.decode(observation)
@@ -58,6 +58,8 @@ def collect_episode(env, model, policy, episode_index, behavior, action_rng, sim
         events["diagnostic"] += int(event in {"probe", "deep"})
         events["nuisance"] += int(event in {"tv", "reeds", "shallow"})
         events["risky"] += int(event in {"challenge", "outer"})
+        events["diversions"] += int(info.get("nuisance_activated", False))
+        events["lost_steps"] += int(info.get("nuisance_delay_step", False))
         done = bool(term or trunc)
         ll = model.log_likelihood(state, action, next_obs, reward, done)
         transitions.append(Transition(state, action, float(reward), -1 if done else model.index[int(next_obs)], done, ll))
@@ -114,7 +116,7 @@ def execute(model, folder, method, seed, mode, episodes, config, resume=False, p
     started = time.monotonic()
     cumulative_return = cumulative_regret = cumulative_information = 0.
     cumulative_steps = 0
-    cumulative_events = {"diagnostic": 0, "nuisance": 0, "risky": 0}
+    cumulative_events = {"diagnostic": 0, "nuisance": 0, "risky": 0, "diversions": 0, "lost_steps": 0}
     visited_states, visited_locations = set(), set()
     rows = []
     try:
@@ -149,6 +151,8 @@ def execute(model, folder, method, seed, mode, episodes, config, resume=False, p
                    "cumulative_diagnostic_visits": cumulative_events["diagnostic"],
                    "cumulative_nuisance_visits": cumulative_events["nuisance"],
                    "cumulative_risky_visits": cumulative_events["risky"],
+                   "cumulative_diversions": cumulative_events["diversions"],
+                   "cumulative_lost_steps": cumulative_events["lost_steps"],
                    "unique_observed_states": len(visited_states),
                    "unique_physical_locations": len(visited_locations),
                    "diagnostics": learner.diagnostics()}
@@ -273,7 +277,8 @@ def main(argv=None):
                         audits.append(audit_model(model, config.mass_bound))
                         print(f"Preflight verified: {benchmark}/{kind}/context{context}", flush=True)
                         del model
-            atomic_json(audit_path, {"study_identity": study_identity["identity"], "models": audits})
+            atomic_json(audit_path, {"study_identity": study_identity["identity"], "models": audits,
+                                     "strength_checks": audit_strength_family(audits)})
         else:
             saved_audit = json.loads(audit_path.read_text())
             if saved_audit["study_identity"] != study_identity["identity"]:

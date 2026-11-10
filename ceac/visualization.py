@@ -11,8 +11,8 @@ ENVIRONMENT_LABELS = {"deepsea": "Undertow DeepSea", "frozenlake": "False Beacon
 
 LABELS = {
     "ceac": "CEAC (exact-model single loop)", "ceac_actor": "CEAC: actor-only ablation",
-    "oracle": "Offline Graves–Lai oracle", "ids": "IDS: full support",
-    "idac": "IDAC (upstream tabular update)", "ucb_q": "UCB Q-learning (Jin et al.)",
+    "oracle": "Offline Graves–Lai oracle", "ids": "Bayesian IDS: full support",
+    "idac": "IDAC (frequentist actor-critic)", "ucb_q": "UCB Q-learning (Jin et al.)",
     "pomd": "Optimistic POMD (softmax)",
     "ids_rare": "IDS: rare prior (0.001)", "ids_zero": "IDS: zero shifted support",
 }
@@ -82,7 +82,9 @@ def plot_seed_trace(axis, values, method, band):
     color, style, marker = STYLES[method]
     line, = axis.plot(x, stats["mean"], color=color, linestyle=style,
                       lw=4 if method == "ceac" else 2,
-                      marker=marker, markevery=max(1, len(x)//8), markersize=5,
+                      marker=marker,
+                      markevery=((tuple(STYLES).index(method)*max(1,len(x)//(8*len(STYLES)))) % max(1,len(x)//8),
+                                 max(1,len(x)//8)), markersize=6,
                       markerfacecolor="white", label=LABELS[method],
                       zorder=5 if method == "ceac" else 3)
     if stats["lower"] is not None:
@@ -103,7 +105,7 @@ def export_trace_statistics(root, runs, band="sd"):
     fields = ("expected_return", "cumulative_return", "cumulative_pseudo_regret",
               "cumulative_expected_model_information", "cumulative_observed_llr",
               "cumulative_diagnostic_visits", "cumulative_nuisance_visits",
-              "cumulative_risky_visits", "mode1_posterior")
+              "cumulative_risky_visits", "cumulative_diversions", "cumulative_lost_steps", "mode1_posterior")
     path = Path(root)/"trace_statistics.csv.gz"
     with gzip.open(path, "wt", newline="") as target:
         writer = csv.writer(target)
@@ -401,6 +403,8 @@ def make_figures(root, verified_runs, band="sd", sensitivity=None):
     matplotlib.rcParams.update({"font.size": 14, "axes.labelsize": 15, "axes.titlesize": 16,
                                "legend.fontsize": 11, "xtick.labelsize": 12, "ytick.labelsize": 12,
                                "pdf.fonttype": 42, "ps.fonttype": 42})
+    from .benchmarks import STRENGTH_PROFILES
+    from .pathology_report import make_strength_figures
     destination = Path(root)/"figures"; destination.mkdir(exist_ok=True)
     groups = sorted({(r["result"].get("benchmark","legacy"),r["result"]["environment"],r["result"]["context"]) for r in verified_runs})
     sets = {
@@ -411,7 +415,9 @@ def make_figures(root, verified_runs, band="sd", sensitivity=None):
     }
     if sensitivity is None:
         sensitivity=nuisance_sensitivity_rows(verified_runs)
-    artifacts=make_aggregate_nuisance_figures(destination, verified_runs, plt, band)
+    groups = [g for g in groups if g[0] not in STRENGTH_PROFILES]
+    artifacts=make_strength_figures(destination, verified_runs, plt, band)
+    artifacts.extend(make_aggregate_nuisance_figures(destination, verified_runs, plt, band))
     artifacts.extend(make_headline_figures(destination, verified_runs, plt, band))
     for benchmark,kind,context in groups:
         relevant=[r for r in verified_runs if r["result"]["environment"]==kind and r["result"]["context"]==context and r["result"].get("benchmark","legacy")==benchmark]

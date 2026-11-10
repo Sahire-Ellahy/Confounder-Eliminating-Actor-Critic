@@ -1,3 +1,8 @@
+> Comparator revision: the policy-bank UCB, model-confidence, uniform-bank and
+> finite-policy OIR controls are retired. Use `idac`, `ucb_q` and `pomd`; see
+> [source provenance and exact updates](../docs/comparator_provenance.md).
+> Historical counts below describe archived studies, not the active comparator slate.
+
 For an executed visual introduction and a fresh-clone installation, start with
 [the repository guide](../README.md) and [the notebook](../notebooks/Undertow_FalseBeacon.ipynb).
 The default notebook uses the portable evidence export and needs no raw run cache.
@@ -42,13 +47,15 @@ a historical release-results directory.
 The deployment comparison uses the same launch interface:
 
 ```bash
-python -m ceac.run --output runs/ceac_deployment_comparison_20261110 --environments deepsea frozenlake --methods ceac ceac_actor oracle confidence policy_ucb oir_idac coverage ids ids_rare ids_zero --modes 0 1 --seeds 0 1 2 --episodes 256
-python -m ceac.report --input runs/ceac_deployment_comparison_20261110
+python -m ceac.run --output runs/my_deployment_comparison --environments deepsea frozenlake --methods ceac ceac_actor oracle idac ucb_q pomd ids ids_rare ids_zero --modes 0 1 --seeds 0 1 2 --episodes 256
+python -m ceac.report --input runs/my_deployment_comparison
 ```
 
-The completed run with that name is already preserved. Choose a **new output
-name** for a new experiment; matching completed runs may be verified with
-`--resume`. The earlier `runs/ceac_v90_validation_20261110` used actor-only CEAC
+The historical `runs/ceac_deployment_comparison_20261110` is preserved with its
+original comparator slate and runtime. It does not contain the new primitive
+controls. Choose a **new output name** for a new experiment; `--resume` requires
+the original source and configuration. The earlier
+`runs/ceac_v90_validation_20261110` used actor-only CEAC
 and remains an archived result with its original report, not a current launch
 target. The current renderer rejects relabeling that old study as certified
 CEAC.
@@ -76,16 +83,19 @@ support-exclusion treatment, with the asymmetric support reported in each run.
 | `learning.py` | On-policy updates, likelihood confidence, replay and cumulative debt | No off-policy actor updates; zero-price identity; no discarded quota; single credit |
 | `deployment.py` | Reward-only response and certificate | Optimal for every plausible model; revoked when the model set changes |
 | `agents.py`, `ids.py` | CEAC, exact IDS and offline oracle control | Full policy responses; only the oracle receives the realized model |
-| `comparators.py` | Confidence, policy-UCB, OIR/IDAC and coverage | Explicit model access; shared enriched bank for the trajectory-only controls |
+| `comparators.py` | Historical finite-policy audit witnesses only | No active comparator learners |
+| `primitives.py` | Source-backed IDAC, UCB Q-learning and optimistic POMD | Public domain/bounds and observed transitions only |
 | `run.py` | Experiment construction, seeds and execution | Method-order-independent RNGs; evaluator-only truth |
 | `evidence.py` | Streaming evidence and cache identity | Source/config/version identity; immutable completed cells; artifact hashes |
 | `report.py` | Render verified saved evidence | Counts, hashes and study/run identity checked before rendering |
 
-The runner is the only component that owns the realized environment. Agents
-receive `FiniteModel`, which independently enumerates *all declared candidate
-models*. A hypothetical candidate copy carrying label 0 or 1 is model knowledge,
-not access to which candidate generated the experiment. Privileged simulator
-`info` dictionaries never cross the learner interface.
+The runner owns the realized environment. CEAC and Bayesian IDS receive
+`FiniteModel`, which independently enumerates *all declared candidate models*;
+the offline oracle additionally receives the realized mode. IDAC, UCB-Q and
+POMD instead receive the public state/action domain, horizon and reward bounds,
+then observed transitions. They receive no candidate transition laws or mode
+likelihoods. Privileged simulator `info` dictionaries never cross their learner
+interface. This information-access difference limits direct performance claims.
 
 Each cell contains `manifest.json`, `status.json`, `metrics.jsonl`,
 `trajectories.jsonl`, `state_index.npz`, `policies/<digest>.npz`,
@@ -114,18 +124,21 @@ The default `legacy` setting preserves the earlier experiment dynamics. See
 `audits/ceac_undertow_design_20261110.md` for the equations, exact preflight checks,
 allocation-bound calibration and interpretation limits.
 
-From `IDS/code`, the complete exploratory slate is:
+From `IDS/code`, a new exploratory slate with the active controls can be launched as:
 
 ```bash
 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 \
-python -m ceac.run --output runs/ceac_undertow_20261110 \
+python -m ceac.run --output runs/my_undertow_comparison \
   --benchmarks strong_signal_m4 weak_signal_m4 weak_signal_m16 weak_signal_m64 \
-  --methods ceac oracle confidence policy_ucb oir_idac coverage ids \
+  --methods ceac oracle ids idac ucb_q pomd \
   --modes 0 1 --seeds 0 1 2 --episodes 512 --workers 2 --report-pdf
 ```
 
-Use a fresh output name for a new execution. This is 336 cells / 172,032 episodes,
-using CPU finite-model planning. The short `ceac_undertow_preflight_20261110`
+Use a fresh output name for a new execution. This command requests 288 cells /
+147,456 episodes; it has not been run. The archived
+`ceac_undertow_20261110` study contains 336 cells from the retired seven-method
+slate. The new primitive controls have only the separate 48-cell integration
+validation described in the comparator ledger. The short `ceac_undertow_preflight_20261110`
 study is an integration test, not a performance result. Refined settings default
 to mass bound and normalization 128; `--mass-bound` makes this choice explicit.
 
@@ -136,7 +149,7 @@ Outputs remain under the study folder, grouped by benchmark and environment.
 can be read without importing the learning package:
 
 ```bash
-cat runs/ceac_undertow_20261110/status.json
+cat runs/my_undertow_comparison/status.json
 ```
 
 This slate fixes the task mode within each run. No hidden temporal shift or
@@ -155,21 +168,23 @@ The support extension uses the same training runtime with the existing
 
 ```bash
 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 \
-python -m ceac.run --output runs/ceac_prior_support_20261110 \
+python -m ceac.run --output runs/my_prior_support \
   --benchmarks strong_signal_m4 weak_signal_m64 \
   --methods ids_rare ids_zero --modes 0 1 --seeds 0 1 2 \
   --episodes 512 --workers 1
 
-python -m ceac.report --input runs/ceac_prior_support_20261110 \
-  --reference runs/ceac_undertow_20261110 \
-  --reference-methods ceac oracle confidence policy_ucb oir_idac coverage ids --band sd --pdf
+python -m ceac.report --input runs/my_prior_support \
+  --reference runs/my_undertow_comparison \
+  --reference-methods ceac oracle ids --band sd --pdf
 ```
 
-Both studies have completed. The report command is independent of training and
-can be rerun against the saved studies. Use a fresh output name to launch another
-execution. This adds 48 runs; the consolidated report reads 168 compatible
-controls from the reference study, giving 216 verified runs across nine methods. It fails closed
-on source/runtime, environment, learner-setting, budget or seed incompatibility.
+The historical studies `ceac_prior_support_20261110` and
+`ceac_undertow_20261110` completed under their archived source. The commands
+above use new output names for the current runtime. This extension adds 48 runs;
+with the three reference methods selected above, it reads 72 matched controls
+for 120 runs across five methods. The report command is independent of training
+and fails closed on source/runtime, environment, learner-setting, budget or seed
+incompatibility.
 `report_audit.json` records provenance for both studies; `prior_support_audit.json`
 checks the per-episode absorbing posterior and exact linear-regret prediction.
 `report_status.json` distinguishes training completion from report completion.
@@ -188,10 +203,11 @@ intervals; the current slate has only three seeds per curve. One-seed curves hav
 no variability band. Expected-return smoothing uses a causal 16-episode mean
 within each seed before aggregation. The episode index is not a replicate.
 
-The first two figures summarize weak-signal M=64 for both environments: policy
-value, cumulative pseudo-regret and observed log-likelihood evidence. Mode 0
-compares all seven standard methods; mode 1 emphasizes CEAC, offline oracle and
-IDS prior support. Detailed plots retain all benchmark/method comparisons.
+The overview traces summarize weak-signal M=64 for both environments: policy
+value, cumulative pseudo-regret and observed log-likelihood evidence. Historical
+plots retain CEAC, offline oracle and IDS, including the separate IDS prior
+support arms where available. Removed controls are excluded; no historical
+curve is relabeled as one of the new primitive algorithms.
 
 `trace_statistics.csv.gz` exports each curve's seed count, mean, sample SD,
 min/max, band edges and smoothing width. Values are not clipped when a plot's
@@ -210,29 +226,17 @@ into learned critic updates. An active learned-estimator lane and matched
 ablations would be needed for that causal claim.
 
 
-## Aggregate nuisance sensitivity and CEAC labels
+## Learning curves by condition
 
-The base report now opens with `figures/aggregate_nuisance_context0_mode0.pdf`
-and its mode-1 counterpart. Each combines both environments and shows total
-regret, extra regret relative to M=4, and nuisance visits. Only the matched
-weak-signal M=4,16,64 settings share this axis. M counts nuisance observation
-symbols; it is not physical current strength or useful task-signal amplitude.
+The aggregate figures now show training episode versus cumulative pseudo-regret,
+with separate condition-colored curves and panels per method. The nuisance
+symbol-count sweep is explicitly labeled as a cached diversity control. It is
+not physical undertow strength. Coincident traces are not jittered apart.
 
-`nuisance_sensitivity.json` preserves the per-seed endpoints and descriptive
-summaries. Differences are taken within each seed before calculating the SD.
-The renderer rejects missing/duplicate seed pairs or any change to another run
-configuration field. Modes and environments are never pooled into extra seeds.
-
-The plotted label is **CEAC (exact-model single loop)**. This is the maintained
-single episode-loop specialization with exact candidate-model evaluation and
-policy responses. Certified deployment selects a reward-only response whose
-gap is within tolerance for every currently plausible model, after outstanding
-statistical/design debt is served. It uses no true-mode label. The **offline
-Graves–Lai oracle** receives that label before training, fixes its normalized
-allocation once, and executes its debt or the true-model optimal policy.
-Certification does not imply that the learned actor has converged.
-
-The completed normal-mode sensitivity supports increasing OIR/IDAC cost and
-stable CEAC cost. Full-support IDS is also stable. Other comparators have mostly
-unchanged costs as M increases; the report does not relabel those flat curves as
-increasing failures. The excluded-prior IDS treatment remains a separate axis.
+Custom controls are excluded from plots, tables and portable evidence; their
+raw files remain unchanged. `idac` and `ucb_q` are distinct new method IDs, never
+aliases for `oir_idac` or `policy_ucb`. `pomd` is a separate softmax optimism
+control. All three have completed integration runs; performance sweeps require
+new evidence. The
+[comparator ledger](../docs/comparator_provenance.md) records their source and
+adapter contracts and proposes a physical-strength experiment separately.

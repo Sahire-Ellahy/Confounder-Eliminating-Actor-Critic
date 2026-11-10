@@ -1,24 +1,39 @@
 # Publication validation
 
-The branch was checked in a newly created, repository-local Python 3.11 virtual
-environment installed with `python -m pip install -e '.[notebook]'`.
+The maintained branch uses the repository-local Python 3.11 environment,
+installed with `python -m pip install -e '.[notebook]'`. The current comparator
+revision passed:
 
-- `pip check`: no broken requirements.
-- Core algorithm and reporting suite: 58 tests passed.
-- Walkthrough geometry and evidence suite: 5 tests passed.
-- Notebook: all 10 code cells executed, with seven rendered figures and no errors.
+- Core algorithm and reporting suite: 65 tests.
+- Walkthrough geometry and evidence suite: five tests.
+- Notebook: all ten code cells executed, with eight rendered figures and no errors.
 - Default notebook execution launched no training.
-- Export: 108 complete seed traces and 384 unique source-run endpoints; all
-  source studies and raw run hashes were verified before export.
-- The maintained training-source hashes match the completed studies. Cleanup
-  changes packaging, documentation and presentation, not the learning runtime.
+- Comparator integration: 48 completed cells covering two environments, two
+  stationary modes, two seeds and six methods, with 128 episodes per cell.
+- Portable historical export: 132 complete seed traces and 192 retained endpoints
+  from 384 verified source runs. The 192 retired custom-control runs are excluded
+  from display and retain their original provenance.
+
+The primitive IDAC update is compared numerically against the unmodified pinned
+upstream class. UCB-Q and optimistic POMD have published-equation checks;
+additional tests verify information isolation, update ordering and episodic
+padding. See [comparator provenance](comparator_provenance.md) for the source
+references and declared adapters, and
+[the integration audit](../audits/comparator_validation.json) for run hashes and
+update counters.
 
 `notebooks/execution.json` records the executed notebook digest, figure digests
-and exact package versions. `notebooks/evidence/manifest.json` records source
-provenance and export hashes. The GitHub workflow repeats tests and headless
-notebook execution from the published tree.
+and exact package versions. `notebooks/evidence/manifest.json` records export
+hashes and historical source provenance. Its archived runtime is verified
+separately from the current diagnostic kernels: the new comparator runtime is
+not represented as the source of old results. New studies archive their source
+at launch. The GitHub workflow repeats tests and headless notebook execution
+from the published tree, without requiring raw local caches or the legacy package.
 
-The saved data establishes the exact-model experimental behavior. It is not an
-independent learned-critic ablation, a hidden-change-point experiment, or a
-confidence interval based on only three seeds. These limits remain explicit in
-the notebook and mathematical ledgers.
+The integration runs validate execution, not convergence. In these short runs,
+POMD's published bonuses leave all optimistic costs zero and the policy uniform.
+The historical figures vary nuisance alphabet size, not physical strength.
+The requested physical-strength sweep is not yet implemented or launched.
+Neither study is a learned-critic causal ablation or a hidden-change-point
+experiment; seed bands are descriptive standard deviations, not confidence
+intervals. These limits remain explicit in the notebook and mathematical ledgers.

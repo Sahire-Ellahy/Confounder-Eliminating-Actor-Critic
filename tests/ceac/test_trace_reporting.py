@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 from ceac.report import reconstruct_evidence_trace
 from ceac.visualization import (seed_summary, trace_values, export_trace_statistics,
-                                nuisance_sensitivity_rows, summarize_nuisance)
+                                nuisance_sensitivity_rows, summarize_nuisance, nuisance_trace_groups)
 from ceac.benchmarks import specification
 
 
@@ -167,6 +167,26 @@ class NuisanceSensitivityTests(unittest.TestCase):
             lambda c:c["benchmark"]["configuration_overrides"].update(tv_bins=128)):
             runs=self.runs();mutate(runs[-1]["manifest"]["configuration"])
             with self.assertRaises(ValueError):nuisance_sensitivity_rows(runs)
+
+    def test_time_traces_preserve_seed_curves_and_require_complete_doses(self):
+        runs=self.runs()
+        extra=deepcopy(runs[:2])
+        for run in extra:
+            run["result"]["benchmark"]="weak_signal_m16"
+            run["manifest"]["configuration"]["benchmark"]=specification("weak_signal_m16","deepsea")
+        runs.extend(extra)
+        for run in runs:
+            run["result"]["episodes"]=2
+            run["manifest"]["configuration"]["episodes"]=2
+            run["metrics"]=[{"episode":0,"cumulative_pseudo_regret":0.},
+                            {"episode":1,"cumulative_pseudo_regret":run["result"]["pseudo_regret"]}]
+        groups=nuisance_trace_groups(runs)
+        np.testing.assert_array_equal(groups["deepsea",0,0,"ceac"][4],[[0.,1.],[0.,10.]])
+        with self.assertRaisesRegex(ValueError,"all three"):
+            nuisance_trace_groups(runs[:-2])
+        runs[0]["metrics"][-1]["cumulative_pseudo_regret"]+=1.
+        with self.assertRaisesRegex(ValueError,"endpoint"):
+            nuisance_trace_groups(runs)
 
     def test_one_dose_does_not_imply_a_sensitivity_curve(self):
         self.assertEqual(nuisance_sensitivity_rows(self.runs()[:2]),[])

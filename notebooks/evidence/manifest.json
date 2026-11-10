@@ -1,11 +1,43 @@
 {
   "artifacts": {
-    "assets/aggregate_nuisance_context0_mode0.png": "6821fa6f98fb7fa8a6c9b6d30f86cb2660ee018437c658885dedf2af91f4a925",
-    "assets/aggregate_nuisance_context0_mode1.png": "a03bb4976441fdd1330d6f36995ffa5aea9b9e2a4878aa475472bdfd95128c88",
-    "evidence/curves.json.gz": "94b5a03b3d51c6ed5845c968b085724d41e63da73eabcef1d5ac8e9d33f194c4"
+    "assets/aggregate_nuisance_deepsea_context0_mode0.png": "bbeaaa0f1f853e2467bc84df6cc0d4285b4e1ed0bf0a6260ed0bcb7d2a4060f4",
+    "assets/aggregate_nuisance_deepsea_context0_mode1.png": "0e7f07f33d4adcad86de669c1041c6b34b108ff94f0425ff64d8c3a4fbf75bea",
+    "assets/aggregate_nuisance_frozenlake_context0_mode0.png": "6162fb3f63a8a4b2b857f46de2c18c71b8a892468905944d556509c8e4fa8a84",
+    "assets/aggregate_nuisance_frozenlake_context0_mode1.png": "8206165906503c2b7740de5570bb0bb3629ade829e6ce093e5d9e2bc911d8bd2",
+    "evidence/curves.json.gz": "1aeea8dc7e86eead1f573c05bd12dc4ac3567cc5236fc83fe271adc2bd10dbd3",
+    "evidence/source_bundle.tar.gz": "014c5da1c2040c348163ada88d9598461645b7990be1e84184bd564ba7ecc92b"
   },
-  "curve_runs": 108,
-  "curves_benchmark": "weak_signal_m64",
+  "curve_runs": 132,
+  "curves_benchmarks": [
+    "weak_signal_m4",
+    "weak_signal_m16",
+    "weak_signal_m64"
+  ],
+  "diagnostic_sources": {
+    "__init__.py": "14fc46754339bfd968b07581e92ed012271426a3a95410a0ee6e283bd0245bea",
+    "agents.py": "40679735ee69a82d13913ea6468388cac35eeb4a32c68aa0bf9e76bced561903",
+    "benchmark_audit.py": "b598c5f3eaae7c68f8b0aadd37802f0a726d43407e96ac82b3de058825e30050",
+    "benchmarks.py": "2ffa6b5bee31e99acd7d220457a38878bcbbbf3c3fa4d939545522b3e412a211",
+    "contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+    "deployment.py": "3b5d619629eefc1c9b425719101932a38031c57545d203cd62c423e69ed84e3a",
+    "design.py": "30edaf6b81034febdc11eb1ba9fbd00bda16cb2a998f01584fed72d09e6094a9",
+    "environments/__init__.py": "102c3e0de6da66ad31bb6c47794d36585ce15301d55bc8d3df8a555d6f1fb9cb",
+    "environments/deepsea.py": "0683bbb701e2f5da0a70ef3c86686edf6a8aa9424c4c805b083d0a2fc9dd0258",
+    "environments/frozenlake.py": "e806284f1c4943a2cf4f78ff5f55ca936fd1ec05c2c19874aac2060edda3cc59",
+    "evidence.py": "6fa6df0aa4b3f708523d19b40d36b4d7f48128235a76f9afc67b5d47db8fdc13",
+    "ids.py": "4e9de8feeb613ae767317a1690e16ef0a89f6db733174ff34ab63e58a35c2643",
+    "learning.py": "524e9a8c4de070395653e56ffbd9af7f5396e3e31f64597663c40525f7d16d7b",
+    "model.py": "c59098d60dc9d4093bddd6b0976079a35834fae80eb859c8a2aa2b9c8b8f9a87"
+  },
+  "excluded_method_ids": [
+    "confidence",
+    "coverage",
+    "oir_idac",
+    "policy_ucb"
+  ],
+  "excluded_runs": 192,
+  "retained_runs": 192,
+  "runtime_archive": "evidence/source_bundle.tar.gz",
   "runtime_sources": {
     "__init__.py": "14fc46754339bfd968b07581e92ed012271426a3a95410a0ee6e283bd0245bea",
     "agents.py": "40679735ee69a82d13913ea6468388cac35eeb4a32c68aa0bf9e76bced561903",
@@ -24,13 +56,13 @@
     "model.py": "c59098d60dc9d4093bddd6b0976079a35834fae80eb859c8a2aa2b9c8b8f9a87",
     "run.py": "2574bc202c2e107b0d7ecdaf2ba259d54e29d408380cd66149a9114f9147c99a"
   },
-  "schema": 1,
+  "schema": 2,
   "scope": "Derived, verified teaching export; full raw trajectories remain in the original studies",
   "source_runs": 384,
   "source_studies": [
     {
       "name": "ceac_undertow_20261110",
-      "report_audit_sha256": "42c28024eff6e6547d9ed127151008675f5398e991ede99e3ec6c301a3bd33aa",
+      "report_audit_sha256": "43a47f5dc1f2539be035fc7b505a3affaed977155de1b4d43687a0c5615196f7",
       "results_sha256": "8b4250663483f09b30392f7346cc22375c37d63a300f314c9bc410cda3681c47",
       "run_count": 336,
       "run_manifest_hashes": {
@@ -376,7 +408,7 @@
     },
     {
       "name": "ceac_prior_support_20261110",
-      "report_audit_sha256": "78277c36f7b39e56e4e43b4b6ecf37f599b4d796cbcfc63250cbde540372dfe5",
+      "report_audit_sha256": "13e5470d0e1dbf27bd97ca1c5d54d6a7d1a5707f5d278a16443565c3766b9b2a",
       "results_sha256": "f1c68ae49448ffc0d8f33ed224cb43fd8a481ebb3044cb712c349b440915d8c2",
       "run_count": 48,
       "run_manifest_hashes": {

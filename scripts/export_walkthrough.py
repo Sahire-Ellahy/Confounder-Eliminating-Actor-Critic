@@ -11,11 +11,14 @@ import json
 from pathlib import Path
 import shutil
 import sys
+import tarfile
+import hashlib
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from ceac.evidence import atomic_json, digest
 from ceac.report import load_study, validate_reference
+from ceac.visualization import NUISANCE_PROFILES, RETIRED_METHODS
 
 
 RESULT_FIELDS = ("benchmark", "environment", "context", "true_mode", "method", "seed", "episodes",
@@ -46,12 +49,16 @@ def export(base, prior, destination):
                             run_manifest_hashes=manifests, run_count=len(runs)))
         loaded.append(study)
         all_runs.extend(runs)
-    validate_reference(loaded[1], loaded[0], ("ceac", "oracle", "confidence", "policy_ucb", "oir_idac", "coverage", "ids"))
+    validate_reference(loaded[1], loaded[0], ("ceac", "oracle", "ids"))
+    source_runs = len(all_runs)
+    retired_runs = [r for r in all_runs if r["result"]["method"] in RETIRED_METHODS]
+    all_runs = [r for r in all_runs if r["result"]["method"] not in RETIRED_METHODS]
     curves = []
     for run in all_runs:
-        if run["result"].get("benchmark") != "weak_signal_m64":
+        if run["result"].get("benchmark") not in NUISANCE_PROFILES:
             continue
-        curves.append({"result": {key: run["result"][key] for key in RESULT_FIELDS if key in run["result"]},
+        curves.append({"manifest": {"configuration": run["manifest"]["configuration"]},
+                       "result": {key: run["result"][key] for key in RESULT_FIELDS if key in run["result"]},
                        "metrics": [{**{key: m[key] for key in METRIC_FIELDS},
                                     "diagnostics": {"posterior": m["diagnostics"]["posterior"]}
                                        if "posterior" in m["diagnostics"] else {}}
@@ -64,15 +71,26 @@ def export(base, prior, destination):
     with target.open("wb") as raw:
         with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as compressed:
             compressed.write(json.dumps(bundle, sort_keys=True, separators=(",", ":"), allow_nan=False).encode())
-    assets = [target]
-    for name in ("aggregate_nuisance_context0_mode0.png", "aggregate_nuisance_context0_mode1.png"):
+    runtime = destination / "evidence/source_bundle.tar.gz"
+    shutil.copyfile(Path(base) / "source_bundle.tar.gz", runtime)
+    with tarfile.open(runtime, "r:gz") as archive:
+        for name, checksum in loaded[0]["sources"].items():
+            if hashlib.sha256(archive.extractfile("ceac/"+name).read()).hexdigest() != checksum:
+                raise ValueError("Archived training source mismatch: " + name)
+    assets = [target, runtime]
+    for name in (f"aggregate_nuisance_{kind}_context0_mode{mode}.png"
+                 for kind in ("deepsea", "frozenlake") for mode in (0, 1)):
         output = destination / "assets" / name
         shutil.copyfile(Path(base) / "figures" / name, output)
         assets.append(output)
     atomic_json(destination / "evidence/manifest.json", dict(
-        schema=1, source_studies=sources, runtime_sources=loaded[0]["sources"],
+        schema=2, source_studies=sources, runtime_sources=loaded[0]["sources"],
+        runtime_archive="evidence/source_bundle.tar.gz",
+        diagnostic_sources={name: checksum for name, checksum in loaded[0]["sources"].items()
+                            if name not in {"run.py", "comparators.py"}},
+        excluded_method_ids=sorted(RETIRED_METHODS), excluded_runs=len(retired_runs),
         scope="Derived, verified teaching export; full raw trajectories remain in the original studies",
-        curves_benchmark="weak_signal_m64", source_runs=len(all_runs), curve_runs=len(curves),
+        curves_benchmarks=list(NUISANCE_PROFILES), source_runs=source_runs, retained_runs=len(all_runs), curve_runs=len(curves),
         artifacts={str(p.relative_to(destination)): digest(p) for p in assets}))
     print(f"Exported {len(curves)} seed traces and {len(all_runs)} endpoints to {destination / 'evidence'}")
 

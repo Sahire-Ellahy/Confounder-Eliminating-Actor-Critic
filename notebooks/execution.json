@@ -1,11 +1,11 @@
 {
   "code_cells": 10,
-  "evidence_manifest_sha256": "4ef8d2a031fbad697ac28bf9f725ac0cbb80206cc2eb07fa13a87f489478a687",
+  "evidence_manifest_sha256": "12ddee8e32e5282219777fc1f286a0051b2a7704b9e7b7fb7f58d5a1cafd97af",
   "explanatory_map_hashes": {
     "assets/false_beacon.png": "633758351b40cc969c40e861ff3e6386fc34849db6cbe1b2d9877af3e0d681c7",
     "assets/undertow.png": "cc37eee676e87b09b23f73c5529ae3794e30cf7f7f192e6aea4abd2b89081c84"
   },
-  "notebook_sha256": "716113eec85d8ff2456fc6a6ce7dcc5a6d87a0c7064f5608f14934ca957671c1",
+  "notebook_sha256": "64e45d00d249708cdff6449028483a22d5ec4790b3572a32a814c21ce2c235fd",
   "packages": {
     "ipykernel": "7.4.0",
     "matplotlib": "3.11.2",
@@ -14,7 +14,7 @@
     "scipy": "1.17.1"
   },
   "python": "3.11.13",
-  "rendered_figures": 7,
+  "rendered_figures": 8,
   "schema": 1,
   "status": "complete",
   "training_launched": false

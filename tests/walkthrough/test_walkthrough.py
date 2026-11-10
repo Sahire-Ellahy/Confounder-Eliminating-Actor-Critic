@@ -40,9 +40,12 @@ class WalkthroughTests(unittest.TestCase):
 
     def test_published_export_has_unique_complete_seed_curves(self):
         bundle, manifest = verified_bundle(ROOT / "notebooks")
-        self.assertEqual(len(bundle["endpoints"]), 384)
-        self.assertEqual(len(bundle["curves"]), 108)
+        self.assertEqual(len(bundle["endpoints"]), 192)
+        self.assertEqual(len(bundle["curves"]), 132)
+        self.assertEqual(set(manifest["curves_benchmarks"]),
+                         {"weak_signal_m4", "weak_signal_m16", "weak_signal_m64"})
         self.assertEqual(sum(s["run_count"] for s in manifest["source_studies"]), 384)
+        self.assertEqual(manifest["excluded_runs"], 192)
         seen = set()
         for run in bundle["curves"]:
             r = run["result"]
@@ -50,7 +53,7 @@ class WalkthroughTests(unittest.TestCase):
             self.assertNotIn(key, seen); seen.add(key)
             self.assertEqual([m["episode"] for m in run["metrics"]], list(range(512)))
         self.assertEqual({r["result"]["method"] for r in bundle["curves"]},
-                         {"ceac", "oracle", "confidence", "policy_ucb", "oir_idac", "coverage", "ids", "ids_rare", "ids_zero"})
+                         {"ceac", "oracle", "ids", "ids_rare", "ids_zero"})
 
     def test_corrupted_export_is_rejected_before_display(self):
         with tempfile.TemporaryDirectory() as temp:

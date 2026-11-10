@@ -4,7 +4,7 @@ Can an RL agent purchase the specific trajectory evidence needed to rule out
 models that change the optimal policy, instead of paying for irrelevant novelty?
 
 This branch contains **Undertow DeepSea** and **False Beacon Frozen Lake**, a
-maintained finite-model CEAC implementation, audited comparators, and an
+maintained finite-model CEAC implementation, source-backed primitive controls, and an
 executed visual walkthrough.
 
 **Start with [the notebook](notebooks/Undertow_FalseBeacon.ipynb).** Its saved
@@ -33,8 +33,8 @@ Python environment does not repair the selected kernel. Windows activation is
 
 The notebook runs offline after installation and launches no training. A compact,
 hash-verified evidence export is included; raw local training caches are not
-required. It combines 336 base runs and 48 additional prior-support runs without
-duplicating reused controls. There are three seeds per plotted condition.
+required. It verifies 336 base runs and 48 additional prior-support runs, retaining 192
+CEAC/oracle/IDS runs after excluding the retired custom controls. There are three seeds per plotted condition.
 
 For headless verification with the active interpreter:
 
@@ -50,9 +50,11 @@ python -m unittest discover -s tests/walkthrough -v
   Their symbols are diverse but have zero likelihood information about the task.
 - **False Beacon:** reeds and shallow surveys can attract coverage while the
   inner route hides a profitable outer alternative. A deep survey reveals the mode.
-- Increasing the nuisance alphabet worsens the finite-policy OIR/IDAC adaptation,
-  clearly in DeepSea and modestly in Frozen Lake. CEAC and full-support IDS remain
-  stable; not every comparator deteriorates with nuisance diversity.
+- The retained CEAC and full-support IDS curves are stable across nuisance
+  alphabets. This is not yet a physical undertow/false-beacon strength sweep.
+- Custom policy-bank UCB, model optimism, uniform-bank sampling and the
+  finite-policy OIR surrogate are retired. Their curves do not establish
+  failures of published coverage/optimism algorithms.
 - Zero-prior IDS is an explicitly misspecified support treatment. It does not
   refute full-support IDS or show that CEAC discovers undeclared models.
 
@@ -65,11 +67,22 @@ realized mode from the outset. These runs do not isolate learned-critic causalit
 admitted. See the [implementation ledger](audits/ceac_v90_corrections_20261110.md)
 and [benchmark ledger](audits/ceac_undertow_design_20261110.md).
 
+## Source-backed comparators
+
+`idac` ports the original tabular softmax/two-critic update from the supplied
+`inforatio-main.zip` and Sahire's pinned repository. `ucb_q` implements Jin et al.
+(2018), Algorithm 1, at primitive state/action level. `pomd` implements optimistic softmax mirror descent from Shani et al. (2020),
+Algorithm 2. None uses the old policy bank. See the [source and adaptation ledger](docs/comparator_provenance.md) for
+exact equations, parity checks, reward normalization and reset semantics.
+The 48-cell [integration audit](audits/comparator_validation.json) verifies all
+three replacements. Historical notebook plots remain distinct from those short
+smoke results; they are not relabeled or pooled across source versions.
+
 ## Run new experiments
 
 ```bash
 python -m ceac.run --output runs/my_smoke --benchmarks weak_signal_m4 \
-  --environments deepsea frozenlake --methods ceac oracle confidence policy_ucb oir_idac coverage ids \
+  --environments deepsea frozenlake --methods ceac oracle ids idac ucb_q pomd \
   --modes 0 1 --seeds 0 --episodes 32 --workers 1
 python -m ceac.report --input runs/my_smoke
 ```
@@ -93,6 +106,8 @@ PDF report export additionally requires system `pandoc` and `pdflatex`.
 | `runs/` | Local raw studies, excluded from Git |
 | `legacy/upstream/` | Original standalone DeepSea script, retained unchanged |
 
-The unrelated old `inforatio` files were moved to a local archive and excluded
-from this publication. The existing training runtime and raw study paths were
-preserved. Details: [repository layout](docs/repository_layout.md).
+The original `inforatio` package remains in a local archive; the new IDAC port
+has a small pinned source fixture for numerical parity tests. Historical study
+paths and archived runtimes are preserved. Details:
+[repository layout](docs/repository_layout.md) and
+[publication validation](docs/validation.md).

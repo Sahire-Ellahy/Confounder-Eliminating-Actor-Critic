@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from ceac.model import environment
 from ceac.environments import deepsea, frozenlake
-from ceac.visualization import (ENVIRONMENT_LABELS, LABELS, plot_seed_trace, trace_values)
+from ceac.visualization import (ENVIRONMENT_LABELS, LABELS, plot_seed_trace, trace_values,
+                                nuisance_trace_groups, draw_nuisance_learning)
 
 BLUE, ORANGE, GREEN, MAGENTA = "#0058c7", "#df7400", "#07854d", "#bd319b"
 
@@ -185,14 +186,15 @@ def draw_policy_facts(models):
 def draw_learning(bundle, prior=False):
     """Reuse maintained per-seed plotting and smoothing on the exported curves."""
     style()
-    methods=("ceac","oracle","ids","ids_rare","ids_zero") if prior else ("ceac","oracle","confidence","policy_ucb","oir_idac","coverage","ids")
+    methods=("ceac","oracle","ids","ids_rare","ids_zero") if prior else ("ceac","oracle","ids")
     mode=1 if prior else 0
     fig,axes=plt.subplots(2,2,figsize=(15,10))
     handles={}
     for row,kind in enumerate(("deepsea","frozenlake")):
         for method in methods:
             runs=[r for r in bundle["curves"] if r["result"]["environment"]==kind
-                  and r["result"]["true_mode"]==mode and r["result"]["method"]==method]
+                  and r["result"]["true_mode"]==mode and r["result"]["method"]==method
+                  and r["result"]["benchmark"]=="weak_signal_m64"]
             for col,field in enumerate(("expected_return","cumulative_pseudo_regret")):
                 handles[method]=plot_seed_trace(axes[row,col],trace_values(runs,field),method,"sd")
         axes[row,1].set_yscale("symlog",linthresh=.25)
@@ -210,3 +212,10 @@ def draw_learning(bundle, prior=False):
              ha="center",fontsize=11)
     fig.tight_layout(rect=(0,.17,1,.94),h_pad=2)
     return fig
+
+
+def draw_sensitivity(bundle, kind, mode=0, context=0):
+    """Learning curves by cached diversity level; never relabel as physical strength."""
+    style()
+    return draw_nuisance_learning(nuisance_trace_groups(bundle["curves"]),
+                                  kind, context, mode, plt)

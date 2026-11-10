@@ -2,10 +2,20 @@
 
 Raw immutable studies stay here and are excluded from Git.
 
-Current results: `ceac_undertow_20261110` (336 runs) and
-`ceac_prior_support_20261110` (48 new runs with reused controls).
-Historical validation, deployment-comparison and preflight folders retain their
-original paths and hashes. They are not silently merged into current evidence.
+Current comparator integration check: `primitive_comparator_validation_20261110`
+(48 runs, 128 episodes, two environments, two modes, two seeds; CEAC, offline
+oracle, IDS, IDAC, UCB Q-learning and optimistic POMD). Its report includes
+update counters and POMD bonus-saturation diagnostics. This is not a convergence
+or pathology-strength experiment.
 
-A fresh GitHub clone uses the verified compact export in `notebooks/evidence/`.
-Use `python -m ceac.run --output runs/<new-name> ...` for a new study.
+The preceding `source_comparator_smoke_20261110` is the completed five-method
+integration check before POMD was added. Its exact source is archived separately.
+
+Historical studies: `ceac_undertow_20261110` (336 original runs) and
+`ceac_prior_support_20261110` (48 additional runs). Their raw records are
+unchanged; retired custom controls are excluded from current reports/notebooks.
+The cached M sweep measures nuisance alphabet diversity, not physical strength.
+
+New runs snapshot their source at launch. Fresh output directories prevent
+historical source/config/seed identities from being overwritten. The notebook's
+portable export has no dependency on these local raw directories.

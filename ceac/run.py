@@ -8,10 +8,11 @@ import hashlib
 import json
 from pathlib import Path
 import time
+import tarfile
 import numpy as np
 from .agents import CEAC, CEACConfig, LaiGravesOracle
 from .contracts import Episode, Transition
-from .comparators import ModelConfidence, PolicyUCB, UniformCoverage, OIRIDAC
+from .primitives import PrimitiveSpec, IDAC, IDACConfig, UCBQ, UCBQConfig, OptimisticPOMD, POMDConfig
 from .evidence import RunWriter, atomic_json, jsonable, manifest, verify_run
 from .ids import BayesianIDS
 from .model import FiniteModel, environment
@@ -19,8 +20,19 @@ from .benchmarks import BENCHMARKS, specification, study_cells
 from .benchmark_audit import audit_model
 
 
-METHODS = ("ceac", "ceac_actor", "ids", "ids_rare", "ids_zero", "oracle",
-           "confidence", "policy_ucb", "oir_idac", "coverage")
+METHODS = ("ceac", "ceac_actor", "ids", "ids_rare", "ids_zero", "oracle", "idac", "ucb_q", "pomd")
+DEFAULT_METHODS = ("ceac", "oracle", "ids", "idac", "ucb_q", "pomd")
+
+
+def primitive_specification(model):
+    """Public state/time/action interface and reward envelope, not model access."""
+    elapsed = np.empty(model.n, dtype=int)
+    for t, states in enumerate(model.levels):
+        elapsed[states] = t
+    rewards = [0.] + [float(reward) for pair in model.laws.values()
+                      for law in pair for _, reward, _ in law]
+    return PrimitiveSpec(model.mask, elapsed, model.cfg.max_steps, model.initial,
+                         min(rewards), max(rewards))
 
 
 def stable_seed(seed, kind, method, context, channel):
@@ -59,13 +71,20 @@ def collect_episode(env, model, policy, episode_index, behavior, action_rng, sim
              "terminal_observation": int(observation), "events": events, "locations": locations})
 
 
-def execute(model, folder, method, seed, mode, episodes, config, resume=False):
+def execute(model, folder, method, seed, mode, episodes, config, resume=False, primitive_configs=None):
+    if method not in METHODS:
+        raise ValueError("Unsupported or retired comparator: " + str(method))
+    primitive_configs = primitive_configs or {}
+    primitive_config = (asdict(IDACConfig(**primitive_configs.get("idac", {}))) if method == "idac" else
+                        asdict(UCBQConfig(**primitive_configs.get("ucb_q", {}))) if method == "ucb_q" else
+                        asdict(POMDConfig(**primitive_configs.get("pomd", {}))) if method == "pomd" else None)
     if method == "ceac_actor":
         config = replace(config, deployment_rule="actor_only")
     prior = .001 if method == "ids_rare" else 0. if method == "ids_zero" else .5
     configuration = {"benchmark": model.specification, "environment": model.kind, "context": model.context, "method": method,
                      "seed": seed, "true_mode_evaluator_only": mode, "episodes": episodes,
-                     "ids_prior": prior if method.startswith("ids") else None, "ceac": asdict(config)}
+                     "ids_prior": prior if method.startswith("ids") else None, "ceac": asdict(config),
+                     "primitive_comparator": primitive_config}
     identity = manifest(configuration)
     if Path(folder).exists():
         if not resume:
@@ -81,14 +100,12 @@ def execute(model, folder, method, seed, mode, episodes, config, resume=False):
         learner = BayesianIDS(model, rng, prior)
     elif method == "oracle":
         learner = LaiGravesOracle(model, mode, config)
-    elif method == "confidence":
-        learner = ModelConfidence(model, rng, config.confidence_delta)
-    elif method == "policy_ucb":
-        learner = PolicyUCB(model, rng, config.confidence_delta)
-    elif method == "oir_idac":
-        learner = OIRIDAC(model, rng)
-    elif method == "coverage":
-        learner = UniformCoverage(model, rng)
+    elif method == "idac":
+        learner = IDAC(primitive_specification(model), rng, IDACConfig(**primitive_config))
+    elif method == "pomd":
+        learner = OptimisticPOMD(primitive_specification(model), episodes, POMDConfig(**primitive_config))
+    elif method == "ucb_q":
+        learner = UCBQ(primitive_specification(model), rng, episodes, UCBQConfig(**primitive_config))
     else:
         raise ValueError(method)
     setup_seconds = time.monotonic()-setup_started
@@ -177,10 +194,10 @@ def _worker_model(kind, context, benchmark):
     return FiniteModel(kind, context, benchmark)
 
 
-def _execute_cell(cell, episodes, config, resume):
+def _execute_cell(cell, episodes, config, resume, primitive_configs):
     benchmark, kind, context, mode, seed, method, folder = cell
     model = _worker_model(kind, context, benchmark)
-    return execute(model, folder, method, seed, mode, episodes, config, resume)
+    return execute(model, folder, method, seed, mode, episodes, config, resume, primitive_configs)
 
 
 def main(argv=None):
@@ -191,13 +208,21 @@ def main(argv=None):
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--mass-bound", type=float)
     parser.add_argument("--report-pdf", action="store_true", help="Render verified figures and PDF after all cells finish")
-    parser.add_argument("--methods", nargs="+", choices=METHODS, default=["ceac", "oracle", "confidence", "policy_ucb", "oir_idac", "coverage", "ids"])
+    parser.add_argument("--methods", nargs="+", choices=METHODS, default=list(DEFAULT_METHODS))
     parser.add_argument("--contexts", nargs="+", type=int, choices=(0, 1, 2), default=[0])
     parser.add_argument("--modes", nargs="+", type=int, choices=(0, 1), default=[0, 1])
     parser.add_argument("--seeds", nargs="+", type=int, default=[0])
     parser.add_argument("--episodes", type=int, default=128)
     parser.add_argument("--refresh-interval", type=int, default=8)
     parser.add_argument("--actor-init", choices=("model_mixture", "uniform"), default="model_mixture")
+    parser.add_argument("--idac-batch-episodes", type=int, default=16)
+    parser.add_argument("--idac-policy-lr", type=float, default=.1)
+    parser.add_argument("--idac-value-lr", type=float, default=.2)
+    parser.add_argument("--idac-tau", type=float, default=.01)
+    parser.add_argument("--idac-kappa", type=float, default=.1)
+    parser.add_argument("--pomd-policy-step", type=float, default=None)
+    parser.add_argument("--ucb-bonus", type=float, default=1.)
+    parser.add_argument("--comparator-delta", type=float, default=.05)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args(argv)
     if args.episodes < 1 or args.workers < 1:
@@ -207,6 +232,11 @@ def main(argv=None):
     config = CEACConfig(mass_bound=args.mass_bound, normalization=args.mass_bound,
                         refresh_interval=args.refresh_interval, actor_initialization=args.actor_init,
                         confidence_delta=.05/len(set(args.contexts)))
+    primitive_configs = {
+        "idac": asdict(IDACConfig(policy_lr=args.idac_policy_lr, value_lr=args.idac_value_lr,
+                    batch_episodes=args.idac_batch_episodes, tau=args.idac_tau, kappa=args.idac_kappa)),
+        "ucb_q": asdict(UCBQConfig(bonus_constant=args.ucb_bonus, delta=args.comparator_delta)),
+        "pomd": asdict(POMDConfig(delta=args.comparator_delta, policy_step=args.pomd_policy_step))}
     study_configuration = {k: v for k, v in vars(args).items() if k not in {"output", "resume"}}
     study_identity = manifest({"study": study_configuration, "ceac": asdict(config),
         "benchmark_specifications": [specification(b, k) for b in args.benchmarks for k in args.environments]})
@@ -219,6 +249,17 @@ def main(argv=None):
     else:
         args.output.mkdir(parents=True)
         atomic_json(args.output/"study.json", study_identity)
+    source_bundle = args.output / "source_bundle.tar.gz"
+    if not source_bundle.exists():
+        pending_bundle = args.output / "source_bundle.tar.gz.pending"
+        with tarfile.open(pending_bundle, "w:gz") as archive:
+            for name, expected in study_identity["sources"].items():
+                source = Path(__file__).resolve().parent / name
+                if hashlib.sha256(source.read_bytes()).hexdigest() != expected:
+                    raise ValueError("Runtime source changed during study launch")
+                archive.add(source, arcname="ceac/"+name)
+            archive.add(args.output/"study.json", arcname="study.json")
+        pending_bundle.replace(source_bundle)
     atomic_json(args.output/"status.json", {"status": "running"})
     results = []
     try:
@@ -251,10 +292,10 @@ def main(argv=None):
                   flush=True)
         if args.workers == 1:
             for i, cell in enumerate(cells):
-                record(i, _execute_cell(cell, args.episodes, config, args.resume))
+                record(i, _execute_cell(cell, args.episodes, config, args.resume, primitive_configs))
         else:
             with ProcessPoolExecutor(max_workers=args.workers) as pool:
-                pending = {pool.submit(_execute_cell, cell, args.episodes, config, args.resume): i
+                pending = {pool.submit(_execute_cell, cell, args.episodes, config, args.resume, primitive_configs): i
                            for i, cell in enumerate(cells)}
                 for future in as_completed(pending):
                     record(pending[future], future.result())

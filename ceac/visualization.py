@@ -11,16 +11,15 @@ ENVIRONMENT_LABELS = {"deepsea": "Undertow DeepSea", "frozenlake": "False Beacon
 
 LABELS = {
     "ceac": "CEAC (exact-model single loop)", "ceac_actor": "CEAC: actor-only ablation",
-    "oracle": "Offline Graves–Lai oracle", "confidence": "Model-confidence optimism",
-    "policy_ucb": "Policy-UCB (public bank)", "oir_idac": "OIR/IDAC (policy adaptation)",
-    "coverage": "Uniform coverage (public bank)", "ids": "IDS: full support",
+    "oracle": "Offline Graves–Lai oracle", "ids": "IDS: full support",
+    "idac": "IDAC (upstream tabular update)", "ucb_q": "UCB Q-learning (Jin et al.)",
+    "pomd": "Optimistic POMD (softmax)",
     "ids_rare": "IDS: rare prior (0.001)", "ids_zero": "IDS: zero shifted support",
 }
 STYLES = {
     "ceac": ("#cf202f", "-", "o"), "ceac_actor": ("#8b3e2f", ":", "v"),
-    "oracle": ("#161616", "--", "*"), "confidence": ("#07854d", "-.", "x"),
-    "policy_ucb": ("#ed8a00", "--", "s"), "oir_idac": ("#7c2fc5", "-", "^"),
-    "coverage": ("#747474", ":", "+"), "ids": ("#0058c7", "--", "D"),
+    "oracle": ("#161616", "--", "*"), "ucb_q": ("#07854d", "-.", "x"),
+    "idac": ("#7c2fc5", "-", "^"), "pomd": ("#e87500", "--", "s"), "ids": ("#0058c7", "--", "D"),
     "ids_rare": ("#bd319b", "-.", "s"), "ids_zero": ("#00a0a0", ":", "X"),
 }
 
@@ -134,13 +133,14 @@ def export_trace_statistics(root, runs, band="sd"):
 
 def make_headline_figures(destination, runs, plt, band):
     """Two environments side by side in scope, with focused comparator subsets."""
-    selected = [r for r in runs if r["result"].get("benchmark") == "weak_signal_m64"]
+    selected = [r for r in runs if r["result"].get("benchmark") == "weak_signal_m64"
+                and r["result"]["method"] not in RETIRED_METHODS]
     artifacts = []
     for context in sorted({r["result"]["context"] for r in selected}):
         for mode in sorted({r["result"]["true_mode"] for r in selected}):
             relevant = [r for r in selected if r["result"]["context"] == context
                         and r["result"]["true_mode"] == mode]
-            methods = (("ceac", "oracle", "confidence", "policy_ucb", "oir_idac", "coverage", "ids")
+            methods = (("ceac", "oracle", "idac", "ucb_q", "pomd", "ids")
                        if mode == 0 else ("ceac", "oracle", "ids", "ids_rare", "ids_zero"))
             kinds = sorted({r["result"]["environment"] for r in relevant})
             fig, axes = plt.subplots(len(kinds), 3, figsize=(20, 5*len(kinds)+1.5), squeeze=False)
@@ -262,71 +262,133 @@ def summarize_nuisance(rows, band="sd"):
     return summaries
 
 
-def make_aggregate_nuisance_figures(destination, rows, plt, band):
-    """One figure per fixed mode; rows are environments, columns are outcomes."""
-    summaries = summarize_nuisance(rows, band)
+RETIRED_METHODS = frozenset({"confidence", "policy_ucb", "oir_idac", "coverage"})
+NUISANCE_TRACE_METHODS = ("idac", "ucb_q", "pomd", "ids", "ceac", "oracle")
+NUISANCE_TRACE_TITLES = {
+    "idac": "IDAC\nUpstream two-critic softmax update",
+    "ucb_q": "UCB Q-learning\nJin et al. (2018), Algorithm 1",
+    "pomd": "Optimistic POMD\nSoftmax policy / learned model",
+    "ids": "IDS with full prior support\nFinite-model evidence control",
+    "ceac": "CEAC\nExact-model single loop",
+    "oracle": "Offline Graves–Lai oracle\nTrue mode known from the outset",
+}
+NUISANCE_TRACE_STYLES = {4: ("#0058c7", "-", "o"),
+                         16: ("#e36b00", "--", "s"),
+                         64: ("#b80080", ":", "^")}
+
+
+def nuisance_trace_groups(runs):
+    """Matched learning curves, with the same configuration audit as endpoints.
+
+    Never pool modes, benchmarks, or seeds. A missing dose must fail instead of
+    silently changing the comparison. Single-dose studies have no dose response.
+    """
+    runs = [r for r in runs if r["result"]["method"] not in RETIRED_METHODS]
+    paired = nuisance_sensitivity_rows(runs)
+    eligible = {(r["environment"], r["context"], r["mode"], r["method"]) for r in paired}
+    groups = defaultdict(lambda: defaultdict(list))
+    for run in runs:
+        r = run["result"]
+        key = r["environment"], r["context"], r["true_mode"], r["method"]
+        if key not in eligible or r.get("benchmark") not in NUISANCE_PROFILES:
+            continue
+        size = NUISANCE_PROFILES[r["benchmark"]]
+        groups[key][size].append(run)
+    values = {}
+    for key, doses in sorted(groups.items()):
+        if set(doses) != set(NUISANCE_TRACE_STYLES):
+            raise ValueError("Learning comparison requires all three nuisance doses")
+        values[key] = {}
+        for size, subset in sorted(doses.items()):
+            matrix = trace_values(subset, "cumulative_pseudo_regret")
+            for run in subset:
+                r = run["result"]
+                if len(run["metrics"]) != r["episodes"]:
+                    raise ValueError("Learning curve differs from its episode budget")
+                if not np.isclose(run["metrics"][-1]["cumulative_pseudo_regret"],
+                                  r["pseudo_regret"], rtol=1e-10, atol=1e-10):
+                    raise ValueError("Learning curve differs from its recorded endpoint")
+            values[key][size] = matrix
+    return values
+
+
+def draw_nuisance_learning(groups, kind, context, mode, plt, band="sd"):
+    """STEERING-style traces: time on x, regret on y, dose in the legend.
+
+    These cached doses are observation diversity, not physical strength. Method
+    panels share a linear scale; coincident traces are labeled without jitter.
+    """
+    selected = {m: groups[kind, context, mode, m] for m in NUISANCE_TRACE_METHODS
+                if (kind, context, mode, m) in groups}
+    if not selected:
+        raise ValueError("No matched nuisance learning curves for this environment/mode")
+    matrices = [v for doses in selected.values() for v in doses.values()]
+    if len({v.shape for v in matrices}) != 1:
+        raise ValueError("Method panels require matched seed counts and episode budgets")
+    seeds, budget = matrices[0].shape
+    columns = min(3, len(selected))
+    rows = (len(selected)+columns-1)//columns
+    fig, axes = plt.subplots(rows, columns, figsize=(17, 4.2*rows+2.1),
+                             sharex=True, sharey=True, squeeze=False)
+    maxima = []
+    for method, axis in zip(selected, axes.flat):
+        if method not in selected:
+            axis.set_axis_off()
+            continue
+        doses = selected[method]
+        x = np.arange(1, budget+1)
+        endpoint_text = []
+        for offset, (size, matrix) in enumerate(sorted(doses.items())):
+            stats = seed_summary(matrix, band)
+            color, line_style, marker = NUISANCE_TRACE_STYLES[size]
+            axis.plot(x, stats["mean"], color=color, ls=line_style, marker=marker,
+                      markevery=(offset*max(1, budget//36), max(1, budget//9)),
+                      ms=5, markerfacecolor="white", markeredgewidth=1.2,
+                      lw=3 if method == "ceac" else 2, label=f"M = {size}", zorder=3)
+            maxima.append(float(np.max(stats["mean"] if stats["upper"] is None else stats["upper"])))
+            if stats["lower"] is not None:
+                axis.fill_between(x, stats["lower"], stats["upper"], color=color,
+                                  alpha=.10, lw=0, zorder=1)
+            endpoint_text.append(f"{stats['mean'][-1]:.2f}")
+        coincident = all(np.allclose(doses[4], v, rtol=1e-10, atol=1e-10) for v in doses.values())
+        note = ("All three M curves coincide\n" if coincident else "")
+        note += "Final R: " + " / ".join(endpoint_text) + " (M=4/16/64)"
+        axis.text(.03, .96, note, transform=axis.transAxes, va="top", fontsize=10,
+                  bbox=dict(fc="white", ec="none", alpha=.85, pad=3))
+        axis.set_title(NUISANCE_TRACE_TITLES[method], fontsize=15, pad=12)
+        axis.set_xlabel("Training episode", fontsize=13)
+        axis.set_ylabel("Cumulative pseudo-regret", fontsize=13)
+        axis.tick_params(labelbottom=True, labelleft=True, labelsize=11)
+        axis.grid(alpha=.22)
+        axis.spines[["top", "right"]].set_visible(False)
+    for axis in list(axes.flat)[len(selected):]:
+        axis.set_axis_off()
+    axes[0,0].set_xlim(1, budget)
+    axes[0,0].set_ylim(0, max(1., max(maxima))*1.2)
+    handles, labels = next(ax.get_legend_handles_labels() for ax in axes.flat if ax.has_data())
+    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(.5,.067), ncol=3,
+               fontsize=14, frameon=False, title="Cached control: nuisance symbol count (not physical strength)",
+               title_fontsize=12)
+    fig.suptitle(ENVIRONMENT_LABELS[kind]+f" · mode {mode} · context {context}",
+                 fontsize=23, fontweight="bold", y=.99)
+    fig.text(.5, .935, "Fixed geometry, useful probe and route gap; color changes nuisance diversity only.",
+             ha="center", fontsize=12)
+    fig.text(.5,.041,f"{seeds} paired seeds per curve; "+band_description(band), ha="center", fontsize=10)
+    fig.text(.5,.018,"Same linear y-scale in every panel. Regret is to the true optimal policy, not the executed oracle allocation.",
+             ha="center", fontsize=11)
+    fig.tight_layout(rect=(0,.15,1,.92), h_pad=2.3, w_pad=1.5)
+    return fig
+
+
+def make_aggregate_nuisance_figures(destination, runs, plt, band):
+    """Save one method-panel learning comparison per environment and mode."""
+    groups = nuisance_trace_groups(runs)
     artifacts = []
-    for context, mode in sorted({(r["context"], r["mode"]) for r in rows}):
-        selected = [r for r in summaries if r["context"] == context and r["mode"] == mode]
-        kinds = sorted({r["environment"] for r in selected})
-        budgets = {r["episodes"] for r in rows if r["context"] == context and r["mode"] == mode}
-        if len(budgets) != 1:
-            raise ValueError("Aggregate nuisance figure requires an equal episode budget")
-        budget = next(iter(budgets))
-        fig, axes = plt.subplots(len(kinds), 3, figsize=(19.5, 4.7*len(kinds)+1.5), squeeze=False)
-        handles = {}
-        for row, kind in enumerate(kinds):
-            for col, field in enumerate(("cumulative_regret", "added_regret", "nuisance_visits")):
-                axis = axes[row, col]
-                for method in LABELS:
-                    samples = sorted([r for r in selected if r["environment"] == kind
-                                      and r["method"] == method and r["metric"] == field],
-                                     key=lambda r: r["nuisance_bins"])
-                    if not samples:
-                        continue
-                    x = [r["nuisance_bins"] for r in samples]
-                    color, style, marker = STYLES[method]
-                    line, = axis.plot(x, [r["mean"] for r in samples], color=color, ls=style,
-                                      marker=marker, markersize=8, markerfacecolor="white",
-                                      lw=4 if method == "ceac" else 2, zorder=5 if method == "ceac" else 3)
-                    handles[method] = line
-                    if all(r["lower"] is not None for r in samples):
-                        axis.fill_between(x, [r["lower"] for r in samples], [r["upper"] for r in samples],
-                                          color=color, alpha=.13, lw=0, zorder=1)
-                if col == 0:
-                    axis.set_yscale("symlog", linthresh=.25)
-                    axis.set_ylim(bottom=0)
-                elif col == 1:
-                    axis.axhline(0, color="#333333", lw=.8, alpha=.6)
-                    from matplotlib.ticker import MaxNLocator
-                    axis.yaxis.set_major_locator(MaxNLocator(nbins=6))
-                    axis.ticklabel_format(axis="y", style="plain", useOffset=False)
-                else:
-                    axis.set_ylim(bottom=0)
-                axis.set_xscale("log", base=4)
-                axis.set_xticks([4, 16, 64], ["4", "16", "64"])
-                axis.set_xlim(3.5, 74)
-                axis.set_xlabel("Nuisance diversity M (task signal fixed)")
-                axis.set_ylabel(("Cumulative pseudo-regret\n(symlog scale)",
-                                 "Added regret relative to M=4\n(paired by training seed)",
-                                 "Cumulative nuisance visits")[col])
-                axis.set_title(ENVIRONMENT_LABELS[kind]+"\n"+
-                               ("Total learning cost", "Effect of increasing nuisance diversity", "Distraction exposure")[col], pad=12)
-                axis.grid(True, color="#dfe3e8", lw=.7, alpha=.8)
-                axis.spines[["top", "right"]].set_visible(False)
-        ordered = [m for m in LABELS if m in handles]
-        fig.legend([handles[m] for m in ordered], [LABELS[m] for m in ordered], loc="lower center",
-                   bbox_to_anchor=(.5, .052), ncol=3, frameon=False, fontsize=12)
-        fig.suptitle(f"Nuisance sensitivity · {budget} episodes · mode {mode} · context {context}",
-                     fontsize=23, fontweight="bold", y=.995)
-        fig.text(.5, .032, "Task probability separation = 0.05; physical geometry and policy-bank size held fixed.",
-                 ha="center", fontsize=12, color="#444444")
-        fig.text(.5, .009, band_description(band)+" Unchanged methods overlap at zero in the middle column.",
-                 ha="center", fontsize=11, color="#444444")
-        fig.tight_layout(rect=(0, .20, 1, .955), h_pad=2.5, w_pad=1.8)
+    for kind, context, mode in sorted({key[:3] for key in groups}):
+        fig = draw_nuisance_learning(groups, kind, context, mode, plt, band)
         for extension in ("png", "pdf"):
-            path = Path(destination)/f"aggregate_nuisance_context{context}_mode{mode}.{extension}"
-            fig.savefig(path, dpi=180, facecolor="white", bbox_inches="tight")
+            path = Path(destination)/f"aggregate_nuisance_{kind}_context{context}_mode{mode}.{extension}"
+            fig.savefig(path, dpi=160, facecolor="white", bbox_inches="tight")
             artifacts.append(path)
         plt.close(fig)
     return artifacts
@@ -342,14 +404,14 @@ def make_figures(root, verified_runs, band="sd", sensitivity=None):
     destination = Path(root)/"figures"; destination.mkdir(exist_ok=True)
     groups = sorted({(r["result"].get("benchmark","legacy"),r["result"]["environment"],r["result"]["context"]) for r in verified_runs})
     sets = {
-        "comparators": ("ceac","oracle","confidence","policy_ucb","oir_idac","coverage","ids"),
-        "exploration": ("ceac","oracle","confidence","policy_ucb","oir_idac","coverage","ids"),
+        "comparators": ("ceac","oracle","idac","ucb_q","pomd","ids"),
+        "exploration": ("ceac","oracle","idac","ucb_q","pomd","ids"),
         "prior_support": ("ids","ids_rare","ids_zero"),
         "deployment_and_prior": ("ceac","ceac_actor","oracle","ids","ids_rare","ids_zero"),
     }
     if sensitivity is None:
         sensitivity=nuisance_sensitivity_rows(verified_runs)
-    artifacts=make_aggregate_nuisance_figures(destination, sensitivity, plt, band)
+    artifacts=make_aggregate_nuisance_figures(destination, verified_runs, plt, band)
     artifacts.extend(make_headline_figures(destination, verified_runs, plt, band))
     for benchmark,kind,context in groups:
         relevant=[r for r in verified_runs if r["result"]["environment"]==kind and r["result"]["context"]==context and r["result"].get("benchmark","legacy")==benchmark]

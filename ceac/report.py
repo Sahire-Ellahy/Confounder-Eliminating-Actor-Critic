@@ -11,7 +11,7 @@ import hashlib
 import numpy as np
 from .evidence import atomic_json, digest, encoded, verify_run
 from .visualization import (LABELS, ENVIRONMENT_LABELS, make_figures, export_trace_statistics,
-                            band_description, nuisance_sensitivity_rows, summarize_nuisance)
+                            band_description, nuisance_sensitivity_rows, summarize_nuisance, RETIRED_METHODS)
 from .benchmarks import study_cells
 
 
@@ -19,10 +19,9 @@ ACCESS = {
     "ceac": "Unknown realized mode; exact planning over declared models; certified reward-only execution",
     "ceac_actor": "Same CEAC design and model family; actor-only free episodes",
     "oracle": "Realized model known; allocation computed offline and fixed",
-    "confidence": "Same declared model family and anytime confidence; optimistic response",
-    "policy_ucb": "Observed returns; range-calibrated UCB over the public bank",
-    "oir_idac": "Observed returns and occupancy; finite-policy OIR/IDAC adaptation",
-    "coverage": "Uniform sampling of the same public bank",
+    "idac": "Primitive trajectories only; upstream tabular softmax actor and two critics",
+    "ucb_q": "Primitive trajectories only; Jin et al. Algorithm 1 UCB-Hoeffding Q-learning",
+    "pomd": "Primitive trajectories only; optimistic POMD softmax policy and learned empirical model",
     "ids": "Declared model family; full-support Bayesian IDS; full policy response",
     "ids_rare": "Same IDS, with shifted-mode prior 0.001",
     "ids_zero": "Same IDS, with shifted mode explicitly excluded from prior support",
@@ -209,6 +208,9 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
         reference_record={"root":str(reference),"study_identity":saved["identity"],
                           "study_sha256":digest(reference/"study.json"),
                           "run_manifest_hashes":control_manifests,"reused_runs":len(controls)}
+    retired_runs = [r for r in runs if r["result"]["method"] in RETIRED_METHODS]
+    runs = [r for r in runs if r["result"]["method"] not in RETIRED_METHODS]
+    config["methods"] = [m for m in config["methods"] if m not in RETIRED_METHODS]
     results=[r["result"] for r in runs]
     groups=defaultdict(list)
     for r in results:groups[r.get("benchmark","legacy"),r["environment"],r["context"],r["true_mode"],r["method"]].append(r)
@@ -242,7 +244,7 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
           "This is a paired, stationary-context finite-model experiment. It tests the deployment correction and exploration behavior; it does not establish an asymptotic coefficient-one theorem or recovery from unannounced temporal changes.","",
           "## Main finding","",
           "The corrected CEAC separates its pricing-policy actor from reward-only deployment. Once the likelihood evidence supports a policy that is reward-optimal for every plausible model, free episodes use that certified policy. Statistical and Graves–Lai debts retain priority.","",
-          (f"**CEAC matches the offline oracle’s last-window expected return in {len(matched)} of {len(certified)} certified cells.** Endpoint equality is distinct from cumulative exploration cost." if not refined else "The primary comparison is the cost of resolving task uncertainty as nuisance diversity grows. The preflight certifies the objective mismatch; actual learning is assessed using cumulative regret, diagnostic/nuisance visits, and matched-seed sensitivity. No algorithm ranking is assumed in advance."),"",
+          (f"**CEAC matches the offline oracle’s last-window expected return in {len(matched)} of {len(certified)} certified cells.** Endpoint equality is distinct from cumulative exploration cost." if not refined else "This study measures cumulative regret and diagnostic/nuisance visits under its recorded settings. Preflight verifies confounding and useful diagnostic routes. Sensitivity is assessed only for matched multilevel studies; no algorithm ranking is assumed in advance."),"",
           f"{len(certified)} CEAC cells finish with a valid deployment certificate. This certifies the deployed response on the model-confidence event; it does not mean the stochastic proposal actor has converged.","",
           "The offline oracle knows the realized mode, solves its full-policy Lai–Graves allocation once, and keeps that allocation fixed throughout execution. Its privilege is explicit; it is a benchmark, not an online learner.","",
           "## CEAC, certified deployment, and the offline oracle", "",
@@ -273,7 +275,7 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
                  "The strong-signal control uses M=4 and route probability separation 0.25 from the midpoint. Weak-signal arms use separation 0.05 and M=4,16,64. Probe signals remain Bernoulli(0.15) versus Bernoulli(0.85). DeepSea uses terminal reward 0.5, signed challenge reward scale 0.5, and probe cost 0.02. Shores uses inner mean success 0.5, outer success 0.502 +/- separation, unit dock rewards, safe-dock reward 0.3 and deep-survey fee 0.02. The 0.002 offset compensates for two additional travel steps.", "",
                  "The refined DeepSea enables a mode-independent nuisance action at each depth and supplies one sonar-sweep seed policy to every bank method. FrozenLake keeps its original six seed routes. Seed-bank size is constant across M; CEAC still pays its one-episode-per-seed initialization. This experiment does not claim an M-fold uniform-route-search penalty, which would require expanding the route bank.", "",
                  f"The shared CEAC/oracle allocation mass bound is {study['configuration']['ceac']['mass_bound']:g}. It is enlarged because inverse weak-route KL exceeds the old bound of 20. Confidence level, statistical gate, debt accounting and actor update remain unchanged. Probe and nuisance events are evaluator annotations; they are never supplied to a learner as labels.", "",
-                 "Preflight evaluates the actual normalized occupancy E[counts / realized episode length]. A zero-information policy beating the reward-optimal policy under OIR proves an objective mismatch for this finite-policy adaptation. It does not prove finite-budget SGD converges to the distracting solution.", "",
+                 "The preflight retains historical episodic finite-policy objective witnesses for audit only. They are not the continuing reset-process objective used by the new IDAC implementation and do not establish IDAC failure. Source-faithful controls require their own measured trajectories and convergence diagnostics.", "",
                  "| Setting | Environment | States | Seed/public bank | Oracle cost (mode 0 / 1) | Risky-route / optimal information cost (mode 0) | Zero-information OIR witness (mode 0) |",
                  "|---|---|---:|---:|---:|---:|---|"]
         for a in environment_audit["models"]:
@@ -297,10 +299,10 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
                      "Full mathematical specification and implementation adjustments: [benchmark design ledger](../../audits/ceac_undertow_design_20261110.md).", ""]
 
     if sensitivity:
-        text += ["", "## Aggregate nuisance sensitivity", "",
-                 "The aggregate figures put both environments in one panel grid, separately for each stationary mode. The x-axis is nuisance observation diversity M=4,16,64. Route probability separation stays 0.05, diagnostic signal quality stays fixed, and geometry and bank size do not change. Increasing useful task evidence would be a different experiment.", "",
-                 "Columns show final cumulative regret, the additional regret relative to M=4, and nuisance visits. Additional regret is computed within each matching seed before taking the mean and sample SD. All non-nuisance run settings and seed pairs are checked for equality. The complete per-seed data and summaries are in `nuisance_sensitivity.json`.", "",
-                 "The normal-mode results support a specific pattern: CEAC and full-support IDS are stable; OIR/IDAC becomes more costly as nuisance diversity increases, clearly in DeepSea and modestly in Frozen Lake. Confidence, policy-UCB and uniform coverage have mostly M-invariant costs. This is not evidence that every alternative worsens with M or that full-support IDS fails.", "",
+        text += ["", "## Learning curves by experimental condition", "",
+                 "Following the training-time sensitivity layout in [STEERING](https://arxiv.org/pdf/2301.12038), each method has a panel: x is training episode, y is cumulative pseudo-regret, and color identifies nuisance diversity M=4,16,64. These cached doses are symbol counts, not physical undertow strength or false-beacon activation probability. Shared linear axes preserve comparisons; coincident traces are labeled without artificial jitter.", "",
+                 "The custom policy-bank UCB, model-confidence, uniform-bank and episodic policy-mixture OIR controls have been retired. Their historical data remain in the original study and source archive but are excluded from active figures and tables. Their results do not establish a failure of published coverage/optimism algorithms. Replacement IDAC, UCB Q-learning and optimistic POMD use distinct method identifiers; only actually recorded methods are plotted.", "",
+                 "Matched endpoint summaries below are a supplemental audit. Pseudo-regret is measured against the true-mode optimal policy, not against the executed offline oracle's allocation. The current historical CEAC and full-support IDS controls are stable with nuisance diversity.", "",
                  "| Environment | Method | Regret at M=4 | Regret at M=64 | Paired added regret, mean +/- sample SD |",
                  "|---|---|---:|---:|---:|"]
         for kind,context in sorted({(r["environment"],r["context"]) for r in sensitivity}):
@@ -344,8 +346,21 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
                  f"**{zero_updates} of {len(ceac_history)} CEAC runs made zero actor/evidence-critic updates; {actor_admissions} learned actor proposals were admitted.** Actor and evidence-value updates occur only on episodes labeled actor. Exact declared-model evaluation supplies diagnostic-design coefficients and response/deployment certificates. These experiments therefore support cumulative evidence accounting, directed experimental design and certified deployment; they do not isolate a causal performance gain from the learned TD evidence critic or replay resampling.", "",
                  "The replay object retains policy-labeled trajectories and cumulative likelihood sufficient statistics. Its ledger report exposes policies with quotas/statistical requests; it does not expose all internal buffer entries. The reconstruction verifies every saved episode and every reported credit, rather than interpreting missing ledger keys as discarded evidence. No frozen diagnostic/deployment trajectory is counted as an off-policy actor update.", "",
                  "A learned-critic claim needs an active learned-estimator lane and matched ablations of evidence pricing and cumulative-history use. Those experiments are not inferred from these cached curves.", ""]
-    text += ["","The bank-based controls share an enriched, fixed public bank containing both candidate-model optimal policies, the missing low-cost FrozenLake survey route, and public design/information responses. Their online updates receive no true-mode information. They remain finite-bank adaptations; their curves are not claims about every full-policy or neural OIR/IDAC implementation.","",
-             "OIR/IDAC minimizes empirical return cost divided by an occupancy-entropy offset. Occupancy is the expected state distribution from a uniformly selected pre-action time within an episode. This is a finite episodic adaptation, not the original infinite-horizon stationary objective. Confidence controls include both model-confidence optimism and trajectory-only policy-UCB with an anytime Hoeffding radius calibrated to the full episodic reward range.","",
+    primitive_runs = [r for r in runs if r["result"]["method"] in {"idac", "ucb_q", "pomd"}]
+    if primitive_runs:
+        text += ["", "## Primitive learner update diagnostics", "",
+                 "These runs validate the new primitive-action implementations. A short run is not a convergence claim or evidence of systematic failure under increasing pathology strength. In particular, the published POMD bonuses can leave every optimistic cost clipped to zero, so its softmax policy stays uniform.", "",
+                 "| Environment | Mode | Method | Seed | Episodes | Actor / Q updates | Episodes with all POMD costs zero |",
+                 "|---|---:|---|---:|---:|---:|---:|"]
+        for run in primitive_runs:
+            r=run["result"];d=r["diagnostics"]
+            updates=d.get("actor_updates",d.get("updates",0))
+            zero=(sum(m["diagnostics"]["all_optimistic_q_zero"] for m in run["metrics"])
+                  if r["method"] == "pomd" else "n/a")
+            text.append(f"| {r['environment']} | {r['true_mode']} | {LABELS[r['method']]} | {r['seed']} | {r['episodes']} | {updates} | {zero} |")
+        text += ["", "IDAC updates both its cost critic and shadow critic at each reported actor update. UCB-Q counts updates on the analytically padded horizon; physical simulator steps remain separately charged. All three controls use the public finite domain and reward envelope, while CEAC/IDS additionally use declared candidate-model laws. That information-access difference must accompany any ranking.", ""]
+    text += ["", "## Comparator provenance", "",
+             f"Excluded {len(retired_runs)} historical custom-control runs from these comparisons. Raw run hashes and source archives remain unchanged. Active primitive-action controls are IDAC (the upstream tabular two-critic/softmax update), UCB Q-learning (Jin et al., 2018, Algorithm 1), and optimistic POMD with a softmax policy (Shani et al., 2020, Algorithm 2). Their exact source, update equations, reward normalization and reset/padding adapter are documented in [the comparator ledger](../../docs/comparator_provenance.md). No cached policy-mixture OIR or policy-bank UCB curve is relabeled as a new algorithm.", "",
              "## Time traces","",
              "Expected policy return is evaluated exactly in the realized candidate model **by the evaluator only**. Pseudo-regret sums its gap to the model-optimal policy. Expected model KL measures decision-relevant evidence, not raw state coverage. The return trace uses a causal 16-episode moving mean within each seed before aggregation; other traces are cumulative. Observed log-likelihood-ratio traces are reconstructed from saved trajectories and oriented toward the realized mode for evaluation only. They differ from expected model KL, which is an exact evaluator quantity.",""]
     text += [band_description(band)+f" There are {len(config['seeds'])} seeds per curve in this report. The episode index is not treated as additional independent replication. These are pointwise descriptive bands, not confidence intervals or simultaneous coverage guarantees. Nonnegative plot domains may clip a negative mean-minus-SD edge; exported values are untruncated.", "",
@@ -403,7 +418,8 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
     atomic_json(root/"report_audit.json",{"schema":3,"study_identity":study["identity"],
                 "reference_study":reference_record,
                 "descriptive_band":band,"independent_unit":"training_seed","expected_return_smoothing":16,
-                "run_manifest_hashes":manifests,"report_sha256":digest(root/"report.md"),
+                "run_manifest_hashes":manifests,"excluded_retired_runs":len(retired_runs),
+                "excluded_method_ids":sorted(RETIRED_METHODS),"report_sha256":digest(root/"report.md"),
                 "renderer_sources":{p.name:digest(p) for p in (renderer/"report.py",renderer/"visualization.py")},
                 "artifacts":{str(p.relative_to(root)):digest(p) for p in artifacts}})
     return root/"report.md"

@@ -1,0 +1,19 @@
+# Local environments, caches and build products
+.venv*/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+.env
+*.pending
+
+# Raw studies remain local; the notebook uses an explicit portable evidence export.
+/runs/*
+!/runs/README.md
+/legacy/inforatio/
+/audits/archive/
+/notebooks/.generated/

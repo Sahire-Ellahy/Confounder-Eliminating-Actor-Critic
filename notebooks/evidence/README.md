@@ -11,10 +11,13 @@ main figures for both environments. The Bayesian priors are `(0.5, 0.5)` and
 The compressed curve bundle includes physical exposure counters, terminal
 success, evaluator regret and information traces, per-seed strength statistics,
 history audits and matched-domain preflight facts. The manifest records run,
-study, source archive and figure hashes. No authentication, download, local
+study, source archive, figure and report PDF hashes. No authentication, download, local
 absolute path, raw cache, or legacy package is needed to execute the notebook.
 
-Regenerate this maintained export with:
+The [complete PDF report](report.pdf) is copied from the verified study without
+modification. Its checksum is included in the portable evidence manifest.
+
+Regenerate this maintained export after rendering the study with `--pdf`:
 
     python scripts/export_walkthrough.py --study runs/pathology_strength_20261110
 

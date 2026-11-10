@@ -11,6 +11,9 @@ executed visual walkthrough.
 outputs render on GitHub. It explains the route geometry, the confounding
 mechanism, nuisance versus useful evidence, and what the completed runs show.
 
+The [complete PDF report](notebooks/evidence/report.pdf) includes the corrected
+seven-method comparisons, both Bayesian priors, diagnostics and audit details.
+
 ![Undertow route pathology](notebooks/assets/undertow.png)
 ![False Beacon route pathology](notebooks/assets/false_beacon.png)
 

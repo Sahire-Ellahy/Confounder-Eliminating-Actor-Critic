@@ -21,6 +21,7 @@
     "assets/pathology_prior_frozenlake_context0_mode0.png": "038b00632cb0921a4bffa3beddd60db987bc95f683bfaca1d2fd5330b26242ff",
     "assets/pathology_prior_frozenlake_context0_mode1.png": "8baeee5bfd7804299b5dc0b73f482c3cee2fb255c50f23767fbdb54b3b836b0b",
     "evidence/curves.json.gz": "a3f06c701e1d39e7990492d9fe230777f021c00407c592f9be9713a359c856b7",
+    "evidence/report.pdf": "5acd550e307c4f17d6f065629ff65d752eba001fe33d1d0232d59692a8a5a8c7",
     "evidence/source_bundle.tar.gz": "8c13954593022b2cab134f667b3e16b4d1d326a9f4f809b6ba8c76d917435105"
   },
   "curve_runs": 336,

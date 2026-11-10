@@ -148,11 +148,14 @@ def export_study(study_root, destination):
             if hashlib.sha256(archive.extractfile("ceac/"+name).read()).hexdigest()!=checksum:
                 raise ValueError("Archived training source mismatch: "+name)
     assets=[target,runtime]
-    # The report manifest, rather than a filesystem glob, defines published figures.
+    # The report manifest defines the published figures and standalone PDF.
     for name in report_audit["artifacts"]:
         path=Path(name)
         if path.parent==Path("figures") and path.name.startswith("pathology_") and path.suffix==".png":
             output=destination/"assets"/path.name
+            shutil.copyfile(study_root/path,output);assets.append(output)
+        elif path==Path("report.pdf"):
+            output=destination/"evidence/report.pdf"
             shutil.copyfile(study_root/path,output);assets.append(output)
     atomic_json(destination/"evidence/manifest.json",dict(schema=2,source_studies=[source],
         runtime_sources=study["sources"],runtime_archive="evidence/source_bundle.tar.gz",

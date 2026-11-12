@@ -1,0 +1,469 @@
+{
+  "files": {
+    "assessment.md": "c7662424035f81b15d8f3c64ebca0c8de4f22daea918c9bc48fdeff00c310aa0",
+    "dose_response.pdf": "58aa313e5ae5ac5e4b0366ae223ad5f30fc093c6fc4fb3a33f1fcab59e636862",
+    "dose_response.png": "449eaf23cfa1e4b66d790995911cd0dafd2db6cf89b3765f85a84a33ad96301d",
+    "endpoints.csv": "caa72e604fb5706643a49dcad6d14a2c8ae3b79881c45f8ef1302e5080f26b33",
+    "endpoints.json": "d50389ed9106f80ca3598eb3797ecdb21f8af46b6757d5d10fde64000a5b7bc6",
+    "evidence.json.gz": "bbdc64999d133916b600e64a957c0c75dafad1984d50cdd86cf26238acfc9078",
+    "false_beacon_junction_task1_cumulative_regret.pdf": "e8b5748043142b02053228297fa959c8aaff95383bee10f6593f833abfb833b3",
+    "false_beacon_junction_task1_cumulative_regret.png": "1a9da399b8e9a74d921e6e581de6db0a4e56d4ce101dd82d85f48885c87a31c0",
+    "false_beacon_junction_task1_window_gap.pdf": "fbc2123a349567fcba211825a710550ace562af3ae4b75b33fc551ddc8a4d70e",
+    "false_beacon_junction_task1_window_gap.png": "1b203cd683b3b4f9b1450d2dff421f6d9060a4bba50a797fd4af62542f99e4cb",
+    "seed_endpoints.csv": "54a2526f5bdb63478e258c66043a5244f535ace89ca861cb4789682c8885b60c",
+    "undertow_junction_task1_cumulative_regret.pdf": "b6acdfb9602b532992b868e30f89d5fcd53c58060f58e879fa5146408d86dc14",
+    "undertow_junction_task1_cumulative_regret.png": "b44e7a264265c3ff930aa534c22fc5e1ed816dd457f1cf9418c111f564358626",
+    "undertow_junction_task1_window_gap.pdf": "a50687ccb19b9949f6fa947b792bd9a50828925b20cf08e0a698654b865e1e77",
+    "undertow_junction_task1_window_gap.png": "3ba43410f401d8bb6398771825b43fab74830710d34aa7264e5e32ba54cda7b8"
+  },
+  "raw_source_bundle_sha256": "d3a18279edcd57209206805441654e12e7220de2ed9c84dbf1248c0249bb1336",
+  "registration": {
+    "calibration_gates": [
+      {
+        "data": {
+          "all_pass": true,
+          "cells": [
+            {
+              "actor_updates": 121890,
+              "bank": 3,
+              "budget": 131072,
+              "late_gap": 4.910933718365977e-06,
+              "method": "ceac",
+              "priced_actor_updates": 121890,
+              "protocol": "burden",
+              "reason": "replay_design_certified",
+              "seconds": 45.60984441684559,
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 121890,
+              "bank": 3,
+              "budget": 131072,
+              "late_gap": 0.020013493289687483,
+              "method": "ceac",
+              "priced_actor_updates": 121890,
+              "protocol": "burden",
+              "reason": "replay_design_certified",
+              "seconds": 45.920272124931216,
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 121890,
+              "bank": 3,
+              "budget": 131072,
+              "late_gap": 0.02000987420317242,
+              "method": "ceac",
+              "priced_actor_updates": 121890,
+              "protocol": "burden",
+              "reason": "replay_design_certified",
+              "seconds": 46.140587667003274,
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 121890,
+              "bank": 3,
+              "budget": 131072,
+              "late_gap": 6.685948938696916e-06,
+              "method": "ceac",
+              "priced_actor_updates": 121890,
+              "protocol": "burden",
+              "reason": "replay_design_certified",
+              "seconds": 43.35535041592084,
+              "seed": 1002,
+              "task": 1
+            }
+          ],
+          "sources": {
+            "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+            "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+            "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+            "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+            "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+            "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+            "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+            "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+            "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+            "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+            "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+            "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022",
+            "ceac_pseudocode/__init__.py": "1d12a0e2d5d6e0a1ab284ac2ffe4422a4012a204d3715ed593a989295353ef78",
+            "ceac_pseudocode/agent.py": "18511fc30027c92313f33fce52337b91da931e353c7a35b7ef6def55a30e53e3",
+            "ceac_pseudocode/design.py": "c79737e97b896890ec37cf2f84f5a0379733fad334ebf5f6a1f38d774918fdae",
+            "ceac_pseudocode/learning.py": "3d573fed19ca1b2b6a2482746e9274573bec2a5de50d9f70ddcbcf26e6934cf0",
+            "ceac_pseudocode/run.py": "7aa129382fb2a588bb0d04e256b079db82d5cafc15754c78909228129cba215d"
+          },
+          "tolerance": 0.025
+        },
+        "path": "runs/ceac_pseudocode_calibration_v2_20261111/burden_131072/gate.json",
+        "sha256": "76b9e78c03d6f52a49c6ecd9bb8a6a0119b614f16d630ade86f36b5b4c3a31d0"
+      },
+      {
+        "data": {
+          "all_pass": true,
+          "cells": [
+            {
+              "budget": 131072,
+              "late_gap": 0.0012974995640983034,
+              "method": "idac",
+              "pomd_zero_fraction": 0.0,
+              "protocol": "burden",
+              "seconds": 10.859486875124276,
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.02085712141841825,
+              "method": "idac",
+              "pomd_zero_fraction": 0.0,
+              "protocol": "burden",
+              "seconds": 10.867590291891247,
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.0015672099791277441,
+              "method": "idac",
+              "pomd_zero_fraction": 0.0,
+              "protocol": "burden",
+              "seconds": 10.889662124915048,
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.0,
+              "method": "ucb_q",
+              "pomd_zero_fraction": 0.0,
+              "protocol": "burden",
+              "seconds": 10.649309959029779,
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.0012762444767647485,
+              "method": "idac",
+              "pomd_zero_fraction": 0.0,
+              "protocol": "burden",
+              "seconds": 10.755330374930054,
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.0050781250000000045,
+              "method": "ucb_q",
+              "pomd_zero_fraction": 0.0,
+              "protocol": "burden",
+              "seconds": 13.39534429111518,
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.0015625,
+              "method": "ucb_q",
+              "pomd_zero_fraction": 0.0,
+              "protocol": "burden",
+              "seconds": 10.794306374853477,
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.0062500000000000056,
+              "method": "ucb_q",
+              "pomd_zero_fraction": 0.0,
+              "protocol": "burden",
+              "seconds": 13.220854416955262,
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.00947415761083152,
+              "method": "pomd",
+              "pomd_zero_fraction": 0.01406097412109375,
+              "protocol": "burden",
+              "seconds": 22.233207459095865,
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.0007177951403697955,
+              "method": "pomd",
+              "pomd_zero_fraction": 0.01406097412109375,
+              "protocol": "burden",
+              "seconds": 22.77356041711755,
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.009342694930608223,
+              "method": "pomd",
+              "pomd_zero_fraction": 0.01406097412109375,
+              "protocol": "burden",
+              "seconds": 23.82322566700168,
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "budget": 131072,
+              "late_gap": 0.00048308319911316,
+              "method": "pomd",
+              "pomd_zero_fraction": 0.01406097412109375,
+              "protocol": "burden",
+              "seconds": 23.32462454191409,
+              "seed": 1002,
+              "task": 1
+            }
+          ],
+          "sources": {
+            "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+            "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+            "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+            "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+            "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+            "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+            "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+            "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+            "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+            "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+            "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+            "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+          },
+          "tolerance": 0.025
+        },
+        "path": "runs/hardness_calibration_20261111/burden_131072/gate.json",
+        "sha256": "dfef301587ae4361f917cda1a452ebea70b131e1e875b31f484e8465e2b0f2c6"
+      }
+    ],
+    "configuration": {
+      "burden": {
+        "doses": [
+          0,
+          4,
+          16,
+          64
+        ],
+        "episodes": 131072,
+        "intervention": "physical dead-end actions or reachable zero-reward chamber states; useful laws and horizon fixed",
+        "kinds": [
+          "undertow_junction",
+          "false_beacon_junction"
+        ],
+        "methods": [
+          "idac",
+          "ucb_q",
+          "pomd",
+          "ids_product",
+          "ceac",
+          "oracle"
+        ],
+        "tasks": [
+          1
+        ]
+      },
+      "calibration_budget_ladder": [
+        8192,
+        32768,
+        131072
+      ],
+      "calibration_seeds": [
+        1001,
+        1002
+      ],
+      "easy_gap_tolerance": 0.025,
+      "evaluation_seeds": [
+        0,
+        1,
+        2
+      ],
+      "notes": [
+        "Burden primary scope is task 1; easy-case calibration covers both tasks.",
+        "Kinds share the identical B=0 kernel; these are not independent benchmark replications.",
+        "Three held-out seeds are a small initial study; report all seeds and sample SD, not confidence claims.",
+        "Prior-shift is a generic cue junction shared by both narratives, not two independent environments.",
+        "Primary CEAC uses observed replay, reward and price-conditioned evidence critics, and the statistical/design/actor selector.",
+        "No ablation is included. Historical exact-model reference results are archived separately.",
+        "Prior-shift budget increased solely after independent easy-case CEAC calibration; all three methods use the same new budget."
+      ],
+      "prior_shift": {
+        "correlated_prior": [
+          {
+            "mass": 0.5,
+            "q": 0.1,
+            "task": 0
+          },
+          {
+            "mass": 0.5,
+            "q": 0.9,
+            "task": 1
+          }
+        ],
+        "doses": [
+          0,
+          0.25,
+          0.5,
+          0.75,
+          1
+        ],
+        "episodes": 32768,
+        "methods": [
+          "ids_correlated",
+          "ids_product",
+          "ceac"
+        ],
+        "product_prior": "uniform over Cartesian task x q",
+        "public_q": [
+          0.1,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "task0_q": "0.1 + 0.8*d",
+        "task1_q": "0.9 - 0.8*d",
+        "tasks": [
+          0,
+          1
+        ]
+      },
+      "schema": 3,
+      "status": "primary_replay_driven_ceac_calibration_gated"
+    },
+    "driver_sha256": "846afbd583dd7ab6cfeb233a2a0ac8189d6c6d5effba28ddff626cc9b61c5bf3",
+    "episodes": 131072,
+    "jobs": 144,
+    "metric": "exact pre-trajectory expected policy gap; final 256 episodes; seed is replicate",
+    "phase": "sweep",
+    "protocol": "burden",
+    "python": "3.11.13",
+    "reused_controls": {
+      "cells": 120,
+      "folder": "/Users/koppeae1/Documents/Research/2027/IDS/code/runs/hardness_burden_20261111",
+      "registration_sha256": "f9bd8085e268f36fe9c9796fabe86e83e084883154a5f66fc2030c795d927d87",
+      "results_sha256": "b29fdeefbd08961cd9e4597d5163c056f0e6d795c966155f2fe357b4f6d48edb"
+    },
+    "schema": 2,
+    "scope": "stationary two-step junction variants; replay-driven two-critic CEAC; historical grids separate",
+    "sources": {
+      "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+      "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+      "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+      "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+      "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+      "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+      "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+      "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+      "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+      "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+      "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+      "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022",
+      "ceac_pseudocode/__init__.py": "1d12a0e2d5d6e0a1ab284ac2ffe4422a4012a204d3715ed593a989295353ef78",
+      "ceac_pseudocode/agent.py": "18511fc30027c92313f33fce52337b91da931e353c7a35b7ef6def55a30e53e3",
+      "ceac_pseudocode/design.py": "c79737e97b896890ec37cf2f84f5a0379733fad334ebf5f6a1f38d774918fdae",
+      "ceac_pseudocode/learning.py": "3d573fed19ca1b2b6a2482746e9274573bec2a5de50d9f70ddcbcf26e6934cf0",
+      "ceac_pseudocode/run.py": "7aa129382fb2a588bb0d04e256b079db82d5cafc15754c78909228129cba215d"
+    },
+    "sources_by_method": {
+      "ceac": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022",
+        "ceac_pseudocode/__init__.py": "1d12a0e2d5d6e0a1ab284ac2ffe4422a4012a204d3715ed593a989295353ef78",
+        "ceac_pseudocode/agent.py": "18511fc30027c92313f33fce52337b91da931e353c7a35b7ef6def55a30e53e3",
+        "ceac_pseudocode/design.py": "c79737e97b896890ec37cf2f84f5a0379733fad334ebf5f6a1f38d774918fdae",
+        "ceac_pseudocode/learning.py": "3d573fed19ca1b2b6a2482746e9274573bec2a5de50d9f70ddcbcf26e6934cf0",
+        "ceac_pseudocode/run.py": "7aa129382fb2a588bb0d04e256b079db82d5cafc15754c78909228129cba215d"
+      },
+      "idac": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      },
+      "ids_product": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      },
+      "oracle": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      },
+      "pomd": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      },
+      "ucb_q": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      }
+    }
+  },
+  "schema": 1
+}

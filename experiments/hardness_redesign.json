@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "status": "implemented_calibration_gated",
+  "calibration_seeds": [
+    1001,
+    1002
+  ],
+  "evaluation_seeds": [
+    0,
+    1,
+    2
+  ],
+  "easy_gap_tolerance": 0.025,
+  "calibration_budget_ladder": [
+    8192,
+    32768,
+    131072
+  ],
+  "burden": {
+    "episodes": 131072,
+    "kinds": [
+      "undertow_junction",
+      "false_beacon_junction"
+    ],
+    "doses": [
+      0,
+      4,
+      16,
+      64
+    ],
+    "tasks": [
+      1
+    ],
+    "methods": [
+      "idac",
+      "ucb_q",
+      "pomd",
+      "ids_product",
+      "ceac_exact",
+      "oracle"
+    ],
+    "intervention": "physical dead-end actions or reachable zero-reward chamber states; useful laws and horizon fixed"
+  },
+  "prior_shift": {
+    "episodes": 8192,
+    "doses": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1
+    ],
+    "tasks": [
+      0,
+      1
+    ],
+    "methods": [
+      "ids_correlated",
+      "ids_product",
+      "ceac_exact",
+      "ceac_actor"
+    ],
+    "public_q": [
+      0.1,
+      0.3,
+      0.5,
+      0.7,
+      0.9
+    ],
+    "task1_q": "0.9 - 0.8*d",
+    "task0_q": "0.1 + 0.8*d",
+    "correlated_prior": [
+      {
+        "task": 0,
+        "q": 0.1,
+        "mass": 0.5
+      },
+      {
+        "task": 1,
+        "q": 0.9,
+        "mass": 0.5
+      }
+    ],
+    "product_prior": "uniform over Cartesian task x q"
+  },
+  "notes": [
+    "Burden primary scope is task 1; easy-case calibration covers both tasks.",
+    "Kinds share the identical B=0 kernel; these are not independent benchmark replications.",
+    "Three held-out seeds are a small initial study; report all seeds and sample SD, not confidence claims.",
+    "Prior-shift is a generic cue junction shared by both narratives, not two independent environments.",
+    "Exact-model CEAC is not evidence of learned-critic or replay causality; actor-only is an explicit ablation."
+  ]
+}

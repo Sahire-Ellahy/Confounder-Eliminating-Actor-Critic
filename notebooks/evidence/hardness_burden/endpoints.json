@@ -1,0 +1,1314 @@
+[
+  {
+    "ceac_actor_updates": 365670,
+    "ceac_priced_actor_updates": 365670,
+    "dose": 0,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 1.3658887649810296e-05,
+    "late_gap_sd": 2.607800808565492e-06,
+    "method": "ceac",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.004313151041666667,
+    "protocol": "burden",
+    "regret_mean": 461.9637301568312,
+    "regret_sd": 2.7396970037502038,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      1.2702130105982697e-05,
+      1.660993427424727e-05,
+      1.166459856920092e-05
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 365670,
+    "ceac_priced_actor_updates": 365670,
+    "dose": 4,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 1.5768188276534038e-05,
+    "late_gap_sd": 4.69765317908983e-06,
+    "method": "ceac",
+    "nuisance_episode_fraction": 7.62939453125e-05,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.004290262858072917,
+    "protocol": "burden",
+    "regret_mean": 470.0256691403593,
+    "regret_sd": 3.191673704397967,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      1.6481881571139487e-05,
+      2.0068156721323675e-05,
+      1.0754526537138948e-05
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 365670,
+    "ceac_priced_actor_updates": 365670,
+    "dose": 16,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 1.5768188276534038e-05,
+    "late_gap_sd": 4.69765317908983e-06,
+    "method": "ceac",
+    "nuisance_episode_fraction": 7.62939453125e-05,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.004290262858072917,
+    "protocol": "burden",
+    "regret_mean": 470.0256691403593,
+    "regret_sd": 3.191673704397967,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      1.6481881571139487e-05,
+      2.0068156721323675e-05,
+      1.0754526537138948e-05
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 365670,
+    "ceac_priced_actor_updates": 365670,
+    "dose": 64,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 1.5768188276534038e-05,
+    "late_gap_sd": 4.69765317908983e-06,
+    "method": "ceac",
+    "nuisance_episode_fraction": 7.62939453125e-05,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.004290262858072917,
+    "protocol": "burden",
+    "regret_mean": 470.0256691403593,
+    "regret_sd": 3.191673704397967,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      1.6481881571139487e-05,
+      2.0068156721323675e-05,
+      1.0754526537138948e-05
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0013161957996890249,
+    "late_gap_sd": 6.014746571118621e-05,
+    "method": "idac",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.010904947916666666,
+    "protocol": "burden",
+    "regret_mean": 1013.4257508860557,
+    "regret_sd": 205.66083691764763,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0013344631364715226,
+      0.0013650918300444903,
+      0.0012490324325510616
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.338287149951531,
+    "late_gap_sd": 0.011712325309741685,
+    "method": "idac",
+    "nuisance_episode_fraction": 0.355682373046875,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.019571940104166668,
+    "protocol": "burden",
+    "regret_mean": 43963.44219033403,
+    "regret_sd": 321.14592469368836,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.3248742201214373,
+      0.34349409854757607,
+      0.3464931311855796
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.464591374458716,
+    "late_gap_sd": 0.012293165694612205,
+    "method": "idac",
+    "nuisance_episode_fraction": 0.49212646484375,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.021746317545572918,
+    "protocol": "burden",
+    "regret_mean": 60139.61428887987,
+    "regret_sd": 2088.13100565133,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.4510860074077305,
+      0.4675591249056978,
+      0.4751289910627198
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.5152159139021363,
+    "late_gap_sd": 0.01176041156295626,
+    "method": "idac",
+    "nuisance_episode_fraction": 0.4118499755859375,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.020075480143229168,
+    "protocol": "burden",
+    "regret_mean": 50496.4552939928,
+    "regret_sd": 28859.320680289584,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.5019229506621351,
+      0.5194582061878497,
+      0.5242665848564239
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1,
+    "true_joint_prior_supported": true,
+    "wrong_task_posterior": 0.0
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1,
+    "true_joint_prior_supported": true,
+    "wrong_task_posterior": 0.0
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1,
+    "true_joint_prior_supported": true,
+    "wrong_task_posterior": 0.0
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1,
+    "true_joint_prior_supported": true,
+    "wrong_task_posterior": 0.0
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0005983936835362741,
+    "late_gap_sd": 9.592940143078868e-05,
+    "method": "pomd",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.01406097412109375,
+    "probe_episode_fraction": 0.05236053466796875,
+    "protocol": "burden",
+    "regret_mean": 5804.4492440970125,
+    "regret_sd": 27.549957212586705,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.00070446528089088,
+      0.0005729995605471632,
+      0.0005177162091707793
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.004479424136243887,
+    "late_gap_sd": 0.0003541895321658396,
+    "method": "pomd",
+    "nuisance_episode_fraction": 0.13631439208984375,
+    "pomd_zero_fraction": 0.035746256510416664,
+    "probe_episode_fraction": 0.08027394612630208,
+    "protocol": "burden",
+    "regret_mean": 24935.160253170645,
+    "regret_sd": 48.78496143230723,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.004862115323588637,
+      0.004163135291283756,
+      0.004413021793859267
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.06246033543574911,
+    "late_gap_sd": 0.013081807720651609,
+    "method": "pomd",
+    "nuisance_episode_fraction": 0.2403844197591146,
+    "pomd_zero_fraction": 0.08604685465494792,
+    "probe_episode_fraction": 0.08737945556640625,
+    "protocol": "burden",
+    "regret_mean": 38061.48897582293,
+    "regret_sd": 81.88860018290161,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.06508527685573817,
+      0.07403064218817779,
+      0.04826508726333137
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.30783162779566775,
+    "late_gap_sd": 0.0032097574157651386,
+    "method": "pomd",
+    "nuisance_episode_fraction": 0.24106343587239584,
+    "pomd_zero_fraction": 0.2886454264322917,
+    "probe_episode_fraction": 0.25022633870442706,
+    "protocol": "burden",
+    "regret_mean": 55604.0241675872,
+    "regret_sd": 41.437517984162554,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.3089779425631408,
+      0.31031084891212807,
+      0.3042060919117343
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ucb_q",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.010678609212239584,
+    "protocol": "burden",
+    "regret_mean": 1165.8599999999863,
+    "regret_sd": 3.4550832117340646,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0005208333333333333,
+    "late_gap_sd": 0.0009021097956087904,
+    "method": "ucb_q",
+    "nuisance_episode_fraction": 0.019605000813802082,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.010571797688802084,
+    "protocol": "burden",
+    "regret_mean": 3532.5466666669804,
+    "regret_sd": 10.37940910328716,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0015625,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.0033854166666666668,
+    "late_gap_sd": 0.0029318568357285684,
+    "method": "ucb_q",
+    "nuisance_episode_fraction": 0.059247334798177086,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0115966796875,
+    "protocol": "burden",
+    "regret_mean": 8258.833333331995,
+    "regret_sd": 10.736076254082063,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.005078125,
+      0.005078125,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "false_beacon_junction",
+    "late_gap_mean": 0.012161458333333333,
+    "late_gap_sd": 0.01083386542162853,
+    "method": "ucb_q",
+    "nuisance_episode_fraction": 0.20517985026041666,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.01145172119140625,
+    "protocol": "burden",
+    "regret_mean": 25516.286666675824,
+    "regret_sd": 28.572240607565988,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.02078125,
+      0.015703125000000002,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 365670,
+    "ceac_priced_actor_updates": 365670,
+    "dose": 0,
+    "kind": "undertow_junction",
+    "late_gap_mean": 7.370335413146654e-06,
+    "late_gap_sd": 3.165443146861461e-06,
+    "method": "ceac",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.00429534912109375,
+    "protocol": "burden",
+    "regret_mean": 460.5540514007384,
+    "regret_sd": 1.3231395293079697,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      1.0743611564015265e-05,
+      6.902625688148898e-06,
+      4.464768987275797e-06
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 365670,
+    "ceac_priced_actor_updates": 365670,
+    "dose": 4,
+    "kind": "undertow_junction",
+    "late_gap_mean": 1.101581079084599e-05,
+    "late_gap_sd": 4.333909585321703e-06,
+    "method": "ceac",
+    "nuisance_episode_fraction": 0.00019073486328125,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.00429534912109375,
+    "protocol": "burden",
+    "regret_mean": 479.38881589511055,
+    "regret_sd": 7.8894136669007215,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      1.5850020489420902e-05,
+      9.71923471691262e-06,
+      7.4781771662044486e-06
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 365670,
+    "ceac_priced_actor_updates": 365670,
+    "dose": 16,
+    "kind": "undertow_junction",
+    "late_gap_mean": 1.270055763907312e-05,
+    "late_gap_sd": 5.933745796627717e-06,
+    "method": "ceac",
+    "nuisance_episode_fraction": 0.0005645751953125,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.004267374674479167,
+    "protocol": "burden",
+    "regret_mean": 518.7906497192215,
+    "regret_sd": 5.900761287248248,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      1.9546992555715195e-05,
+      9.509903888443687e-06,
+      9.04477647306048e-06
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 365670,
+    "ceac_priced_actor_updates": 365670,
+    "dose": 64,
+    "kind": "undertow_junction",
+    "late_gap_mean": 1.263805701466845e-05,
+    "late_gap_sd": 7.957419424904877e-06,
+    "method": "ceac",
+    "nuisance_episode_fraction": 0.0015131632486979167,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.00420379638671875,
+    "protocol": "burden",
+    "regret_mean": 623.1243040638442,
+    "regret_sd": 51.57905728004034,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      2.176044190104311e-05,
+      9.029279603116943e-06,
+      7.124449539845298e-06
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0012778950995275748,
+    "late_gap_sd": 8.167910265327171e-05,
+    "method": "idac",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.008433024088541666,
+    "protocol": "burden",
+    "regret_mean": 852.1403996062985,
+    "regret_sd": 246.65015212918874,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0013325702441478668,
+      0.0013171116197347663,
+      0.0011840034347000913
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.3206982667516303,
+    "late_gap_sd": 0.011508698027395632,
+    "method": "idac",
+    "nuisance_episode_fraction": 0.361419677734375,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.033419291178385414,
+    "protocol": "burden",
+    "regret_mean": 45413.35012726705,
+    "regret_sd": 5796.637665957728,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.32268841713918495,
+      0.33108210215430145,
+      0.3083242809614045
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.43946296995279815,
+    "late_gap_sd": 0.012822410958761483,
+    "method": "idac",
+    "nuisance_episode_fraction": 0.58538818359375,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.046419779459635414,
+    "protocol": "burden",
+    "regret_mean": 72356.13012901826,
+    "regret_sd": 17180.88520681166,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.4364753690881934,
+      0.45351542889629215,
+      0.42839811187390886
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.6024371883907543,
+    "late_gap_sd": 0.18613697446455527,
+    "method": "idac",
+    "nuisance_episode_fraction": 0.7199452718098959,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0303955078125,
+    "protocol": "burden",
+    "regret_mean": 87060.07845974846,
+    "regret_sd": 22646.032688125266,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.49592010661847447,
+      0.8173668668706422,
+      0.4940245916831462
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 1.0172526041666666e-05,
+    "protocol": "burden",
+    "regret_mean": 0.6933333333333334,
+    "regret_sd": 1.2008885599144217,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1,
+    "true_joint_prior_supported": true,
+    "wrong_task_posterior": 0.0
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 1.0172526041666666e-05,
+    "protocol": "burden",
+    "regret_mean": 0.6933333333333334,
+    "regret_sd": 1.2008885599144217,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1,
+    "true_joint_prior_supported": true,
+    "wrong_task_posterior": 0.0
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 1.0172526041666666e-05,
+    "protocol": "burden",
+    "regret_mean": 0.6933333333333334,
+    "regret_sd": 1.2008885599144217,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1,
+    "true_joint_prior_supported": true,
+    "wrong_task_posterior": 0.0
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 1.0172526041666666e-05,
+    "protocol": "burden",
+    "regret_mean": 0.6933333333333334,
+    "regret_sd": 1.2008885599144217,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1,
+    "true_joint_prior_supported": true,
+    "wrong_task_posterior": 0.0
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.0,
+    "protocol": "burden",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0005818310015652492,
+    "late_gap_sd": 0.00018131748223430735,
+    "method": "pomd",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.01406097412109375,
+    "probe_episode_fraction": 0.052317301432291664,
+    "protocol": "burden",
+    "regret_mean": 5800.069310655573,
+    "regret_sd": 32.0967224362557,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0007889723563766181,
+      0.0004518903846645393,
+      0.0005046302636545902
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.046526642172861364,
+    "late_gap_sd": 0.02589759365963771,
+    "method": "pomd",
+    "nuisance_episode_fraction": 0.2360051472981771,
+    "pomd_zero_fraction": 0.06389617919921875,
+    "probe_episode_fraction": 0.075347900390625,
+    "protocol": "burden",
+    "regret_mean": 36100.83550270908,
+    "regret_sd": 146.0966993719884,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.02801529404026242,
+      0.07612151116164981,
+      0.03544312131667184
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.8010526315789476,
+    "late_gap_sd": 0.0,
+    "method": "pomd",
+    "nuisance_episode_fraction": 0.8417460123697916,
+    "pomd_zero_fraction": 0.43493906656901044,
+    "probe_episode_fraction": 0.053438822428385414,
+    "protocol": "burden",
+    "regret_mean": 104995.57052615807,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.8010526315789476,
+      0.8010526315789476,
+      0.8010526315789476
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.8719402985074627,
+    "late_gap_sd": 0.0,
+    "method": "pomd",
+    "nuisance_episode_fraction": 0.9552205403645834,
+    "pomd_zero_fraction": 1.0,
+    "probe_episode_fraction": 0.014757792154947916,
+    "protocol": "burden",
+    "regret_mean": 114286.95880562458,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.8719402985074627,
+      0.8719402985074627,
+      0.8719402985074627
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 0,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ucb_q",
+    "nuisance_episode_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.010164896647135416,
+    "protocol": "burden",
+    "regret_mean": 1172.3799999999874,
+    "regret_sd": 8.667340999408419,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 4,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0010677083333333335,
+    "late_gap_sd": 0.00184932508099802,
+    "method": "ucb_q",
+    "nuisance_episode_fraction": 0.033721923828125,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.011472066243489584,
+    "protocol": "burden",
+    "regret_mean": 5230.473333333239,
+    "regret_sd": 13.705609557159967,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0032031250000000002,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 16,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.0010677083333333335,
+    "late_gap_sd": 0.00184932508099802,
+    "method": "ucb_q",
+    "nuisance_episode_fraction": 0.14497884114583334,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.011149088541666666,
+    "protocol": "burden",
+    "regret_mean": 18448.95999999842,
+    "regret_sd": 50.31846182073034,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0032031250000000002,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "task": 1
+  },
+  {
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "dose": 64,
+    "kind": "undertow_junction",
+    "late_gap_mean": 0.07768229166666668,
+    "late_gap_sd": 0.13313138036108904,
+    "method": "ucb_q",
+    "nuisance_episode_fraction": 0.58251953125,
+    "pomd_zero_fraction": 0.0,
+    "probe_episode_fraction": 0.01224517822265625,
+    "protocol": "burden",
+    "regret_mean": 70007.83333337745,
+    "regret_sd": 179.61976542957476,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.23140625000000004,
+      0.0,
+      0.0016406250000000002
+    ],
+    "seeds": 3,
+    "task": 1
+  }
+]

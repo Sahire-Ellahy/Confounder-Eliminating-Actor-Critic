@@ -42,6 +42,11 @@ class WalkthroughTests(unittest.TestCase):
         bundle, manifest = verified_bundle(ROOT / "notebooks")
         self.assertEqual(len(bundle["endpoints"]), 336)
         self.assertEqual(len(bundle["curves"]), 336)
+        from ceac.pathology_report import ceac_advantage_statistics, summarize_ceac_advantages
+        computed=ceac_advantage_statistics(bundle["pathology_statistics"])
+        self.assertEqual(bundle["ceac_comparisons"]["rows"],computed)
+        self.assertEqual(bundle["ceac_comparisons"]["summaries"],summarize_ceac_advantages(computed))
+        self.assertEqual(len(computed),288)
         self.assertEqual(set(manifest["curves_benchmarks"]),
                          {"pathology_rho005", "pathology_rho025", "pathology_rho050", "pathology_rho075"})
         self.assertEqual(sum(s["run_count"] for s in manifest["source_studies"]), 336)

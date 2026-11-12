@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "name": "false_beacon_physical_breadth_v1",
+  "benchmarks": [
+    "beacon_breadth_b00",
+    "beacon_breadth_b01",
+    "beacon_breadth_b02",
+    "beacon_breadth_b04",
+    "beacon_breadth_b08"
+  ],
+  "environments": [
+    "frozenlake"
+  ],
+  "contexts": [
+    0
+  ],
+  "modes": [
+    0,
+    1
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "methods": [
+    "ceac",
+    "oracle",
+    "ids",
+    "ids_zero",
+    "idac",
+    "ucb_q",
+    "pomd"
+  ],
+  "episodes": 8192,
+  "workers": 4,
+  "smoke": {
+    "benchmarks": [
+      "beacon_breadth_b00",
+      "beacon_breadth_b08"
+    ],
+    "seeds": [
+      0
+    ],
+    "episodes": 32,
+    "workers": 2
+  }
+}

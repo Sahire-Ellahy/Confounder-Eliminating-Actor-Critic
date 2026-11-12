@@ -1,0 +1,12 @@
+# Preserve byte identities of verified evidence and notebook snapshots.
+/notebooks/evidence/** -text
+/notebooks/assets/** -text
+/notebooks/*.ipynb -text
+/audits/** -text
+
+# Registered numerical sources and protocols use LF on every platform.
+*.py text eol=lf
+/experiments/*.json text eol=lf
+
+# Python's standard CSV dialect writes CRLF; the bytes are hash-verified.
+*.csv -text whitespace=cr-at-eol

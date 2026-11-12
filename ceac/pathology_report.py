@@ -6,10 +6,10 @@ from pathlib import Path
 import numpy as np
 from .benchmarks import STRENGTH_PROFILES
 from .visualization import (ENVIRONMENT_LABELS, LABELS, STYLES, seed_summary,
-                            trace_values, plot_seed_trace, band_description)
+                            trace_values, plot_seed_trace, band_description, plot_summary, pad_plot_axis)
 
 METHODS = ("ucb_q", "pomd", "idac", "ids", "ids_zero", "ceac", "oracle")
-DOSE_COLORS = ("#0058c7", "#008747", "#df7400", "#c90078")
+DOSE_COLORS = ("#0058c7", "#008747", "#ad5700", "#c90078")
 DOSE_LINES = ("-", "--", "-.", ":")
 METRICS = ("regret", "last_gap", "success", "nuisance_visits", "lost_steps", "information")
 METRIC_LABELS = ("Cumulative pseudo-regret", "Last 32-episode\nexpected value gap",
@@ -139,12 +139,12 @@ def draw_method_overlay(groups, kind, context=0, mode=1, plt=None, band="sd", pr
                       bbox=dict(fc="white",ec="#cccccc",alpha=.9,boxstyle="round,pad=.4"))
         axis.set(title=fr"Diversion probability $\rho={rho:g}$",
                  xlabel="Training episode",ylabel="Cumulative pseudo-regret (symlog)")
-        axis.set_yscale("symlog",linthresh=1)
-        axis.set_ylim(bottom=0)
+        axis.set_yscale("symlog",linthresh=.01)
         axis.grid(alpha=.23)
         axis.tick_params(labelleft=True,labelbottom=True)
     for axis in list(axes.flat)[len(levels):]:
         axis.set_axis_off()
+    pad_plot_axis(axes[0,0])
     subtitle = (r"Bayesian priors: full support $p_0(1)=0.5$ vs excluded mode 1 $p_0(1)=0$" if prior else
                 "Optimism vs frequentist IDAC vs Bayesian IDS (full support and misspecified prior)")
     _title(fig,kind,context,mode,subtitle)
@@ -165,8 +165,6 @@ def draw_strength_learning(groups, kind, context=0, mode=1, plt=None, band="sd",
     fig,axes=plt.subplots(rows,columns,figsize=(6*columns+1,5*rows+1),
                           sharex=True,sharey=True,squeeze=False)
     handles={}
-    maximum=0.
-    minimum=0.
     for method,axis in zip(present,axes.flat):
         doses=groups[kind,context,mode,method]
         matrices=[]
@@ -177,29 +175,25 @@ def draw_strength_learning(groups, kind, context=0, mode=1, plt=None, band="sd",
             matrices.append(values)
             stats=seed_summary(values,band);x=np.arange(1,values.shape[1]+1)
             color=DOSE_COLORS[i]
-            handles[rho],=axis.plot(x,stats["mean"],color=color,ls=DOSE_LINES[i],
-                lw=4 if method=="ceac" else 2,marker=("o","s","^","D")[i],ms=4,
-                markevery=(i*max(1,len(x)//40),max(1,len(x)//8)),markerfacecolor="white",
-                label=fr"$\rho={rho:g}$")
-            if stats["lower"] is not None:
-                axis.fill_between(x,stats["lower"],stats["upper"],color=color,alpha=.12,lw=0)
-            maximum=max(maximum,float(np.max(stats["upper"] if stats["upper"] is not None else stats["mean"])))
-            minimum=min(minimum,float(np.min(stats["lower"] if stats["lower"] is not None else stats["mean"])))
+            handles[rho]=plot_summary(axis,x,stats,color=color,linestyle=DOSE_LINES[i],
+                marker=("o","s","^","D")[i],label=fr"$\rho={rho:g}$",
+                lw=2.2,marker_slot=i,marker_slots=len(doses),time_trace=True)
         if len(matrices)>1 and all(np.allclose(matrices[0],v,atol=1e-10,rtol=1e-10) for v in matrices[1:]):
             axis.text(.04,.93,"Strength curves coincide",transform=axis.transAxes,va="top",fontsize=11,
                       bbox=dict(fc="white",ec="none",alpha=.9))
         axis.set(title=LABELS[method].replace(": ", ":\n"),xlabel="Training episode",
-                 ylabel="Added pseudo-regret\nvs mildest strength" if incremental else "Cumulative pseudo-regret")
+                 ylabel="Added pseudo-regret vs mildest\n(symlog)" if incremental else "Cumulative pseudo-regret (symlog)")
+        axis.set_yscale("symlog",linthresh=.01)
         if incremental:axis.axhline(0,color="#555555",lw=.8)
         axis.tick_params(labelleft=True,labelbottom=True)
         axis.grid(alpha=.23)
     for axis in list(axes.flat)[len(present):]:axis.set_axis_off()
-    axes[0,0].set_ylim(minimum*1.13 if incremental else 0,max(1,maximum)*1.13)
+    pad_plot_axis(axes[0,0])
     _title(fig,kind,context,mode,("Additional cost of stronger nuisance · paired subtraction within each seed" if incremental else
                                "Physical diversion strength · identical domain, useful routes and task signals"))
     fig.legend(list(handles.values()),[fr"$\rho={r:g}$" for r in handles],loc="lower center",
                bbox_to_anchor=(.5,.065),ncol=4,frameon=False,fontsize=14)
-    fig.text(.5,.035,"Shared linear y scale. Coincident curves remain coincident; no artificial offsets.",ha="center",fontsize=11)
+    fig.text(.5,.035,"Shared symlog y scale (linear within ±0.01). Markers identify measured episodes; no artificial offsets.",ha="center",fontsize=11)
     fig.text(.5,.012,band_description(band),ha="center",fontsize=10)
     fig.tight_layout(rect=(0,.14,1,.92),h_pad=2.3,w_pad=1.4)
     return fig
@@ -220,18 +214,308 @@ def draw_strength_diagnostics(rows, kind, context=0, mode=1, plt=None, band="sd"
             matrix=np.array([[r[metric] for r in sorted(subset,key=lambda r:r["seed"]) if r["rho"]==rho] for rho in levels]).T
             stats=seed_summary(matrix,band)
             color,line,marker=STYLES[method]
-            handles[method],=axis.plot(levels,stats["mean"],color=color,ls=line,marker=marker,
-                                      lw=4 if method=="ceac" else 2,ms=7,markerfacecolor="white")
-            if stats["lower"] is not None:
-                axis.fill_between(levels,stats["lower"],stats["upper"],color=color,alpha=.12,lw=0)
-            axis.set(xlabel=r"Physical diversion probability $\rho$",ylabel=label,xticks=levels)
-            axis.set_ylim(bottom=0)
+            handles[method]=plot_summary(axis,levels,stats,color=color,linestyle=line,
+                marker=marker,label=LABELS[method],lw=2.6 if method=="ceac" else 1.9)
+            axis.set(xlabel=DOSE_LABELS[kind]+r" $\rho$",ylabel=label,xticks=levels)
             axis.grid(alpha=.23)
-            if metric=="success":axis.set_ylim(0,1)
+    for axis in axes.flat:
+        pad_plot_axis(axis)
     _title(fig,kind,context,mode,"Why performance differs: value gap, successful arrivals, wasted steps and useful evidence")
     _legend(fig,handles,METHODS,band,bottom=.045)
     fig.tight_layout(rect=(0,.18,1,.92),h_pad=2.2,w_pad=1.7)
     return fig
+
+
+
+# These labels describe the recorded intervention, not an inferred mechanism.
+DOSE_LABELS = {
+    "deepsea": "Undertow: probability of losing progress",
+    "frozenlake": "False Beacon: probability of one dwell step",
+}
+
+
+def _endpoint_grid(rows):
+    """Validate complete paired endpoints before subtracting methods or doses."""
+    groups = defaultdict(dict)
+    for row in rows:
+        condition = row["environment"], row["context"], row["mode"]
+        key = row["method"], row["rho"], row["seed"]
+        if key in groups[condition]:
+            raise ValueError("Duplicate strength endpoint")
+        if row["method"] not in METHODS or not np.isfinite(
+                [row[k] for k in ("rho", "regret", "last_gap", "episodes")]).all():
+            raise ValueError("Unknown method or nonfinite strength endpoint")
+        groups[condition][key] = row
+    for grid in groups.values():
+        methods = {key[0] for key in grid}
+        levels = {key[1] for key in grid}
+        seeds = {key[2] for key in grid}
+        if len(grid) != len(methods)*len(levels)*len(seeds):
+            raise ValueError("Strength endpoints require paired seeds at every method and dose")
+        if len({r["episodes"] for r in grid.values()}) != 1:
+            raise ValueError("Strength endpoints require equal episode budgets")
+    return groups
+
+
+def ceac_advantage_statistics(rows):
+    """Positive = CEAC better; subtract within seed BEFORE computing variation.
+
+    extra_regret_saved is the change in CEAC's advantage relative to the
+    mildest dose, not the absolute advantage already present at that dose.
+    """
+    paired = []
+    for (kind, context, mode), grid in sorted(_endpoint_grid(rows).items()):
+        if not any(m == "ceac" for m, _, _ in grid):
+            raise ValueError("CEAC comparisons require a recorded CEAC reference")
+        mild = min(rho for _, rho, _ in grid)
+        for (method, rho, seed), row in sorted(grid.items()):
+            if method == "ceac":
+                continue
+            ceac = grid["ceac", rho, seed]
+            baseline = grid[method, mild, seed]["regret"] - grid["ceac", mild, seed]["regret"]
+            saved = row["regret"] - ceac["regret"]
+            paired.append(dict(environment=kind, context=context, mode=mode, method=method,
+                rho=rho, seed=seed, episodes=row["episodes"], mildest_rho=mild,
+                regret_saved=saved, extra_regret_saved=saved-baseline,
+                gap_reduction=row["last_gap"]-ceac["last_gap"]))
+    return paired
+
+
+def summarize_ceac_advantages(paired):
+    groups = defaultdict(list)
+    for row in paired:
+        key = tuple(row[k] for k in ("environment", "context", "mode", "method", "rho"))
+        groups[key].append(row)
+    summaries = []
+    for key, subset in sorted(groups.items()):
+        summary = dict(zip(("environment", "context", "mode", "method", "rho"), key))
+        summary["n"] = len(subset)
+        for metric in ("regret_saved", "extra_regret_saved", "gap_reduction"):
+            values = np.array([r[metric] for r in sorted(subset, key=lambda r:r["seed"])])
+            summary[metric] = dict(mean=float(values.mean()),
+                sample_sd=float(values.std(ddof=1)) if len(values)>1 else None,
+                minimum=float(values.min()), maximum=float(values.max()),
+                ceac_better=int(np.sum(values>1e-10)),
+                tied=int(np.sum(np.abs(values)<=1e-10)),
+                ceac_worse=int(np.sum(values < -1e-10)))
+        summaries.append(summary)
+    return summaries
+
+
+def draw_pathology_response(rows, context=0, mode=1, plt=None, band="sd"):
+    """Headline: absolute cost, dose-induced cost, and remaining value gap."""
+    if plt is None:
+        import matplotlib.pyplot as plt
+    grids = _endpoint_grid([r for r in rows if (r["context"], r["mode"]) == (context, mode)])
+    if not grids:
+        raise ValueError("No recorded strength endpoints")
+    fig, axes = plt.subplots(len(grids), 3, figsize=(18, 4.2*len(grids)+2.5), sharey="col", squeeze=False)
+    handles = {}
+    for i, ((kind, _, _), grid) in enumerate(sorted(grids.items())):
+        levels = sorted({rho for _, rho, _ in grid})
+        seeds = sorted({seed for _, _, seed in grid})
+        for method in METHODS:
+            if not any(m == method for m, _, _ in grid):
+                continue
+            raw = np.array([[grid[method,rho,seed]["regret"] for rho in levels] for seed in seeds])
+            gaps = np.array([[grid[method,rho,seed]["last_gap"] for rho in levels] for seed in seeds])
+            for axis, matrix in zip(axes[i], (raw, raw-raw[:, :1], gaps)):
+                stats = seed_summary(matrix, band)
+                color, line, marker = STYLES[method]
+                handles[method] = plot_summary(axis,levels,stats,color=color,linestyle=line,
+                    marker=marker,label=LABELS[method],lw=2.6 if method=="ceac" else 1.9)
+        for axis, title, label in zip(axes[i],
+                ("Total exploration cost", "Extra cost as pathology increases", "Remaining policy error"),
+                ("Cumulative pseudo-regret (symlog)", "Regret minus mildest dose (linear)",
+                 "Last 32-episode expected value gap")):
+            axis.set(title=title, xlabel=DOSE_LABELS[kind]+r" $\rho$", ylabel=label, xticks=levels)
+            axis.grid(alpha=.2)
+            axis.tick_params(labelsize=10, labelleft=True)
+            axis.xaxis.label.set_size(11)
+            axis.yaxis.label.set_size(12)
+            axis.title.set_size(14)
+        axes[i,0].set_yscale("symlog", linthresh=.01)
+        # Signed added-cost bands are intentionally untruncated.
+        axes[i,1].axhline(0, color="#555555", lw=.8)
+        axes[i,0].text(0, 1.19, ENVIRONMENT_LABELS[kind], transform=axes[i,0].transAxes,
+                       fontsize=16, fontweight="bold")
+        axes[i,2].text(.98,.77,f"{len(seeds)} seeds; {next(iter(grid.values()))['episodes']:,} episodes",
+                       ha="right",va="top",transform=axes[i,2].transAxes,fontsize=10)
+    for axis in axes[0]:
+        pad_plot_axis(axis)
+    fig.suptitle(f"Increasing pathology: overall failure versus additional harm · mode {mode} · context {context}",
+                 fontsize=19, fontweight="bold", y=.995)
+    fig.text(.5,.953,"Shared y scales within columns. Lower is better. False Beacon varies activation probability, not breadth.",
+             ha="center",fontsize=12)
+    _legend(fig, handles, METHODS, band, bottom=.045)
+    fig.tight_layout(rect=(0,.17,1,.98), h_pad=3.2, w_pad=2.5)
+    return fig
+
+
+def draw_endpoint_comparison(rows, kind, context=0, mode=1, plt=None, band="sd", rho=None):
+    """One row per method makes exact ties visible without moving any values."""
+    if plt is None:
+        import matplotlib.pyplot as plt
+    selected = [r for r in rows if (r["environment"],r["context"],r["mode"]) == (kind,context,mode)]
+    grids = _endpoint_grid(selected)
+    if not grids:
+        raise ValueError("No recorded strength endpoints")
+    grid = grids[kind,context,mode]
+    levels = sorted({p for _,p,_ in grid})
+    rho = levels[-1] if rho is None else rho
+    if rho not in levels:
+        raise ValueError("Requested strength was not recorded")
+    seeds = sorted({seed for _,_,seed in grid})
+    methods = [m for m in METHODS if any(a==m for a,_,_ in grid)]
+    fig, axes = plt.subplots(1,3,figsize=(20,7),sharey=True)
+    metrics = ("regret","added_regret","last_gap")
+    for col,(axis,metric,title) in enumerate(zip(axes,metrics,
+            ("Total exploration cost", "Extra cost above mildest dose", "Remaining policy error"))):
+        for i,method in enumerate(methods):
+            values = np.array([grid[method,rho,seed]["regret"]-grid[method,levels[0],seed]["regret"]
+                               if metric=="added_regret" else grid[method,rho,seed][metric] for seed in seeds])
+            stats = seed_summary(values[:,None],band)
+            mean = float(stats["mean"][0])
+            spread = None if stats["lower"] is None else np.array(
+                [[mean-stats["lower"][0]], [stats["upper"][0]-mean]])
+            color,_,marker = STYLES[method]
+            axis.errorbar(mean,i,xerr=spread,fmt=marker,color=color,ms=7,mfc="white",
+                          capsize=3,lw=1.5,label=LABELS[method],zorder=3)
+            # Numeric columns distinguish nearly equal results even on log axes.
+            digits = 4 if metric=="last_gap" else 3
+            numeric = f"{mean:.{digits}f}"
+            if stats["lower"] is not None:
+                if band=="sd":
+                    numeric += f' ± {stats["sample_sd"][0]:.{digits}f}'
+                else:
+                    numeric += f' [{stats["lower"][0]:.{digits}f}, {stats["upper"][0]:.{digits}f}]'
+            axis.text(1.03,i,numeric,transform=axis.get_yaxis_transform(),va="center",fontsize=10)
+            if i%2==0:axis.axhspan(i-.5,i+.5,color="#f1f3f6",zorder=0)
+        if col==0:axis.set_xscale("symlog",linthresh=.01)
+        axis.set(title=title,xlabel=("Cumulative pseudo-regret (symlog)",
+            "Regret minus mildest dose (linear)","Last 32-episode expected value gap")[col])
+        axis.axvline(0,color="#777777",lw=.8,zorder=1)
+        axis.set_yticks(range(len(methods)),[LABELS[m] for m in methods])
+        axis.tick_params(axis="y",length=0,labelsize=11)
+        axis.spines[["top","right","left"]].set_visible(False)
+        axis.grid(axis="x",alpha=.2)
+        pad_plot_axis(axis,coordinate="x",fraction=.09)
+    axes[0].set_ylim(len(methods)-.5,-.5)
+    fig.suptitle(ENVIRONMENT_LABELS[kind]+f" · mode {mode} · context {context}",
+                 fontsize=21,fontweight="bold",y=.99)
+    fig.text(.5,.91,f"Separate rows preserve ties · recorded strength ρ={rho:g} · "
+             f"{len(seeds)} seeds × {next(iter(grid.values()))['episodes']:,} episodes",
+             ha="center",fontsize=12)
+    fig.text(.5,.09,"Lower is better. Extra cost uses within-seed subtraction relative to "
+             +f"ρ={levels[0]:g}. Points are seed means; no offsets in metric values.",ha="center",fontsize=11)
+    fig.text(.5,.045,"Error bars: "+("±1 sample SD" if band=="sd" else "observed seed range")
+             +"; descriptive, not confidence intervals. No error bar for a single seed.",ha="center",fontsize=11)
+    fig.subplots_adjust(left=.205,right=.88,bottom=.23,top=.81,wspace=1.2)
+    return fig
+
+
+def draw_ceac_advantage(rows, context=0, mode=1, plt=None, band="sd"):
+    """All comparator/dose pairs, including CEAC losses and oracle references."""
+    if plt is None:
+        import matplotlib.pyplot as plt
+    from matplotlib.colors import SymLogNorm
+    selected = [r for r in rows if (r["context"],r["mode"]) == (context,mode)]
+    summaries = summarize_ceac_advantages(ceac_advantage_statistics(selected))
+    if not summaries:
+        raise ValueError("No recorded CEAC comparisons")
+    kinds = sorted({r["environment"] for r in summaries})
+    limit = max(1., max(abs(r["regret_saved"]["mean"]) for r in summaries))
+    norm = SymLogNorm(linthresh=1., vmin=-limit, vmax=limit, base=10)
+    fig, axes = plt.subplots(1,len(kinds),figsize=(9.5*len(kinds),7),squeeze=False)
+    cmap = plt.get_cmap("PuOr")
+    for kind, axis in zip(kinds, axes.flat):
+        subset = [r for r in summaries if r["environment"]==kind]
+        levels = sorted({r["rho"] for r in subset})
+        methods = [m for m in METHODS if any(r["method"]==m for r in subset)]
+        lookup = {(r["method"],r["rho"]):r for r in subset}
+        matrix = np.array([[lookup[m,rho]["regret_saved"]["mean"] for rho in levels] for m in methods])
+        axis.imshow(matrix, norm=norm, cmap=cmap, aspect="auto")
+        for i, method in enumerate(methods):
+            for j, rho in enumerate(levels):
+                record = lookup[method,rho]; stats = record["regret_saved"]
+                spread = "n/a" if stats["sample_sd"] is None else f'{stats["sample_sd"]:.2f}'
+                rgba = cmap(norm(stats["mean"]))
+                luminance = sum(w*c for w,c in zip((.2126,.7152,.0722),rgba[:3]))
+                axis.text(j,i,f'{stats["mean"]:+.2f}\n± {spread}',ha="center",va="center",fontsize=10,
+                    color="white" if luminance<.45 else "#161616",
+                    fontweight="bold" if stats["ceac_better"]==record["n"] else "normal")
+        axis.set(xticks=range(len(levels)), xticklabels=[f"{p:g}" for p in levels],
+                 yticks=range(len(methods)), yticklabels=[LABELS[m] for m in methods],
+                 xlabel=DOSE_LABELS[kind]+r" $\rho$", title=ENVIRONMENT_LABELS[kind])
+        axis.tick_params(labelsize=11)
+        axis.xaxis.label.set_size(11)
+        axis.set_xticks(np.arange(-.5,len(levels),1),minor=True)
+        axis.set_yticks(np.arange(-.5,len(methods),1),minor=True)
+        axis.grid(which="minor",color="white",linewidth=2)
+        axis.tick_params(which="minor",bottom=False,left=False)
+    fig.suptitle(f"When CEAC saves exploration cost · mode {mode} · context {context}",
+                 fontsize=20,fontweight="bold",y=.99)
+    counts=sorted({r["n"] for r in summaries})
+    fig.text(.5,.93,"Comparator regret − CEAC regret: positive favors CEAC; negative favors comparator. "
+             +f"Paired seeds/cell: {', '.join(map(str,counts))}.",
+             ha="center",fontsize=12)
+    fig.text(.5,.10,"Cells: paired seed mean ± sample SD. Bold: CEAC lower in every recorded pair; not a significance test.",
+             ha="center",fontsize=11)
+    fig.text(.5,.065,"CEAC/IDS know candidate models; primitive controls learn transitions. Oracle additionally knows the true mode.",
+             ha="center",fontsize=10)
+    fig.text(.5,.03,"Last-window value ties can coexist with different cumulative costs. Colors use a symmetric log scale.",
+             ha="center",fontsize=10)
+    fig.tight_layout(rect=(0,.16,1,.88),w_pad=3)
+    return fig
+
+
+def ceac_comparison_section(rows, context=None, mode=None):
+    """Data-derived assessment shared by notebook and standard report."""
+    selected = [r for r in rows if (context is None or r["context"]==context)
+                and (mode is None or r["mode"]==mode)]
+    summaries = summarize_ceac_advantages(ceac_advantage_statistics(selected))
+    text = ["## Where CEAC performs better", "",
+        "Positive saved regret means comparator minus CEAC. The additional advantage subtracts "
+        "the same contrast at the mildest dose, within each seed. It separates an advantage "
+        "already present at mild pathology from one that grows with pathology. "
+        "All uncertainties below are sample SD across paired seeds, not confidence intervals. "
+        "Bold entries favor CEAC in every recorded pair; this is descriptive, not a significance test.", "",
+        "False Beacon currently varies the probability of one dwell step, not beacon breadth. "
+        "The full-support and excluded-support Bayesian treatments remain distinct. "
+        "CEAC/IDS have candidate-model access; the primitive controls learn from transitions. "
+        "These are finite-budget comparisons, not evidence that a learned evidence critic caused the advantage.", ""]
+    def fmt(stats, digits=2):
+        spread = "n/a" if stats["sample_sd"] is None else f'{stats["sample_sd"]:.{digits}f}'
+        value = f'{stats["mean"]:+.{digits}f} ± {spread}'
+        return f"**{value}**" if stats["minimum"]>1e-10 else value
+    for (kind, c, m), grid in sorted(_endpoint_grid(selected).items()):
+        levels = sorted({rho for _,rho,_ in grid})
+        def mean(method, rho, metric):
+            return float(np.mean([r[metric] for (a,p,_),r in grid.items() if a==method and p==rho]))
+        ceac_low,ceac_high = [mean("ceac",p,"regret") for p in (levels[0],levels[-1])]
+        text += [f"### {ENVIRONMENT_LABELS[kind]} · mode {m} · context {c}", "",
+            f"CEAC cumulative regret: {ceac_low:.3f} at rho={levels[0]:g} to {ceac_high:.3f} "
+            f"at rho={levels[-1]:g}; strongest-dose last-window value gap: "
+            f"{mean('ceac',levels[-1],'last_gap'):.4f}.", ""]
+        if any(method=="ids" for method,_,_ in grid):
+            ids_high = mean("ids",levels[-1],"regret")
+            relation = "lower" if ids_high<ceac_high-1e-10 else "higher" if ids_high>ceac_high+1e-10 else "equal"
+            text += [f"Full-support IDS has {relation} cumulative regret ({ids_high:.3f}) at the strongest dose; "
+                     f"its last-window value gap is {mean('ids',levels[-1],'last_gap'):.4f}.", ""]
+        text += [f"Strongest-dose comparison (rho={levels[-1]:g}); positive numbers favor CEAC.", "",
+            "| Comparator | Regret saved | Additional advantage over mild dose | Last value-gap reduction | Pairs: CEAC lower / tied / higher regret |",
+            "|---|---:|---:|---:|---:|"]
+        for method in METHODS:
+            match = [r for r in summaries if (r["environment"],r["context"],r["mode"],r["method"],r["rho"])
+                     ==(kind,c,m,method,levels[-1])]
+            if not match:
+                continue
+            record=match[0]; saved=record["regret_saved"]
+            text.append(f'| {LABELS[method]} | {fmt(saved)} | {fmt(record["extra_regret_saved"])} | '
+                        f'{fmt(record["gap_reduction"],4)} | '
+                        f'{saved["ceac_better"]} / {saved["tied"]} / {saved["ceac_worse"]} |')
+        text += [""]
+    return text
 
 
 def make_strength_figures(destination, runs, plt, band="sd"):
@@ -239,12 +523,23 @@ def make_strength_figures(destination, runs, plt, band="sd"):
     if not groups:return []
     rows=strength_statistics(runs)
     artifacts=[]
+    for context,mode in sorted({k[1:3] for k in groups}):
+        for family,draw in (("response",draw_pathology_response),("ceac_advantage",draw_ceac_advantage)):
+            if family=="ceac_advantage" and not any(k[1:]==(context,mode,"ceac") for k in groups):
+                continue
+            fig=draw(rows,context=context,mode=mode,plt=plt,band=band)
+            for extension in ("png","pdf"):
+                path=Path(destination)/f"pathology_{family}_context{context}_mode{mode}.{extension}"
+                fig.savefig(path,dpi=150,facecolor="white",bbox_inches="tight")
+                artifacts.append(path)
+            plt.close(fig)
     for kind,context,mode in sorted({k[:3] for k in groups}):
         for family,draw,data,extra in (
             ("overlay",draw_method_overlay,groups,{}),
             ("learning",draw_strength_learning,groups,{}),
             ("added_regret",draw_strength_learning,groups,{"incremental":True}),
             ("diagnostics",draw_strength_diagnostics,rows,{}),
+            ("endpoints",draw_endpoint_comparison,rows,{}),
             ("prior",draw_method_overlay,groups,{"prior":True})):
             if family=="prior" and (kind,context,mode,"ids_zero") not in groups:continue
             fig=draw(data,kind,context,mode,plt,band,**extra)
@@ -278,7 +573,10 @@ def report_section(rows):
           r"$$P_{m,\rho}(\cdot\mid s,a_N)=(1-\rho)P_{\mathrm{pass}}(\cdot\mid s,a_N)"
           r"+\rho P_{\mathrm{divert}}(\cdot\mid s,a_N).$$", "",
           "The report automatically emits method overlays, STEERING-style strength curves in "
-          "separate method panels, paired added-regret traces, and exposure/value/success diagnostics. Raw per-seed summaries "
+          "separate method panels, paired added-regret traces, and exposure/value/success diagnostics. "
+          "Training traces use shared symlog axes, linear within ±0.01, to keep small costs visible. "
+          "Markers are drawn above the lines on staggered recorded episodes; no values are shifted. "
+          "A strongest-dose endpoint view gives each method its own row, including exact ties. Raw per-seed summaries "
           "and paired added regret are saved in pathology_statistics.json. No monotone deterioration "
           "or algorithm ranking is imposed. Training budgets match in episodes; physical steps are "
           "recorded separately. CEAC/IDS have candidate-model access that the primitive controls lack.", "",

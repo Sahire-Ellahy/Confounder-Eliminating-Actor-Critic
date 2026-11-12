@@ -135,6 +135,12 @@ def export_study(study_root, destination):
         endpoints=[r["result"] for r in curves],history_audits=[r["history_audit"] for r in runs],
         model_audits=environment_audit["models"],strength_checks=environment_audit["strength_checks"],
         pathology_statistics=statistics["rows"])
+    comparisons_path=study_root/"ceac_comparisons.json"
+    if "ceac_comparisons.json" in report_audit["artifacts"]:
+        comparisons=json.loads(comparisons_path.read_text())
+        if comparisons["study_identity"] != study["identity"]:
+            raise ValueError("CEAC comparisons belong to another study")
+        bundle["ceac_comparisons"]=comparisons
     (destination/"evidence").mkdir(parents=True,exist_ok=True)
     (destination/"assets").mkdir(parents=True,exist_ok=True)
     target=destination/"evidence/curves.json.gz"

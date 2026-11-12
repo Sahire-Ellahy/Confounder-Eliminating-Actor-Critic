@@ -15,12 +15,15 @@ from .contracts import Episode, Transition
 from .primitives import PrimitiveSpec, IDAC, IDACConfig, UCBQ, UCBQConfig, OptimisticPOMD, POMDConfig
 from .evidence import RunWriter, atomic_json, jsonable, manifest, verify_run
 from .ids import BayesianIDS
-from .model import FiniteModel, environment
-from .benchmarks import BENCHMARKS, specification, study_cells
+from .breadth import (make_model, make_environment as environment, specification,
+                      register_breadth, BREADTH_PROFILES, audit_breadth_model, audit_breadth_family)
+from .benchmarks import BENCHMARKS, study_cells
 from .benchmark_audit import audit_model, audit_strength_family
 
 
 METHODS = ("ceac", "ceac_actor", "ids", "ids_rare", "ids_zero", "oracle", "idac", "ucb_q", "pomd")
+register_breadth()
+
 DEFAULT_METHODS = ("ceac", "oracle", "ids", "ids_zero", "idac", "ucb_q", "pomd")
 
 
@@ -46,8 +49,8 @@ def collect_episode(env, model, policy, episode_index, behavior, action_rng, sim
     observation, _ = env.reset(seed=simulation_seed,
                                options={"episode_index": model.context*env.config.block_length})
     transitions = []
-    events = {"diagnostic": 0, "nuisance": 0, "risky": 0, "diversions": 0, "lost_steps": 0}
-    locations = set()
+    events = {"diagnostic": 0, "nuisance": 0, "risky": 0, "diversions": 0, "lost_steps": 0, "beacon_steps": 0}
+    locations, beacon_locations = set(), set()
     for _ in range(model.cfg.max_steps):
         decoded = env.decode(observation)
         locations.add((decoded.row, decoded.column if model.kind == "deepsea" else decoded.col))
@@ -56,10 +59,13 @@ def collect_episode(env, model, policy, episode_index, behavior, action_rng, sim
         next_obs, reward, term, trunc, info = env.step(action)
         event = info.get("diagnostic_event", "none")
         events["diagnostic"] += int(event in {"probe", "deep"})
-        events["nuisance"] += int(event in {"tv", "reeds", "shallow"})
+        events["nuisance"] += int(event in {"tv", "reeds", "shallow", "beacon_field"})
         events["risky"] += int(event in {"challenge", "outer"})
         events["diversions"] += int(info.get("nuisance_activated", False))
         events["lost_steps"] += int(info.get("nuisance_delay_step", False))
+        events["beacon_steps"] += int(info.get("beacon_field_step",False))
+        if info.get("beacon_field_step",False):
+            beacon_locations.add(tuple(info["position"]))
         done = bool(term or trunc)
         ll = model.log_likelihood(state, action, next_obs, reward, done)
         transitions.append(Transition(state, action, float(reward), -1 if done else model.index[int(next_obs)], done, ll))
@@ -70,7 +76,7 @@ def collect_episode(env, model, policy, episode_index, behavior, action_rng, sim
         raise RuntimeError("Simulator exceeded declared horizon")
     return (Episode(episode_index, model.context, policy.identity, behavior, tuple(transitions)),
             {"terminal_success": bool(info["terminal_success"]),
-             "terminal_observation": int(observation), "events": events, "locations": locations})
+             "terminal_observation": int(observation), "events": events, "locations": locations, "beacon_locations": beacon_locations})
 
 
 def execute(model, folder, method, seed, mode, episodes, config, resume=False, primitive_configs=None):
@@ -116,8 +122,8 @@ def execute(model, folder, method, seed, mode, episodes, config, resume=False, p
     started = time.monotonic()
     cumulative_return = cumulative_regret = cumulative_information = 0.
     cumulative_steps = 0
-    cumulative_events = {"diagnostic": 0, "nuisance": 0, "risky": 0, "diversions": 0, "lost_steps": 0}
-    visited_states, visited_locations = set(), set()
+    cumulative_events = {"diagnostic": 0, "nuisance": 0, "risky": 0, "diversions": 0, "lost_steps": 0, "beacon_steps": 0}
+    visited_states, visited_locations, visited_beacon = set(), set(), set()
     rows = []
     try:
         for index in range(episodes):
@@ -136,6 +142,7 @@ def execute(model, folder, method, seed, mode, episodes, config, resume=False, p
                 cumulative_events[event] += count
             visited_states.update(step.state for step in episode.transitions)
             visited_locations.update(evaluation["locations"])
+            visited_beacon.update(evaluation["beacon_locations"])
             row = {"episode": index, "benchmark": model.benchmark, "context": model.context, "method": method, "behavior": behavior,
                    "return": episode.total_return, "expected_return": float(expected[mode]),
                    "optimal_return": float(model.optimal_returns[mode]), "pseudo_regret": float(regret),
@@ -153,6 +160,8 @@ def execute(model, folder, method, seed, mode, episodes, config, resume=False, p
                    "cumulative_risky_visits": cumulative_events["risky"],
                    "cumulative_diversions": cumulative_events["diversions"],
                    "cumulative_lost_steps": cumulative_events["lost_steps"],
+                   "cumulative_beacon_steps": cumulative_events["beacon_steps"],
+                   "unique_beacon_cells": len(visited_beacon),
                    "unique_observed_states": len(visited_states),
                    "unique_physical_locations": len(visited_locations),
                    "diagnostics": learner.diagnostics()}
@@ -169,6 +178,7 @@ def execute(model, folder, method, seed, mode, episodes, config, resume=False, p
                   "last_window_expected_return": float(np.mean([r["expected_return"] for r in rows[-min(32, episodes):]])),
                   "elapsed_seconds": time.monotonic()-started, "setup_seconds": setup_seconds,
                   "primitive_steps": cumulative_steps, "event_counts": cumulative_events,
+                  "unique_beacon_cells": len(visited_beacon),
                   "unique_observed_states": len(visited_states),
                   "unique_physical_locations": len(visited_locations),
                   "diagnostics": learner.diagnostics()}
@@ -195,7 +205,7 @@ def execute(model, folder, method, seed, mode, episodes, config, resume=False, p
 
 @lru_cache(maxsize=1)
 def _worker_model(kind, context, benchmark):
-    return FiniteModel(kind, context, benchmark)
+    return make_model(kind, context, benchmark)
 
 
 def _execute_cell(cell, episodes, config, resume, primitive_configs):
@@ -274,12 +284,14 @@ def main(argv=None):
             for benchmark in args.benchmarks:
                 for kind in args.environments:
                     for context in args.contexts:
-                        model = FiniteModel(kind, context, benchmark)
-                        audits.append(audit_model(model, config.mass_bound))
+                        model = make_model(kind, context, benchmark)
+                        audit = audit_breadth_model if benchmark in BREADTH_PROFILES else audit_model
+                        audits.append(audit(model, config.mass_bound))
                         print(f"Preflight verified: {benchmark}/{kind}/context{context}", flush=True)
                         del model
             atomic_json(audit_path, {"study_identity": study_identity["identity"], "models": audits,
-                                     "strength_checks": audit_strength_family(audits)})
+                                     "strength_checks": audit_strength_family(audits),
+                                     "breadth_checks": audit_breadth_family(audits)})
         else:
             saved_audit = json.loads(audit_path.read_text())
             if saved_audit["study_identity"] != study_identity["identity"]:

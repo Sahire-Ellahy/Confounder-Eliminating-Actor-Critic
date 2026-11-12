@@ -1,0 +1,41 @@
+{
+  "algorithm_modified": false,
+  "analysis_source_sha256": "086a3b9fba29f1cd3ec5e32af61a7b9d066f443b0fc398c0bd77a29690064b06",
+  "diagnosis_sha256": "9ae99fa5e2ea65adb3fed148735feb6bcddae2fdd8ed689faa48b146a4153194",
+  "interpretation": "Local expectations and variances at the same saved policy, per unit optimizer step. Not a new trajectory, optimizer selection, or performance result.",
+  "mean_direction_ratio": 10509.37681872453,
+  "natural_unit_step": {
+    "expected_probe_minus_risky_logit_increment": 0.13060233250511583,
+    "sampled_increment_sd": 32.19612894828279
+  },
+  "ordinary_unit_step": {
+    "expected_probe_minus_risky_logit_increment": 1.2427219497203868e-05,
+    "sampled_increment_sd": 0.022156928348870144
+  },
+  "protocol_sha256": "87ab3c8d750fff0707bbc7cb54a793607b3b42973defe5256c52aef27360ff79",
+  "schedule_check": {
+    "actor_exponent": 0.9,
+    "critic_exponent": 0.6,
+    "floor_exponent": 0.45,
+    "noise_summability_exponent": 1.35,
+    "scope": "Bounded conditional TD second moments at a repeatedly visited fixed state; does not prove the full adaptive CEAC theorem."
+  },
+  "schema": 1,
+  "snapshot": {
+    "augmented_q": [
+      0.5,
+      0.9065108105337718,
+      1.0371131430388876
+    ],
+    "dose": 0,
+    "probabilities": [
+      0.0001845124487599969,
+      0.9994808580029422,
+      0.0003346295482982841
+    ],
+    "seed": 0,
+    "state": 1,
+    "task": 0
+  },
+  "training_launched": false
+}

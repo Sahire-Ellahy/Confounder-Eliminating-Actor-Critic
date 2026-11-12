@@ -1,0 +1,1894 @@
+{
+  "checks": [
+    {
+      "breadths": [
+        0,
+        1,
+        2,
+        4,
+        8
+      ],
+      "context": 0,
+      "environment": "frozenlake",
+      "fixed_domain": false,
+      "fixed_horizon_and_action_alphabet": true,
+      "fixed_optimum_and_oracle_cost": true,
+      "fixed_six_seed_routes": true,
+      "fixed_useful_route_values_and_KL": true,
+      "reachable_states": [
+        3733,
+        3813,
+        3893,
+        4023,
+        4223
+      ],
+      "zero_task_KL_in_added_chamber": true
+    }
+  ],
+  "configuration": {
+    "benchmarks": [
+      "beacon_breadth_b00",
+      "beacon_breadth_b01",
+      "beacon_breadth_b02",
+      "beacon_breadth_b04",
+      "beacon_breadth_b08"
+    ],
+    "contexts": [
+      0
+    ],
+    "environments": [
+      "frozenlake"
+    ],
+    "episodes": 8192,
+    "methods": [
+      "ceac",
+      "oracle",
+      "ids",
+      "ids_zero",
+      "idac",
+      "ucb_q",
+      "pomd"
+    ],
+    "modes": [
+      0,
+      1
+    ],
+    "name": "false_beacon_physical_breadth_v1",
+    "schema": 1,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "smoke": {
+      "benchmarks": [
+        "beacon_breadth_b00",
+        "beacon_breadth_b08"
+      ],
+      "episodes": 32,
+      "seeds": [
+        0
+      ],
+      "workers": 2
+    },
+    "workers": 4
+  },
+  "models": [
+    {
+      "action_mask_sha256": "3bce57be44598bb792931287e336aa82d6e5b464a7ce680b90fefa4cfe130833",
+      "benchmark": "beacon_breadth_b00",
+      "breadth": {
+        "cells": 0,
+        "field_transition_max_task_kl": 0.0,
+        "horizon": 16,
+        "physical_cells": [],
+        "primitive_actions": 4
+      },
+      "context": 0,
+      "design_certificates": [
+        {
+          "beta": [
+            [
+              0.0,
+              0.01811861657235046
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.01811861657235046,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.8235734805613817
+          ],
+          "inserted": 1,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "9973d244a4431165be30553bd3038373ff7f8883f4fe21efe70861957be54694",
+            "5fad3834611e8ee4fc71f73169d41032779463d032dea7731a00655272175b7d",
+            "e802bccf5a6804c221efc0ee84429e56811f1f2d6262c8815407af66669ac09d",
+            "f498080c6ffd36eafb33cf5109a10c37bc0132fb4b21555e430632fdf07f20b3",
+            "786563b625d3e6945d587e83de214ff5d6594f060ef3b7ecf13cc28eafd7de75",
+            "56360882d271357ff2e6de6fd1196615654726a5906b46c6e44c13a412e3bf7b",
+            "82276180c08eaf9c43c0dcd58d2c96b41a089ab161090df728f6118896cf2db0"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            0
+          ],
+          "row_minimum": 1.0
+        },
+        {
+          "beta": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.0,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            49.84548436491481,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "inserted": 0,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "9973d244a4431165be30553bd3038373ff7f8883f4fe21efe70861957be54694",
+            "5fad3834611e8ee4fc71f73169d41032779463d032dea7731a00655272175b7d",
+            "e802bccf5a6804c221efc0ee84429e56811f1f2d6262c8815407af66669ac09d",
+            "f498080c6ffd36eafb33cf5109a10c37bc0132fb4b21555e430632fdf07f20b3",
+            "786563b625d3e6945d587e83de214ff5d6594f060ef3b7ecf13cc28eafd7de75",
+            "56360882d271357ff2e6de6fd1196615654726a5906b46c6e44c13a412e3bf7b",
+            "82276180c08eaf9c43c0dcd58d2c96b41a089ab161090df728f6118896cf2db0"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            1
+          ],
+          "row_minimum": 0.9999999999999999
+        }
+      ],
+      "design_mass_bound": 128.0,
+      "environment": "frozenlake",
+      "nuisance_route_kl_zero": true,
+      "optimal_policy_oir_objective": [
+        0.28739807341237994,
+        0.2525800324312637
+      ],
+      "optimal_returns": [
+        0.489,
+        0.539
+      ],
+      "oracle_design_costs": [
+        0.01811861657235046,
+        0.0
+      ],
+      "policies": [
+        {
+          "expected_return": [
+            0.292,
+            0.292
+          ],
+          "label": "shore",
+          "occupancy_entropy": [
+            2.0794415416798357,
+            2.0794415416798357
+          ],
+          "oir_objective": [
+            0.4112573691414274,
+            0.4112573691414274
+          ],
+          "policy_id": "9973d244a4431165be30553bd3038373ff7f8883f4fe21efe70861957be54694",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "inner-bridge",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "5fad3834611e8ee4fc71f73169d41032779463d032dea7731a00655272175b7d",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.439,
+            0.539
+          ],
+          "label": "outer-causeway",
+          "occupancy_entropy": [
+            2.564949357461537,
+            2.564949357461537
+          ],
+          "oir_objective": [
+            0.2881046502134386,
+            0.2525800324312637
+          ],
+          "policy_id": "e802bccf5a6804c221efc0ee84429e56811f1f2d6262c8815407af66669ac09d",
+          "task_kl": [
+            0.020072794251022208,
+            0.020061997846767418
+          ]
+        },
+        {
+          "expected_return": [
+            0.27499999999999997,
+            0.27499999999999997
+          ],
+          "label": "shallow-survey",
+          "occupancy_entropy": [
+            2.7877881193860077,
+            2.7877881193860077
+          ],
+          "oir_objective": [
+            0.3209572102076248,
+            0.3209572102076248
+          ],
+          "policy_id": "f498080c6ffd36eafb33cf5109a10c37bc0132fb4b21555e430632fdf07f20b3",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.26999999999999996,
+            0.26999999999999996
+          ],
+          "label": "deep-survey",
+          "occupancy_entropy": [
+            2.5139396368970415,
+            2.5139396368970415
+          ],
+          "oir_objective": [
+            0.354566354097445,
+            0.354566354097445
+          ],
+          "policy_id": "786563b625d3e6945d587e83de214ff5d6594f060ef3b7ecf13cc28eafd7de75",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.283,
+            0.283
+          ],
+          "label": "reed-scan",
+          "occupancy_entropy": [
+            3.1780538303479453,
+            3.1780538303479453
+          ],
+          "oir_objective": [
+            0.28208425183972397,
+            0.28208425183972397
+          ],
+          "policy_id": "56360882d271357ff2e6de6fd1196615654726a5906b46c6e44c13a412e3bf7b",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "separator",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "987de03e759aecb66dacaa35922d28bf9cbba492d26cce8f4e6766bbbe17b2b3",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.4669999999999999,
+            0.46699999999999997
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8250780268806084,
+            2.8250780268806084
+          ],
+          "oir_objective": [
+            0.2546276852669926,
+            0.25462768526699253
+          ],
+          "policy_id": "82276180c08eaf9c43c0dcd58d2c96b41a089ab161090df728f6118896cf2db0",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.4594999999999999,
+            0.5095
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8615962085019393,
+            2.9542733302328124
+          ],
+          "oir_objective": [
+            0.2540496732320489,
+            0.2310976385857188
+          ],
+          "policy_id": "8d1afa6a3194a155c1c8d02abb79925f1286b34b09a33a417f1a48a9eab7fbec",
+          "task_kl": [
+            1.2172316579093276,
+            1.2312734369414267
+          ]
+        },
+        {
+          "expected_return": [
+            0.4169999999999999,
+            0.517
+          ],
+          "label": "maximum-model-information",
+          "occupancy_entropy": [
+            2.9898562596395375,
+            2.9898562596395375
+          ],
+          "oir_objective": [
+            0.25711017194715874,
+            0.2262446050867555
+          ],
+          "policy_id": "847275c08edd6e7d572313079f253f1eb995d32b55887bb197f7aa25499cb250",
+          "task_kl": [
+            1.2342935330226965,
+            1.2342827366184417
+          ]
+        }
+      ],
+      "public_bank_size": 10,
+      "reachable_states": 3733,
+      "return_range": [
+        -0.056000000000000015,
+        0.989
+      ],
+      "risky_route_regret_per_nat_mode0": 2.490933717285212,
+      "risky_to_optimal_information_cost_ratio_mode0": 137.47924447424148,
+      "safe_route_kl_zero": true,
+      "seed_policies": 6,
+      "specification": {
+        "configuration_overrides": {
+          "beacon_cells": 0,
+          "deep_fee": 0.02,
+          "inner_reward": 1.0,
+          "inner_success_normal": 0.5,
+          "inner_success_shifted": 0.5,
+          "outer_reward": 1.0,
+          "outer_success_normal": 0.452,
+          "outer_success_shifted": 0.552,
+          "reed_bins": 4,
+          "safe_reward": 0.3
+        },
+        "dose_unit": "additional_traversable_chamber_cells",
+        "environment": "frozenlake",
+        "name": "beacon_breadth_b00",
+        "nuisance_mechanism": "mode_independent_physical_chamber_breadth",
+        "seed_bank_rule": "six_original_routes_at_every_breadth",
+        "shift_protocol": "paired_stationary_modes"
+      },
+      "state_domain_sha256": "8f1e624bc7d65f40509aa90f05b15ee90a47d90d619af5c92b4227eebe3af2fb",
+      "zero_information_policies_beating_reward_optimum_in_oir_mode0": [
+        "reed-scan"
+      ]
+    },
+    {
+      "action_mask_sha256": "2f2e09875f9fd75e92b69d7713a516d9b818e8bac2dbbcab8331e4bfb57ddaa7",
+      "benchmark": "beacon_breadth_b01",
+      "breadth": {
+        "cells": 1,
+        "field_transition_max_task_kl": 0.0,
+        "horizon": 16,
+        "physical_cells": [
+          [
+            3,
+            2
+          ]
+        ],
+        "primitive_actions": 4
+      },
+      "context": 0,
+      "design_certificates": [
+        {
+          "beta": [
+            [
+              0.0,
+              0.01811861657235046
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.01811861657235046,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.8235734805613817
+          ],
+          "inserted": 1,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "284ea822ca64c819610fe91e0c64c0740ba055bd9174682ec61d701a5dd6b0a4",
+            "37a2c53db9257c130447fc8da033dcd01cb113b5f23fa3d8b5132615ab6eafde",
+            "38520a2fc0512f2edc056165258d5ee07032bc971c4798c6c579564bf90f2371",
+            "c2f837734f7e8678afec426b147e93f698000fb333cfcbc5f6039f7975de3f98",
+            "bebf683fa84dd676653a2dd12cbf51a6dc80556071035b3fab4c31213c7f4867",
+            "3f26985bfe4e5a8a4b51753421cb3445ed829b523d4dbbf4a4e6e80abe80e5fb",
+            "0843742cebabb08971fa0916338785f14605e2ef2dca8be7f23c36b8069540a6"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            0
+          ],
+          "row_minimum": 1.0
+        },
+        {
+          "beta": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.0,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            49.84548436491481,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "inserted": 0,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "284ea822ca64c819610fe91e0c64c0740ba055bd9174682ec61d701a5dd6b0a4",
+            "37a2c53db9257c130447fc8da033dcd01cb113b5f23fa3d8b5132615ab6eafde",
+            "38520a2fc0512f2edc056165258d5ee07032bc971c4798c6c579564bf90f2371",
+            "c2f837734f7e8678afec426b147e93f698000fb333cfcbc5f6039f7975de3f98",
+            "bebf683fa84dd676653a2dd12cbf51a6dc80556071035b3fab4c31213c7f4867",
+            "3f26985bfe4e5a8a4b51753421cb3445ed829b523d4dbbf4a4e6e80abe80e5fb",
+            "0843742cebabb08971fa0916338785f14605e2ef2dca8be7f23c36b8069540a6"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            1
+          ],
+          "row_minimum": 0.9999999999999999
+        }
+      ],
+      "design_mass_bound": 128.0,
+      "environment": "frozenlake",
+      "nuisance_route_kl_zero": true,
+      "optimal_policy_oir_objective": [
+        0.28739807341237994,
+        0.2525800324312637
+      ],
+      "optimal_returns": [
+        0.489,
+        0.539
+      ],
+      "oracle_design_costs": [
+        0.01811861657235046,
+        0.0
+      ],
+      "policies": [
+        {
+          "expected_return": [
+            0.292,
+            0.292
+          ],
+          "label": "shore",
+          "occupancy_entropy": [
+            2.0794415416798357,
+            2.0794415416798357
+          ],
+          "oir_objective": [
+            0.4112573691414274,
+            0.4112573691414274
+          ],
+          "policy_id": "284ea822ca64c819610fe91e0c64c0740ba055bd9174682ec61d701a5dd6b0a4",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "inner-bridge",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "37a2c53db9257c130447fc8da033dcd01cb113b5f23fa3d8b5132615ab6eafde",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.439,
+            0.539
+          ],
+          "label": "outer-causeway",
+          "occupancy_entropy": [
+            2.564949357461537,
+            2.564949357461537
+          ],
+          "oir_objective": [
+            0.2881046502134386,
+            0.2525800324312637
+          ],
+          "policy_id": "38520a2fc0512f2edc056165258d5ee07032bc971c4798c6c579564bf90f2371",
+          "task_kl": [
+            0.020072794251022208,
+            0.020061997846767418
+          ]
+        },
+        {
+          "expected_return": [
+            0.27499999999999997,
+            0.27499999999999997
+          ],
+          "label": "shallow-survey",
+          "occupancy_entropy": [
+            2.7877881193860077,
+            2.7877881193860077
+          ],
+          "oir_objective": [
+            0.3209572102076248,
+            0.3209572102076248
+          ],
+          "policy_id": "c2f837734f7e8678afec426b147e93f698000fb333cfcbc5f6039f7975de3f98",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.26999999999999996,
+            0.26999999999999996
+          ],
+          "label": "deep-survey",
+          "occupancy_entropy": [
+            2.5139396368970415,
+            2.5139396368970415
+          ],
+          "oir_objective": [
+            0.354566354097445,
+            0.354566354097445
+          ],
+          "policy_id": "bebf683fa84dd676653a2dd12cbf51a6dc80556071035b3fab4c31213c7f4867",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.283,
+            0.283
+          ],
+          "label": "reed-scan",
+          "occupancy_entropy": [
+            3.1780538303479453,
+            3.1780538303479453
+          ],
+          "oir_objective": [
+            0.28208425183972397,
+            0.28208425183972397
+          ],
+          "policy_id": "3f26985bfe4e5a8a4b51753421cb3445ed829b523d4dbbf4a4e6e80abe80e5fb",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "separator",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "7e276b0a2f8add3bef0c6835561cab9fabb1d1b3b3053ec8dac2fd8b8f5154ea",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.4669999999999999,
+            0.46699999999999997
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8250780268806084,
+            2.8250780268806084
+          ],
+          "oir_objective": [
+            0.2546276852669926,
+            0.25462768526699253
+          ],
+          "policy_id": "0843742cebabb08971fa0916338785f14605e2ef2dca8be7f23c36b8069540a6",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.4594999999999999,
+            0.5095
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8615962085019393,
+            2.9542733302328124
+          ],
+          "oir_objective": [
+            0.2540496732320489,
+            0.2310976385857188
+          ],
+          "policy_id": "8cb021919545f0642fd53d6a757397b85b1735428d108fc4edc62d8f587963df",
+          "task_kl": [
+            1.2172316579093276,
+            1.2312734369414267
+          ]
+        },
+        {
+          "expected_return": [
+            0.4169999999999999,
+            0.517
+          ],
+          "label": "maximum-model-information",
+          "occupancy_entropy": [
+            2.9898562596395375,
+            2.9898562596395375
+          ],
+          "oir_objective": [
+            0.25711017194715874,
+            0.2262446050867555
+          ],
+          "policy_id": "bf801f05316a709e585ce4396182dc08d52342a303d2a539ac305c30d49014e5",
+          "task_kl": [
+            1.2342935330226965,
+            1.2342827366184417
+          ]
+        }
+      ],
+      "public_bank_size": 10,
+      "reachable_states": 3813,
+      "return_range": [
+        -0.056000000000000015,
+        0.989
+      ],
+      "risky_route_regret_per_nat_mode0": 2.490933717285212,
+      "risky_to_optimal_information_cost_ratio_mode0": 137.47924447424148,
+      "safe_route_kl_zero": true,
+      "seed_policies": 6,
+      "specification": {
+        "configuration_overrides": {
+          "beacon_cells": 1,
+          "deep_fee": 0.02,
+          "inner_reward": 1.0,
+          "inner_success_normal": 0.5,
+          "inner_success_shifted": 0.5,
+          "outer_reward": 1.0,
+          "outer_success_normal": 0.452,
+          "outer_success_shifted": 0.552,
+          "reed_bins": 4,
+          "safe_reward": 0.3
+        },
+        "dose_unit": "additional_traversable_chamber_cells",
+        "environment": "frozenlake",
+        "name": "beacon_breadth_b01",
+        "nuisance_mechanism": "mode_independent_physical_chamber_breadth",
+        "seed_bank_rule": "six_original_routes_at_every_breadth",
+        "shift_protocol": "paired_stationary_modes"
+      },
+      "state_domain_sha256": "3c37bd4217618696e1018b211ccadce346fa29854f18d1c6cbd5f4eb4e10a1e0",
+      "zero_information_policies_beating_reward_optimum_in_oir_mode0": [
+        "reed-scan"
+      ]
+    },
+    {
+      "action_mask_sha256": "10d8e53f8d23a03af8082ee2be251445d95b3ee39ea304d440646302ae5d3536",
+      "benchmark": "beacon_breadth_b02",
+      "breadth": {
+        "cells": 2,
+        "field_transition_max_task_kl": 0.0,
+        "horizon": 16,
+        "physical_cells": [
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ]
+        ],
+        "primitive_actions": 4
+      },
+      "context": 0,
+      "design_certificates": [
+        {
+          "beta": [
+            [
+              0.0,
+              0.01811861657235046
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.01811861657235046,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.8235734805613817
+          ],
+          "inserted": 1,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "54205d63acf1df86ed32f89b8ca98c83e90729eac4fd6a570ba257e75f9e0721",
+            "5539ec2dc60b58127bdca39b6cc188efdf0d05bb0f44915b25d074878e21297b",
+            "814e48f34f15abbdeb819c7a0ba976969c0f6c76066d48e0ba0eddab3e12a356",
+            "17abf1aa7689c0ecf6870f32344c4a148c325f6dc4b96a5c36c5b85915cde9f1",
+            "e4db590417a626aa56c41be8df631868f0c0deb801423fa4a8966cccd9bde29d",
+            "f1610ec999404392d16eb72c36c5a58d217566b78ab5c8635d14cca550f1c455",
+            "42f1bb69faf328f947e55769c7c89538cfbb9373e380617ac31b7ed6caa658d4"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            0
+          ],
+          "row_minimum": 1.0
+        },
+        {
+          "beta": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.0,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            49.84548436491481,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "inserted": 0,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "54205d63acf1df86ed32f89b8ca98c83e90729eac4fd6a570ba257e75f9e0721",
+            "5539ec2dc60b58127bdca39b6cc188efdf0d05bb0f44915b25d074878e21297b",
+            "814e48f34f15abbdeb819c7a0ba976969c0f6c76066d48e0ba0eddab3e12a356",
+            "17abf1aa7689c0ecf6870f32344c4a148c325f6dc4b96a5c36c5b85915cde9f1",
+            "e4db590417a626aa56c41be8df631868f0c0deb801423fa4a8966cccd9bde29d",
+            "f1610ec999404392d16eb72c36c5a58d217566b78ab5c8635d14cca550f1c455",
+            "42f1bb69faf328f947e55769c7c89538cfbb9373e380617ac31b7ed6caa658d4"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            1
+          ],
+          "row_minimum": 0.9999999999999999
+        }
+      ],
+      "design_mass_bound": 128.0,
+      "environment": "frozenlake",
+      "nuisance_route_kl_zero": true,
+      "optimal_policy_oir_objective": [
+        0.28739807341237994,
+        0.2525800324312637
+      ],
+      "optimal_returns": [
+        0.489,
+        0.539
+      ],
+      "oracle_design_costs": [
+        0.01811861657235046,
+        0.0
+      ],
+      "policies": [
+        {
+          "expected_return": [
+            0.292,
+            0.292
+          ],
+          "label": "shore",
+          "occupancy_entropy": [
+            2.0794415416798357,
+            2.0794415416798357
+          ],
+          "oir_objective": [
+            0.4112573691414274,
+            0.4112573691414274
+          ],
+          "policy_id": "54205d63acf1df86ed32f89b8ca98c83e90729eac4fd6a570ba257e75f9e0721",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "inner-bridge",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "5539ec2dc60b58127bdca39b6cc188efdf0d05bb0f44915b25d074878e21297b",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.439,
+            0.539
+          ],
+          "label": "outer-causeway",
+          "occupancy_entropy": [
+            2.564949357461537,
+            2.564949357461537
+          ],
+          "oir_objective": [
+            0.2881046502134386,
+            0.2525800324312637
+          ],
+          "policy_id": "814e48f34f15abbdeb819c7a0ba976969c0f6c76066d48e0ba0eddab3e12a356",
+          "task_kl": [
+            0.020072794251022208,
+            0.020061997846767418
+          ]
+        },
+        {
+          "expected_return": [
+            0.27499999999999997,
+            0.27499999999999997
+          ],
+          "label": "shallow-survey",
+          "occupancy_entropy": [
+            2.7877881193860077,
+            2.7877881193860077
+          ],
+          "oir_objective": [
+            0.3209572102076248,
+            0.3209572102076248
+          ],
+          "policy_id": "17abf1aa7689c0ecf6870f32344c4a148c325f6dc4b96a5c36c5b85915cde9f1",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.26999999999999996,
+            0.26999999999999996
+          ],
+          "label": "deep-survey",
+          "occupancy_entropy": [
+            2.5139396368970415,
+            2.5139396368970415
+          ],
+          "oir_objective": [
+            0.354566354097445,
+            0.354566354097445
+          ],
+          "policy_id": "e4db590417a626aa56c41be8df631868f0c0deb801423fa4a8966cccd9bde29d",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.283,
+            0.283
+          ],
+          "label": "reed-scan",
+          "occupancy_entropy": [
+            3.1780538303479453,
+            3.1780538303479453
+          ],
+          "oir_objective": [
+            0.28208425183972397,
+            0.28208425183972397
+          ],
+          "policy_id": "f1610ec999404392d16eb72c36c5a58d217566b78ab5c8635d14cca550f1c455",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "separator",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "72cf3beaa16a069c62e91981a3caacce0698a433cb0e3926bc6df65aa656f36c",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.4669999999999999,
+            0.46699999999999997
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8250780268806084,
+            2.8250780268806084
+          ],
+          "oir_objective": [
+            0.2546276852669926,
+            0.25462768526699253
+          ],
+          "policy_id": "42f1bb69faf328f947e55769c7c89538cfbb9373e380617ac31b7ed6caa658d4",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.4594999999999999,
+            0.5095
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8615962085019393,
+            2.9542733302328124
+          ],
+          "oir_objective": [
+            0.2540496732320489,
+            0.2310976385857188
+          ],
+          "policy_id": "59ff98e7cc6d230410df60416fc201eb7fe965b636bb120fb331a0c9db8d8524",
+          "task_kl": [
+            1.2172316579093276,
+            1.2312734369414267
+          ]
+        },
+        {
+          "expected_return": [
+            0.4169999999999999,
+            0.517
+          ],
+          "label": "maximum-model-information",
+          "occupancy_entropy": [
+            2.9898562596395375,
+            2.9898562596395375
+          ],
+          "oir_objective": [
+            0.25711017194715874,
+            0.2262446050867555
+          ],
+          "policy_id": "c6058b7ae4bd90f1c1bf2ad23523f35a5b970855d561c75b31d10731e9922ea2",
+          "task_kl": [
+            1.2342935330226965,
+            1.2342827366184417
+          ]
+        }
+      ],
+      "public_bank_size": 10,
+      "reachable_states": 3893,
+      "return_range": [
+        -0.056000000000000015,
+        0.989
+      ],
+      "risky_route_regret_per_nat_mode0": 2.490933717285212,
+      "risky_to_optimal_information_cost_ratio_mode0": 137.47924447424148,
+      "safe_route_kl_zero": true,
+      "seed_policies": 6,
+      "specification": {
+        "configuration_overrides": {
+          "beacon_cells": 2,
+          "deep_fee": 0.02,
+          "inner_reward": 1.0,
+          "inner_success_normal": 0.5,
+          "inner_success_shifted": 0.5,
+          "outer_reward": 1.0,
+          "outer_success_normal": 0.452,
+          "outer_success_shifted": 0.552,
+          "reed_bins": 4,
+          "safe_reward": 0.3
+        },
+        "dose_unit": "additional_traversable_chamber_cells",
+        "environment": "frozenlake",
+        "name": "beacon_breadth_b02",
+        "nuisance_mechanism": "mode_independent_physical_chamber_breadth",
+        "seed_bank_rule": "six_original_routes_at_every_breadth",
+        "shift_protocol": "paired_stationary_modes"
+      },
+      "state_domain_sha256": "2ecc6b0e045d9a2c79b534fd7f0ae26097d5459724fa6017285c46fb2f80ca42",
+      "zero_information_policies_beating_reward_optimum_in_oir_mode0": [
+        "reed-scan"
+      ]
+    },
+    {
+      "action_mask_sha256": "a9778940d79e92050ea401718c64f7ee8da025dc90dd60c2c1afd1145a4c9c7e",
+      "benchmark": "beacon_breadth_b04",
+      "breadth": {
+        "cells": 4,
+        "field_transition_max_task_kl": 0.0,
+        "horizon": 16,
+        "physical_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ]
+        ],
+        "primitive_actions": 4
+      },
+      "context": 0,
+      "design_certificates": [
+        {
+          "beta": [
+            [
+              0.0,
+              0.01811861657235046
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.01811861657235046,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.8235734805613817
+          ],
+          "inserted": 1,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "03c63a504b3a6eba019c1e4a36ec2acff43b972f6668ab93b3d77fecc3ad5bf9",
+            "642dbd7b08be441cc76ab60881c5585c90296a57146c49c7c8482a2e30769c2a",
+            "09dbd20b6825cd60e67fe4eec6d5df3835f25e5cb116f8e66922f30f7c95bce2",
+            "a98ded522d5b5e850719879bfe1b0bd0ae2325cee5b88ca111c7fbcfdb85d558",
+            "c08ff8c9c67c9ae1c4a684ea7e633d849630fbf78e4b72a295260fd46446b822",
+            "e75eeb9de00fab1ed3bb41e973d893bb7ca4ea536c21a8ecb3473e4d0497baa4",
+            "7b2b41f584cc94ee821f515394aa11afad70b479168a30c880bd026fd90a2346"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            0
+          ],
+          "row_minimum": 1.0
+        },
+        {
+          "beta": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.0,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            49.84548436491481,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "inserted": 0,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "03c63a504b3a6eba019c1e4a36ec2acff43b972f6668ab93b3d77fecc3ad5bf9",
+            "642dbd7b08be441cc76ab60881c5585c90296a57146c49c7c8482a2e30769c2a",
+            "09dbd20b6825cd60e67fe4eec6d5df3835f25e5cb116f8e66922f30f7c95bce2",
+            "a98ded522d5b5e850719879bfe1b0bd0ae2325cee5b88ca111c7fbcfdb85d558",
+            "c08ff8c9c67c9ae1c4a684ea7e633d849630fbf78e4b72a295260fd46446b822",
+            "e75eeb9de00fab1ed3bb41e973d893bb7ca4ea536c21a8ecb3473e4d0497baa4",
+            "7b2b41f584cc94ee821f515394aa11afad70b479168a30c880bd026fd90a2346"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            1
+          ],
+          "row_minimum": 0.9999999999999999
+        }
+      ],
+      "design_mass_bound": 128.0,
+      "environment": "frozenlake",
+      "nuisance_route_kl_zero": true,
+      "optimal_policy_oir_objective": [
+        0.28739807341237994,
+        0.2525800324312637
+      ],
+      "optimal_returns": [
+        0.489,
+        0.539
+      ],
+      "oracle_design_costs": [
+        0.01811861657235046,
+        0.0
+      ],
+      "policies": [
+        {
+          "expected_return": [
+            0.292,
+            0.292
+          ],
+          "label": "shore",
+          "occupancy_entropy": [
+            2.0794415416798357,
+            2.0794415416798357
+          ],
+          "oir_objective": [
+            0.4112573691414274,
+            0.4112573691414274
+          ],
+          "policy_id": "03c63a504b3a6eba019c1e4a36ec2acff43b972f6668ab93b3d77fecc3ad5bf9",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "inner-bridge",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "642dbd7b08be441cc76ab60881c5585c90296a57146c49c7c8482a2e30769c2a",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.439,
+            0.539
+          ],
+          "label": "outer-causeway",
+          "occupancy_entropy": [
+            2.564949357461537,
+            2.564949357461537
+          ],
+          "oir_objective": [
+            0.2881046502134386,
+            0.2525800324312637
+          ],
+          "policy_id": "09dbd20b6825cd60e67fe4eec6d5df3835f25e5cb116f8e66922f30f7c95bce2",
+          "task_kl": [
+            0.020072794251022208,
+            0.020061997846767418
+          ]
+        },
+        {
+          "expected_return": [
+            0.27499999999999997,
+            0.27499999999999997
+          ],
+          "label": "shallow-survey",
+          "occupancy_entropy": [
+            2.7877881193860077,
+            2.7877881193860077
+          ],
+          "oir_objective": [
+            0.3209572102076248,
+            0.3209572102076248
+          ],
+          "policy_id": "a98ded522d5b5e850719879bfe1b0bd0ae2325cee5b88ca111c7fbcfdb85d558",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.26999999999999996,
+            0.26999999999999996
+          ],
+          "label": "deep-survey",
+          "occupancy_entropy": [
+            2.5139396368970415,
+            2.5139396368970415
+          ],
+          "oir_objective": [
+            0.354566354097445,
+            0.354566354097445
+          ],
+          "policy_id": "c08ff8c9c67c9ae1c4a684ea7e633d849630fbf78e4b72a295260fd46446b822",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.283,
+            0.283
+          ],
+          "label": "reed-scan",
+          "occupancy_entropy": [
+            3.1780538303479453,
+            3.1780538303479453
+          ],
+          "oir_objective": [
+            0.28208425183972397,
+            0.28208425183972397
+          ],
+          "policy_id": "e75eeb9de00fab1ed3bb41e973d893bb7ca4ea536c21a8ecb3473e4d0497baa4",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "separator",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "12765d35862ca4c210d47920e35fdc497a323b1410980a8f4d682e75637dfeac",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.4669999999999999,
+            0.46699999999999997
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8250780268806084,
+            2.8250780268806084
+          ],
+          "oir_objective": [
+            0.2546276852669926,
+            0.25462768526699253
+          ],
+          "policy_id": "7b2b41f584cc94ee821f515394aa11afad70b479168a30c880bd026fd90a2346",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.4594999999999999,
+            0.5095
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8615962085019393,
+            2.9542733302328124
+          ],
+          "oir_objective": [
+            0.2540496732320489,
+            0.2310976385857188
+          ],
+          "policy_id": "6e493dc832f070d4bd94824ef85fca1116339de14455d6d3670024b2c9f3333d",
+          "task_kl": [
+            1.2172316579093276,
+            1.2312734369414267
+          ]
+        },
+        {
+          "expected_return": [
+            0.4169999999999999,
+            0.517
+          ],
+          "label": "maximum-model-information",
+          "occupancy_entropy": [
+            2.9898562596395375,
+            2.9898562596395375
+          ],
+          "oir_objective": [
+            0.25711017194715874,
+            0.2262446050867555
+          ],
+          "policy_id": "ef5a67ac57c459f3999b1adda682390e9b7d1fa37a8b4ff7835465ce3804a803",
+          "task_kl": [
+            1.2342935330226965,
+            1.2342827366184417
+          ]
+        }
+      ],
+      "public_bank_size": 10,
+      "reachable_states": 4023,
+      "return_range": [
+        -0.056000000000000015,
+        0.989
+      ],
+      "risky_route_regret_per_nat_mode0": 2.490933717285212,
+      "risky_to_optimal_information_cost_ratio_mode0": 137.47924447424148,
+      "safe_route_kl_zero": true,
+      "seed_policies": 6,
+      "specification": {
+        "configuration_overrides": {
+          "beacon_cells": 4,
+          "deep_fee": 0.02,
+          "inner_reward": 1.0,
+          "inner_success_normal": 0.5,
+          "inner_success_shifted": 0.5,
+          "outer_reward": 1.0,
+          "outer_success_normal": 0.452,
+          "outer_success_shifted": 0.552,
+          "reed_bins": 4,
+          "safe_reward": 0.3
+        },
+        "dose_unit": "additional_traversable_chamber_cells",
+        "environment": "frozenlake",
+        "name": "beacon_breadth_b04",
+        "nuisance_mechanism": "mode_independent_physical_chamber_breadth",
+        "seed_bank_rule": "six_original_routes_at_every_breadth",
+        "shift_protocol": "paired_stationary_modes"
+      },
+      "state_domain_sha256": "9f521409ca6907fc0d15753dcc2b2b312b40f53cfc1947e804c20331298caf9b",
+      "zero_information_policies_beating_reward_optimum_in_oir_mode0": [
+        "reed-scan"
+      ]
+    },
+    {
+      "action_mask_sha256": "b747aa140cb204c3ca6e601959951e335c384cc99615176c1efabd42f428ad69",
+      "benchmark": "beacon_breadth_b08",
+      "breadth": {
+        "cells": 8,
+        "field_transition_max_task_kl": 0.0,
+        "horizon": 16,
+        "physical_cells": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ]
+        ],
+        "primitive_actions": 4
+      },
+      "context": 0,
+      "design_certificates": [
+        {
+          "beta": [
+            [
+              0.0,
+              0.01811861657235046
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.01811861657235046,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.8235734805613817
+          ],
+          "inserted": 1,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "aa4eefbf0abfbe2cb5cec743471d07b28a9ee6ab668652740ee3251edc6bce36",
+            "e732a8159b2aedcf6efa9849df0b07527b90c1f0b916e87454dd5e6a644d5e27",
+            "cd7f9b9e517748028c7281ddf9e47d9e4920dd784e29330ecae78e48aa899fcc",
+            "e86309153a3894fa1137b8a97022a23a38bbcd6c77705a59286be3ca435796b9",
+            "5bf226b0aff2441735aca07d969a900a794064dd48fd03b61c5fe2e13361fd6e",
+            "3732f35781cd028fb45ac0ee18de84ff28aca0f719843e9ac7580164e2df9ef4",
+            "03dabebefef8b6eed515dd26d4bab482facd604c7fd30ac2cb734871b720ed3b"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            0
+          ],
+          "row_minimum": 1.0
+        },
+        {
+          "beta": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "column_residual": 0.0,
+          "cost": 0.0,
+          "estimation": "exact_declared_model_evaluation",
+          "eta": [
+            0.0,
+            0.0,
+            49.84548436491481,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "inserted": 0,
+          "mass_price": 0.0,
+          "policy_ids": [
+            "aa4eefbf0abfbe2cb5cec743471d07b28a9ee6ab668652740ee3251edc6bce36",
+            "e732a8159b2aedcf6efa9849df0b07527b90c1f0b916e87454dd5e6a644d5e27",
+            "cd7f9b9e517748028c7281ddf9e47d9e4920dd784e29330ecae78e48aa899fcc",
+            "e86309153a3894fa1137b8a97022a23a38bbcd6c77705a59286be3ca435796b9",
+            "5bf226b0aff2441735aca07d969a900a794064dd48fd03b61c5fe2e13361fd6e",
+            "3732f35781cd028fb45ac0ee18de84ff28aca0f719843e9ac7580164e2df9ef4",
+            "03dabebefef8b6eed515dd26d4bab482facd604c7fd30ac2cb734871b720ed3b"
+          ],
+          "primal_dual_gap": 0.0,
+          "references": [
+            1
+          ],
+          "row_minimum": 0.9999999999999999
+        }
+      ],
+      "design_mass_bound": 128.0,
+      "environment": "frozenlake",
+      "nuisance_route_kl_zero": true,
+      "optimal_policy_oir_objective": [
+        0.28739807341237994,
+        0.2525800324312637
+      ],
+      "optimal_returns": [
+        0.489,
+        0.539
+      ],
+      "oracle_design_costs": [
+        0.01811861657235046,
+        0.0
+      ],
+      "policies": [
+        {
+          "expected_return": [
+            0.292,
+            0.292
+          ],
+          "label": "shore",
+          "occupancy_entropy": [
+            2.0794415416798357,
+            2.0794415416798357
+          ],
+          "oir_objective": [
+            0.4112573691414274,
+            0.4112573691414274
+          ],
+          "policy_id": "aa4eefbf0abfbe2cb5cec743471d07b28a9ee6ab668652740ee3251edc6bce36",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "inner-bridge",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "e732a8159b2aedcf6efa9849df0b07527b90c1f0b916e87454dd5e6a644d5e27",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.439,
+            0.539
+          ],
+          "label": "outer-causeway",
+          "occupancy_entropy": [
+            2.564949357461537,
+            2.564949357461537
+          ],
+          "oir_objective": [
+            0.2881046502134386,
+            0.2525800324312637
+          ],
+          "policy_id": "cd7f9b9e517748028c7281ddf9e47d9e4920dd784e29330ecae78e48aa899fcc",
+          "task_kl": [
+            0.020072794251022208,
+            0.020061997846767418
+          ]
+        },
+        {
+          "expected_return": [
+            0.27499999999999997,
+            0.27499999999999997
+          ],
+          "label": "shallow-survey",
+          "occupancy_entropy": [
+            2.7877881193860077,
+            2.7877881193860077
+          ],
+          "oir_objective": [
+            0.3209572102076248,
+            0.3209572102076248
+          ],
+          "policy_id": "e86309153a3894fa1137b8a97022a23a38bbcd6c77705a59286be3ca435796b9",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.26999999999999996,
+            0.26999999999999996
+          ],
+          "label": "deep-survey",
+          "occupancy_entropy": [
+            2.5139396368970415,
+            2.5139396368970415
+          ],
+          "oir_objective": [
+            0.354566354097445,
+            0.354566354097445
+          ],
+          "policy_id": "5bf226b0aff2441735aca07d969a900a794064dd48fd03b61c5fe2e13361fd6e",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.283,
+            0.283
+          ],
+          "label": "reed-scan",
+          "occupancy_entropy": [
+            3.1780538303479453,
+            3.1780538303479453
+          ],
+          "oir_objective": [
+            0.28208425183972397,
+            0.28208425183972397
+          ],
+          "policy_id": "3732f35781cd028fb45ac0ee18de84ff28aca0f719843e9ac7580164e2df9ef4",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.489,
+            0.489
+          ],
+          "label": "separator",
+          "occupancy_entropy": [
+            2.3978952727983707,
+            2.3978952727983707
+          ],
+          "oir_objective": [
+            0.28739807341237994,
+            0.28739807341237994
+          ],
+          "policy_id": "d9779cecd2b92b443b2e7b37cf711ca72e5a66d754fac570086750d4d62684a2",
+          "task_kl": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "expected_return": [
+            0.4669999999999999,
+            0.46699999999999997
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8250780268806084,
+            2.8250780268806084
+          ],
+          "oir_objective": [
+            0.2546276852669926,
+            0.25462768526699253
+          ],
+          "policy_id": "03dabebefef8b6eed515dd26d4bab482facd604c7fd30ac2cb734871b720ed3b",
+          "task_kl": [
+            1.2142207387716744,
+            1.2142207387716744
+          ]
+        },
+        {
+          "expected_return": [
+            0.4594999999999999,
+            0.5095
+          ],
+          "label": "gl-separator",
+          "occupancy_entropy": [
+            2.8615962085019393,
+            2.9542733302328124
+          ],
+          "oir_objective": [
+            0.2540496732320489,
+            0.2310976385857188
+          ],
+          "policy_id": "7dfc330f0fc09ac54e142881fc2a635207dc0372174e8bf8de8577c9f40cb5ec",
+          "task_kl": [
+            1.2172316579093276,
+            1.2312734369414267
+          ]
+        },
+        {
+          "expected_return": [
+            0.4169999999999999,
+            0.517
+          ],
+          "label": "maximum-model-information",
+          "occupancy_entropy": [
+            2.9898562596395375,
+            2.9898562596395375
+          ],
+          "oir_objective": [
+            0.25711017194715874,
+            0.2262446050867555
+          ],
+          "policy_id": "b9f0b7ffc8d39ba70cce78ef3e4143717df319d79779dc5da571718d024ea022",
+          "task_kl": [
+            1.2342935330226965,
+            1.2342827366184417
+          ]
+        }
+      ],
+      "public_bank_size": 10,
+      "reachable_states": 4223,
+      "return_range": [
+        -0.056000000000000015,
+        0.989
+      ],
+      "risky_route_regret_per_nat_mode0": 2.490933717285212,
+      "risky_to_optimal_information_cost_ratio_mode0": 137.47924447424148,
+      "safe_route_kl_zero": true,
+      "seed_policies": 6,
+      "specification": {
+        "configuration_overrides": {
+          "beacon_cells": 8,
+          "deep_fee": 0.02,
+          "inner_reward": 1.0,
+          "inner_success_normal": 0.5,
+          "inner_success_shifted": 0.5,
+          "outer_reward": 1.0,
+          "outer_success_normal": 0.452,
+          "outer_success_shifted": 0.552,
+          "reed_bins": 4,
+          "safe_reward": 0.3
+        },
+        "dose_unit": "additional_traversable_chamber_cells",
+        "environment": "frozenlake",
+        "name": "beacon_breadth_b08",
+        "nuisance_mechanism": "mode_independent_physical_chamber_breadth",
+        "seed_bank_rule": "six_original_routes_at_every_breadth",
+        "shift_protocol": "paired_stationary_modes"
+      },
+      "state_domain_sha256": "200bc71f1e4d5dad383eb273a0a30c662e2db205580a0a8287489050beb2d628",
+      "zero_information_policies_beating_reward_optimum_in_oir_mode0": [
+        "reed-scan"
+      ]
+    }
+  ],
+  "schema": 1,
+  "sources": {
+    "__init__.py": "14fc46754339bfd968b07581e92ed012271426a3a95410a0ee6e283bd0245bea",
+    "agents.py": "40679735ee69a82d13913ea6468388cac35eeb4a32c68aa0bf9e76bced561903",
+    "benchmark_audit.py": "bdd7dcdf65f33d0ede0618f6a89306fe6333aaa3a563cdc4ec158a4db30d9b2b",
+    "benchmarks.py": "6380a77d186bb2ca52768d851cefb3e2dca7f1ab9c93d0e3dcb9111b49250e1f",
+    "breadth.py": "e81254d480a220e35b1b6fdd23e754212b1a5bb920d9fa95c143610336151552",
+    "breadth_report.py": "a65f7773303375b7cac38f8e7ce0afb4bdf7ef1eed03a890a42683bd9af8ceaf",
+    "comparators.py": "78c6b811742c7364cd04b83707358325c753f29e86f5f7ff9063a1902c72c55b",
+    "contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+    "deployment.py": "3b5d619629eefc1c9b425719101932a38031c57545d203cd62c423e69ed84e3a",
+    "design.py": "30edaf6b81034febdc11eb1ba9fbd00bda16cb2a998f01584fed72d09e6094a9",
+    "environments/__init__.py": "102c3e0de6da66ad31bb6c47794d36585ce15301d55bc8d3df8a555d6f1fb9cb",
+    "environments/beacon_breadth.py": "9c3f14eac231bee6d7b1cab3afdcf0b88255c6bda4ab274d134d696147617157",
+    "environments/deepsea.py": "66cb53fa5e3e66323774e6265a9ae7091d89a6cc40e7b547fb3a21565a5c5b6a",
+    "environments/frozenlake.py": "eecef345de8227d7a87d2901abb123b43bdd6a587f54cd8593b3b25dbb87d4f5",
+    "evidence.py": "ab5a82789be5ac7d0b67efd4e5a02b1bd53ffa8d5af1c242469712a9525afc32",
+    "ids.py": "4e9de8feeb613ae767317a1690e16ef0a89f6db733174ff34ab63e58a35c2643",
+    "learning.py": "524e9a8c4de070395653e56ffbd9af7f5396e3e31f64597663c40525f7d16d7b",
+    "model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+    "primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+    "run.py": "306e0e4df24aee022e18bfddc5c037397d9ec14e3ef461e934aa7b8f888323b1"
+  },
+  "status": "verified",
+  "training_launched": false
+}

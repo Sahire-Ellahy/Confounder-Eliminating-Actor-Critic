@@ -10,10 +10,12 @@ import tarfile
 import hashlib
 import numpy as np
 from .evidence import atomic_json, digest, encoded, verify_run
-from .pathology_report import strength_statistics, report_section
+from .pathology_report import (strength_statistics, report_section, ceac_advantage_statistics,
+                                summarize_ceac_advantages, ceac_comparison_section)
 from .visualization import (LABELS, ENVIRONMENT_LABELS, make_figures, export_trace_statistics,
                             band_description, nuisance_sensitivity_rows, summarize_nuisance, RETIRED_METHODS)
 from .benchmarks import study_cells
+from .breadth_report import breadth_statistics, breadth_report_section
 
 
 ACCESS = {
@@ -225,14 +227,35 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
                 "scope":"cumulative likelihood and reported credits; no learned-critic or replay-resampling ablation"})
     physical_rows=strength_statistics(runs)
     physical=bool(physical_rows)
+    breadth_rows=breadth_statistics(runs)
     sensitivity=nuisance_sensitivity_rows(runs)
     sensitivity_summary=summarize_nuisance(sensitivity,band)
     artifacts=make_figures(root,runs,band=band,sensitivity=sensitivity) if figures else []
     artifacts.extend([root/"history_audit.json",export_trace_statistics(root,runs,band)])
     if physical:
+        from ceac_walkthrough.hardness import assessment_markdown, summarize_current_sweep
+        assessment_bundle = {"pathology_statistics": physical_rows, "history_audits": history_rows}
+        (root/"hardness_assessment.md").write_text(assessment_markdown(assessment_bundle))
+        atomic_json(root/"hardness_assessment.json", dict(schema=1, study_identity=study["identity"],
+            late_gap_tolerance=.01, scope="descriptive_easy_to_hard_audit_not_a_significance_test",
+            rows=[row for mode in sorted({r["mode"] for r in physical_rows})
+                  for row in summarize_current_sweep(assessment_bundle, mode)]))
+        artifacts.extend([root/"hardness_assessment.md", root/"hardness_assessment.json"])
         atomic_json(root/"pathology_statistics.json", dict(schema=1, study_identity=study["identity"],
             independent_unit="training_seed", band=band, paired_differences=True, rows=physical_rows))
         artifacts.append(root/"pathology_statistics.json")
+        if "ceac" in config["methods"]:
+            paired=ceac_advantage_statistics(physical_rows)
+            atomic_json(root/"ceac_comparisons.json", dict(schema=1,study_identity=study["identity"],
+                independent_unit="training_seed",positive_favors="ceac",tie_tolerance=1e-10,
+                paired_subtraction_before_aggregation=True,rows=paired,
+                summaries=summarize_ceac_advantages(paired)))
+            artifacts.append(root/"ceac_comparisons.json")
+    if breadth_rows:
+        atomic_json(root/"breadth_statistics.json",dict(schema=1,study_identity=study["identity"],
+            independent_unit="training_seed",dose_unit="additional_traversable_chamber_cells",
+            paired_subtraction_before_aggregation=True,rows=breadth_rows))
+        artifacts.append(root/"breadth_statistics.json")
     if sensitivity:
         atomic_json(root/"nuisance_sensitivity.json",{
             "schema":1,"study_identity":study["identity"],"reference_study":reference_record,
@@ -248,7 +271,8 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
 
     refined=any(b != "legacy" for b in config.get("benchmarks",["legacy"]))
     prior_comparison=any(m in config["methods"] for m in ("ids_rare","ids_zero"))
-    heading="Undertow DeepSea and False Beacon Frozen Lake: "+("physical pathology strength" if physical else "prior support" if prior_comparison else "directed exploration")
+    heading="Undertow DeepSea and False Beacon Frozen Lake: "+("physical beacon breadth" if breadth_rows else "physical pathology strength" if physical else "prior support" if prior_comparison else "directed exploration")
+    if breadth_rows:heading="False Beacon Frozen Lake: physical beacon breadth"
     text=["# "+(heading if refined else "CEAC deployment and exploration comparison"),"",
           f"Verified **{len(results)} runs and {sum(r['episodes'] for r in results):,} environment episodes**. The source, configuration, frozen behavior policies, trajectories and artifact hashes are recorded per cell.","",
           "This is a paired, stationary-context finite-model experiment. It tests the deployment correction and exploration behavior; it does not establish an asymptotic coefficient-one theorem or recovery from unannounced temporal changes.","",
@@ -272,6 +296,15 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
           "Certification is checked without the true-mode label. It affects free-episode exploitation; statistical and design debts still run first. The oracle also executes scheduled experiments even though it knows the true mode, so its plotted finite-budget cost is the implemented fixed-design benchmark, not a finite-time lower bound every method must exceed.", "",
           "The exact tabular separator and Appendix D's reward-only response are part of the v90 finite-model framework. Connecting that certified response to free-episode execution is the documented implementation refinement. This preserves one environment episode loop while using exact optimization at refreshes; it does not establish actor/critic convergence or a literal empirical-only implementation of every pseudocode estimator.", "",
           "## Comparator access and scope","","| Method | Information and policy access |","|---|---|"]
+    headline_figures=[]
+    if physical and "ceac" in config["methods"]:
+        at=text.index("## CEAC, certified deployment, and the offline oracle")
+        headline=ceac_comparison_section(physical_rows)
+        for path in artifacts:
+            if path.suffix==".png" and path.name.startswith(("pathology_response_","pathology_ceac_advantage_")):
+                headline_figures.append(path)
+                headline.extend([f"![{path.stem.replace('_',' ')}](figures/{path.name})", ""])
+        text[at:at]=headline
     for method in config["methods"]:text.append(f"| {LABELS[method]} | {ACCESS[method]} |")
     if reference_record is not None:
         text += ["", f"This report combines **{own_count} new runs with {reference_record['reused_runs']} reused controls**. Controls were read from `{reference_record['root']}` after verifying equal runtime sources, environment definitions, learner settings, seeds and episode budgets. Their saved trajectories were not rerun or copied.", ""]
@@ -281,7 +314,14 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
             raise ValueError("Physical strength report requires its matched-domain preflight audit")
         artifacts.append(root/"environment_audit.json")
         text += report_section(physical_rows)
-    if refined and not physical:
+    if breadth_rows:
+        environment_audit=json.loads((root/"environment_audit.json").read_text())
+        if environment_audit["study_identity"]!=study["identity"] or not environment_audit.get("breadth_checks"):
+            raise ValueError("Breadth report requires its matched preflight")
+        artifacts.append(root/"environment_audit.json")
+        at=text.index("## CEAC, certified deployment, and the offline oracle")
+        text[at:at]=breadth_report_section(breadth_rows)
+    if refined and not physical and not breadth_rows:
         environment_audit=json.loads((root/"environment_audit.json").read_text())
         if environment_audit["study_identity"] != study["identity"]:
             raise ValueError("Environment audit identity mismatch")
@@ -382,7 +422,7 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
     text += [band_description(band)+f" There are {len(config['seeds'])} seeds per curve in this report. The episode index is not treated as additional independent replication. These are pointwise descriptive bands, not confidence intervals or simultaneous coverage guarantees. Nonnegative plot domains may clip a negative mean-minus-SD edge; exported values are untruncated.", "",
              "The compressed `trace_statistics.csv.gz` records seed count, mean, sample SD, range, band edges and smoothing for every exported time point.", ""]
     for path in artifacts:
-        if path.suffix==".png":text.extend([f"![{path.stem.replace('_',' ')}](figures/{path.name})",""])
+        if path.suffix==".png" and path not in headline_figures:text.extend([f"![{path.stem.replace('_',' ')}](figures/{path.name})",""])
     text += ["## Endpoints","","| Setting | Environment | Context | Mode | Method | Seeds | Last-window expected return | Cumulative pseudo-regret | Primitive steps |",
              "|---|---|---:|---:|---|---:|---:|---:|---:|"]
     for (benchmark,kind,context,mode,method),rows in sorted(groups.items()):
@@ -404,6 +444,10 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
              "Appendix D defines a deployment response; Section 4 and Appendix G require the reward-only certificate. The Section 3 selector did not explicitly connect that response to free-episode execution. The implementation makes that connection explicit, using exact finite-model planning. It is a documented execution refinement, not evidence that actor SGD suddenly converged.","",
              f"Recorded {len(certificates)} CEAC/ablation refresh certificates. Maximum design primal/dual gap: {max((c['primal_dual_gap'] for c in certificates),default=0):.3g}; maximum full-policy column residual: {max((c['column_residual'] for c in certificates),default=0):.3g}.","",
              "Detailed specifications and remaining theorem-level limits: [correction ledger](../../audits/ceac_v90_corrections_20261110.md). The v90 manuscript and previous experiment artifacts remain unchanged.",""]
+    if physical:
+        text[1:1] = ["", "**Start with the [compact hardness assessment](hardness_assessment.md):** "
+                     "a smaller diversion probability is not automatically a learnable easy case. "
+                     "The detailed plots below retain the full diagnostic record.", ""]
     (root/"report.md").write_text("\n".join(text))
     if pdf:
         if not shutil.which("pandoc") or not shutil.which("pdflatex"):
@@ -436,7 +480,8 @@ def render(root, figures=True, pdf=False, reference=None, reference_methods=("ce
                 "descriptive_band":band,"independent_unit":"training_seed","expected_return_smoothing":16,
                 "run_manifest_hashes":manifests,"excluded_retired_runs":len(retired_runs),
                 "excluded_method_ids":sorted(RETIRED_METHODS),"report_sha256":digest(root/"report.md"),
-                "renderer_sources":{p.name:digest(p) for p in (renderer/"report.py",renderer/"visualization.py",renderer/"pathology_report.py")},
+                "renderer_sources":{**{p.name:digest(p) for p in (renderer/"report.py",renderer/"visualization.py",renderer/"pathology_report.py")},
+                    "../ceac_walkthrough/hardness.py":digest(renderer.parent/"ceac_walkthrough/hardness.py")},
                 "artifacts":{str(p.relative_to(root)):digest(p) for p in artifacts}})
     return root/"report.md"
 

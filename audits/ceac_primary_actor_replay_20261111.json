@@ -1,0 +1,79 @@
+{
+  "algorithm_modified": false,
+  "cells": [
+    {
+      "actor_admissions": 0,
+      "actor_probabilities": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0001845124487599969,
+          0.9994808580029422,
+          0.0003346295482982841
+        ],
+        [
+          0.0005215679063251328,
+          0.0038861601924710305,
+          0.9955922719012037
+        ]
+      ],
+      "actor_updates": 29000,
+      "augmented_optimization_gap": 0.11764904012592337,
+      "best_augmented_return": 1.0904843113496765,
+      "exact_admissions": 0,
+      "final_actor_gap": 0.3619657631644296,
+      "final_augmented_return": 0.9728352712237531,
+      "interpretation": "Observed trajectories reproduce exactly; correct likelihood reference; finite-budget actor optimization residual persists.",
+      "matched_episodes": 32768,
+      "max_abs_critic_value": 1.2309795912249095,
+      "max_actor_step_norm": 0.8777862319744368,
+      "raw_sha256": "69c26dfdf17136b8465c5421ffbd68e88de42b691a0b0d20401cd0c91312b731",
+      "reference": [
+        0
+      ],
+      "seed": 0,
+      "true_model": 0
+    },
+    {
+      "actor_admissions": 0,
+      "actor_probabilities": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          3.545464390201132e-05,
+          6.3624572729775e-05,
+          0.9999009207833679
+        ],
+        [
+          0.0007778465567092591,
+          0.0028773245705239125,
+          0.9963448288727672
+        ]
+      ],
+      "actor_updates": 29000,
+      "augmented_optimization_gap": 0.00010663480846817563,
+      "best_augmented_return": 1.0253507410516343,
+      "exact_admissions": 0,
+      "final_actor_gap": 0.020128904060849995,
+      "final_augmented_return": 1.025244106243166,
+      "interpretation": "Matched easy-case successful seed under the same fixed settings.",
+      "matched_episodes": 32768,
+      "max_abs_critic_value": 0.8623191694018791,
+      "max_actor_step_norm": 0.7667485795803459,
+      "raw_sha256": "e7503ab3638df8401314fc145ce001e3dfddbd20c9da38bd69c459beafa484c6",
+      "reference": [
+        0
+      ],
+      "seed": 1,
+      "true_model": 0
+    }
+  ],
+  "schema": 1,
+  "training_launched": false
+}

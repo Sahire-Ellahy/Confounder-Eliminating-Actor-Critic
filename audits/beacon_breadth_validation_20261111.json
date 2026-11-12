@@ -1,0 +1,89 @@
+{
+  "breadths": [
+    0,
+    8
+  ],
+  "cells": 28,
+  "episodes_per_cell": 32,
+  "full_sweep_launched": false,
+  "methods": [
+    "ceac",
+    "oracle",
+    "ids",
+    "ids_zero",
+    "idac",
+    "ucb_q",
+    "pomd"
+  ],
+  "modes": [
+    0,
+    1
+  ],
+  "preflight_sha256": "8cf6bfbb884bf97f57ca1c254c96a08a2d91aebad895b3c3712e6e3cf4f8a2b2",
+  "report_audit_sha256": "e6ef5fe1f07f739ffb2febcafded324bd538e0cbf54051418ae36aafe905dbd9",
+  "run_manifest_hashes": {
+    "beacon_breadth_b00/frozenlake/context0_mode0/ceac_seed0": "bfbf719d0645b3bafbdaa1dda00c7659406ae511454d7b787d09cd15a29166ae",
+    "beacon_breadth_b00/frozenlake/context0_mode0/idac_seed0": "653ab7855d08bafba297f264a9ab7e49c796111cb8324db76da81213c355bdf8",
+    "beacon_breadth_b00/frozenlake/context0_mode0/ids_seed0": "4bab7151b941e3f2a4f463e51a844dd43435eec860bfdec1f0d459125f08d404",
+    "beacon_breadth_b00/frozenlake/context0_mode0/ids_zero_seed0": "a41b8a187b2c9a887b9f9e2b82e667b11226220bef907b26292720a55acd0eb3",
+    "beacon_breadth_b00/frozenlake/context0_mode0/oracle_seed0": "5148d37f9436a7aa95a71d2d8979fecd10d4caf735c84e3c255c40c0df84cc8f",
+    "beacon_breadth_b00/frozenlake/context0_mode0/pomd_seed0": "dda04c7eb8bdf5099130c716e8dff8fc90cee161857481e17507c2d5819cf00a",
+    "beacon_breadth_b00/frozenlake/context0_mode0/ucb_q_seed0": "c1aedb92ca2f24d429c29f862e64aeb0936d17702e4b8d5941b5f635485ff7ac",
+    "beacon_breadth_b00/frozenlake/context0_mode1/ceac_seed0": "cb4095177f122be94ba11941481c4aafaadfcc4f0516b51d6dc8235903ef4ff0",
+    "beacon_breadth_b00/frozenlake/context0_mode1/idac_seed0": "ea9c093db46b9099cadae1ad8825f8793c96508e48b324699ac2ac08f3d19f76",
+    "beacon_breadth_b00/frozenlake/context0_mode1/ids_seed0": "4d306143e2edb4a49e31deaf46f8263c42913354ff9c7a2b94908db9b78f4e2c",
+    "beacon_breadth_b00/frozenlake/context0_mode1/ids_zero_seed0": "c34b1a50e48be7fd239916af3f40b2e94931fefe6c3580e45eb6d184bb24c8f1",
+    "beacon_breadth_b00/frozenlake/context0_mode1/oracle_seed0": "f0b897205d6084d61c2ad944c749c767a29026f6a3ce08cf310247e0e240f1d0",
+    "beacon_breadth_b00/frozenlake/context0_mode1/pomd_seed0": "3ce9908bb8d514823da8b794172ade6f270b0642e0d3f09b0a0a545581fecc66",
+    "beacon_breadth_b00/frozenlake/context0_mode1/ucb_q_seed0": "cf7be2a408287339ea746eb88856f7b848e7eff50fa710ae07b1ff9c591f568f",
+    "beacon_breadth_b08/frozenlake/context0_mode0/ceac_seed0": "8d85024195c9e42ab67d7256c669274b6ce37be7509948957878e9f7f655da30",
+    "beacon_breadth_b08/frozenlake/context0_mode0/idac_seed0": "f2b7a70cbbd19687f0fa615c2eebecc83f45a073fdaa8ca7321ed73b4d766636",
+    "beacon_breadth_b08/frozenlake/context0_mode0/ids_seed0": "3ee174bee8a4e93e784db99143101f010ea7cdacb846b7edb18732409aa1b1d5",
+    "beacon_breadth_b08/frozenlake/context0_mode0/ids_zero_seed0": "65811765ff874ccefdc89b283363e270861614ce52f5fda8ed00b6a4ba73455c",
+    "beacon_breadth_b08/frozenlake/context0_mode0/oracle_seed0": "96598905f3da296f07b0814c028c4390bc97968b386e0ac8d2f0cef00c84554c",
+    "beacon_breadth_b08/frozenlake/context0_mode0/pomd_seed0": "7986515dcc76aeb18fed9d24da3d1cfdd30a966cfce684cf81309a2f80e7dee8",
+    "beacon_breadth_b08/frozenlake/context0_mode0/ucb_q_seed0": "c6361f14f4deaaa5087cbe0002359eea89f03cf0257ccd17964c9c9d409449c1",
+    "beacon_breadth_b08/frozenlake/context0_mode1/ceac_seed0": "9088050d554fe84318c873831abc133bd04cb9932674bd4c5a7cda417c5b1284",
+    "beacon_breadth_b08/frozenlake/context0_mode1/idac_seed0": "7dfb1a9a9a19a62cfa2c433fe62a510edc379eeb6a329b2fce38bca1c00178df",
+    "beacon_breadth_b08/frozenlake/context0_mode1/ids_seed0": "7ce3ce4f8eec527d3a3b2f31de99f7f93a93bbd9b52539b5460f4b7639df99af",
+    "beacon_breadth_b08/frozenlake/context0_mode1/ids_zero_seed0": "defe0d2e687ad178503ee54be48140e6c15f402b19bcbd6144f4b2759378de84",
+    "beacon_breadth_b08/frozenlake/context0_mode1/oracle_seed0": "6b6203f17fae3c366f706e4822a8ce5bdb186d433bd85d4456f7b5b7aa861ad8",
+    "beacon_breadth_b08/frozenlake/context0_mode1/pomd_seed0": "560c8cfc38a48966b965fbd408c88def54f28ef4429155a6908956a4e32622e5",
+    "beacon_breadth_b08/frozenlake/context0_mode1/ucb_q_seed0": "e94a21f2d6fe1c84a0eaf23fe2a9078b7617760d11adeaed0b059415c644a795"
+  },
+  "schema": 1,
+  "scope": "integration_smoke_not_performance_evidence",
+  "seeds": [
+    0
+  ],
+  "sources": {
+    "__init__.py": "14fc46754339bfd968b07581e92ed012271426a3a95410a0ee6e283bd0245bea",
+    "agents.py": "40679735ee69a82d13913ea6468388cac35eeb4a32c68aa0bf9e76bced561903",
+    "benchmark_audit.py": "bdd7dcdf65f33d0ede0618f6a89306fe6333aaa3a563cdc4ec158a4db30d9b2b",
+    "benchmarks.py": "6380a77d186bb2ca52768d851cefb3e2dca7f1ab9c93d0e3dcb9111b49250e1f",
+    "breadth.py": "e81254d480a220e35b1b6fdd23e754212b1a5bb920d9fa95c143610336151552",
+    "breadth_report.py": "a65f7773303375b7cac38f8e7ce0afb4bdf7ef1eed03a890a42683bd9af8ceaf",
+    "comparators.py": "78c6b811742c7364cd04b83707358325c753f29e86f5f7ff9063a1902c72c55b",
+    "contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+    "deployment.py": "3b5d619629eefc1c9b425719101932a38031c57545d203cd62c423e69ed84e3a",
+    "design.py": "30edaf6b81034febdc11eb1ba9fbd00bda16cb2a998f01584fed72d09e6094a9",
+    "environments/__init__.py": "102c3e0de6da66ad31bb6c47794d36585ce15301d55bc8d3df8a555d6f1fb9cb",
+    "environments/beacon_breadth.py": "9c3f14eac231bee6d7b1cab3afdcf0b88255c6bda4ab274d134d696147617157",
+    "environments/deepsea.py": "66cb53fa5e3e66323774e6265a9ae7091d89a6cc40e7b547fb3a21565a5c5b6a",
+    "environments/frozenlake.py": "eecef345de8227d7a87d2901abb123b43bdd6a587f54cd8593b3b25dbb87d4f5",
+    "evidence.py": "ab5a82789be5ac7d0b67efd4e5a02b1bd53ffa8d5af1c242469712a9525afc32",
+    "ids.py": "4e9de8feeb613ae767317a1690e16ef0a89f6db733174ff34ab63e58a35c2643",
+    "learning.py": "524e9a8c4de070395653e56ffbd9af7f5396e3e31f64597663c40525f7d16d7b",
+    "model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+    "primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+    "run.py": "306e0e4df24aee022e18bfddc5c037397d9ec14e3ef461e934aa7b8f888323b1"
+  },
+  "status": "passed",
+  "study_identity": "5faacfbe0b80873811d18107ffb2d01e3b835784c087f7c6bffaebeeb44af9f7",
+  "study_sha256": "0d485c81ddcc319dd5f13d140e3daf7aeb9632129e54818d96cb092acb97e974",
+  "tests": {
+    "ceac": 87,
+    "walkthrough": 5
+  },
+  "total_episodes": 896
+}

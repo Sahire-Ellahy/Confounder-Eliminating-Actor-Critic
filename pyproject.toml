@@ -19,5 +19,5 @@ ceac-run = "ceac.run:main"
 ceac-report = "ceac.report:main"
 
 [tool.setuptools.packages.find]
-include = ["ceac", "ceac.*", "ceac_walkthrough", "ceac_walkthrough.*"]
+include = ["ceac", "ceac.*", "ceac_walkthrough", "ceac_walkthrough.*", "ceac_hardness", "ceac_hardness.*", "ceac_pseudocode", "ceac_pseudocode.*", "ceac_stability", "ceac_stability.*"]
 exclude = ["legacy*", "tests*", "notebooks*", "runs*"]

@@ -1,0 +1,32 @@
+{
+  "actor_updates": 3795360,
+  "cells": 54,
+  "evidence_inputs": {
+    "actor_stability": "97ba016ce4a5596eb7c2fe34ebbfd93917783ee6634b79b9593e04f94306625e",
+    "hardness_burden": "5e725e20e8eb8bc68479d270481530a693f5738dab9cdda3cdfb8d6104dea0d9",
+    "hardness_prior": "f70ef390238572b636651cf6f120102ebbc21dfc8fee0fdc48e6971831544119"
+  },
+  "files": {
+    "actor_stability_learning.pdf": "5e3bc4d5d41a3993fa0e4782b90f68523067a79e42e1d312c7f9b46dc48ec561",
+    "actor_stability_learning.png": "b8c43272f430a3b712b1ab4a60dc1a4d0089cd125b662a609cd15440c4992873",
+    "burden_fans.pdf": "f30c2f8b2e24fcad8f23cfde5f7eacd2cf7cd571272ef53e2a447db498c5dc12",
+    "burden_fans.png": "5edd6728c82a482df0dbbad4dd39ea64c6c73870d0e7c4f99ac1dc1e50657c69",
+    "critic_mechanism.pdf": "acd5ad52f4644d21b6f5502cfc3469d3aafee7ac3366fc6285cbc107f620fe43",
+    "critic_mechanism.png": "605dab079836b3f6d06de1621d96ec1eaeefa5fe2ea3e2ba9ed4f60901daf592",
+    "junctions.pdf": "aca504c9327711188e4b6d99118af66d8f59c32d23a042b97170041faf07250f",
+    "junctions.png": "14bc0ac8bd9ed67ac2b8236a166500a3d4957e8e7e56e0ca9992b6cc099792ad",
+    "objective_diagnostics.pdf": "44523c69c6656def6bf76d33878d9bb41e0d08ef72468b97f85e65a4bf765d2e",
+    "objective_diagnostics.png": "83d580d737752c2c678f3d84d5c6f0be879436bb76bb27dfee9c43d7a30bdafc",
+    "prior_fans.pdf": "08152673a2901e2493414a6140afa9e66b1eb358600c95adb19e4f1e741e392e",
+    "prior_fans.png": "59ef7da35ab4a0dd7931b760a804db8d6a34c99eea437f0e827f2ca7311ca139",
+    "report.md": "12d2607d4656aa0dd6ccd401ce013e8532411911d321941e0be144a58a4e14ee",
+    "report.pdf": "7973a1df7aa09b66d169acbbfc1e048baf8c20204a1e9de36dbe964aaee86e2c",
+    "updates.json.gz": "551585a4fb6601a404f51e6c334f5462e2e3c864b372afb8f43e8037e7c27160"
+  },
+  "report_sources": {
+    "ceac_walkthrough/failure_report.py": "b3adb5f9260fe0a7326e1913cb6d4fd557c58a192c0cd854251f388f95f94756",
+    "scripts/render_hardness.py": "fdd37a246faac6ca217afcdb1ccfc945127262f91c7105df4d6e946391598d92"
+  },
+  "schema": 1,
+  "source_sha256": "9445db34bf0992a258bb5a2494806a197d710ac5d2fc1522e8ce61aa0052bc02"
+}

@@ -1,0 +1,17 @@
+{
+  "actor_updates": 870000,
+  "cells": 30,
+  "files": {
+    "actor_failure.pdf": "b3846cca10759abd7f89d54b4b634618ed34166739c012272d76acb5a346dddf",
+    "actor_failure.png": "91b0f4e411f95a178c68577a57a77d1531cf390f62a5c94121b763d7471f0f78",
+    "assessment.md": "c3e85854f41352f0c10a53a544691b38b14f6b5ff6f874cdce56c2be551ca4b1",
+    "diagnostics.json.gz": "9ae99fa5e2ea65adb3fed148735feb6bcddae2fdd8ed689faa48b146a4153194",
+    "endpoints.csv": "623b6432bf21a629b27d2c93b213a832df52acd5777f8bbd5536bc8e55cd5bb4"
+  },
+  "report_source_sha256": "20b24ce169aaf4d8fc9610434d53f66ba7eddf93fe31ab4a1e968d5639de64ec",
+  "schema": 1,
+  "sources": {
+    "ceac_walkthrough/actor_diagnosis.py": "f204ce2dfba5d42be6731b641d788b170098985be025a630d862b30e6c068c30",
+    "scripts/diagnose_actor_failures.py": "dff04ccb603d705ef92771047f5dd8f32342bed4e6747fcb53b3042a45f9ddb5"
+  }
+}

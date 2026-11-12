@@ -1,0 +1,725 @@
+[
+  {
+    "path": "runs/hardness_calibration_20261111/burden_131072/gate.json",
+    "gate": {
+      "all_pass": true,
+      "cells": [
+        {
+          "budget": 131072,
+          "late_gap": 0.0012974995640983034,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 10.859486875124276,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.02085712141841825,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 10.867590291891247,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.0015672099791277441,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 10.889662124915048,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.0,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 10.649309959029779,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.0012762444767647485,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 10.755330374930054,
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.0050781250000000045,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 13.39534429111518,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.0015625,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 10.794306374853477,
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.0062500000000000056,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 13.220854416955262,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.00947415761083152,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.01406097412109375,
+          "protocol": "burden",
+          "seconds": 22.233207459095865,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.0007177951403697955,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.01406097412109375,
+          "protocol": "burden",
+          "seconds": 22.77356041711755,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.009342694930608223,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.01406097412109375,
+          "protocol": "burden",
+          "seconds": 23.82322566700168,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 131072,
+          "late_gap": 0.00048308319911316,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.01406097412109375,
+          "protocol": "burden",
+          "seconds": 23.32462454191409,
+          "seed": 1002,
+          "task": 1
+        }
+      ],
+      "sources": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      },
+      "tolerance": 0.025
+    }
+  },
+  {
+    "path": "runs/hardness_calibration_20261111/burden_32768/gate.json",
+    "gate": {
+      "all_pass": false,
+      "cells": [
+        {
+          "budget": 32768,
+          "late_gap": 0.005022441737795102,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 2.7199722910299897,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.023569900189062926,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 2.749725417001173,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.011979061076984286,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 2.7746400421019644,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.004838515430867253,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 2.6877771669533104,
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.0032031250000000002,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 2.818695249967277,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.009140625000000006,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 3.522712499834597,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.004843750000000001,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 2.8876674161292613,
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.009218750000000006,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 3.5706582500133663,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.027373239418027,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.052490234375,
+          "protocol": "burden",
+          "seconds": 5.616387292044237,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.09731135626587768,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.052490234375,
+          "protocol": "burden",
+          "seconds": 5.555071542039514,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.02691409067400335,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.052490234375,
+          "protocol": "burden",
+          "seconds": 5.553988666972145,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.07209110070302363,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.052490234375,
+          "protocol": "burden",
+          "seconds": 5.450203415937722,
+          "seed": 1002,
+          "task": 1
+        }
+      ],
+      "sources": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      },
+      "tolerance": 0.025
+    }
+  },
+  {
+    "path": "runs/hardness_calibration_20261111/burden_8192/gate.json",
+    "gate": {
+      "all_pass": false,
+      "cells": [
+        {
+          "budget": 8192,
+          "late_gap": 0.37924181035301663,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 0.6941792080178857,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.014238923397947904,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 0.6984841669909656,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.03292611915512656,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 0.7033338327892125,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.016840942830096142,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 0.6761708329431713,
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0064062500000000005,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 0.7200235419441015,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.021171875000000007,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 0.885466624982655,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.023984375000000002,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 0.7164722920861095,
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.015000000000000008,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "burden",
+          "seconds": 0.8788961658719927,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.00963024433122635,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.1949462890625,
+          "protocol": "burden",
+          "seconds": 1.3038861248642206,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.03205996741374068,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.1949462890625,
+          "protocol": "burden",
+          "seconds": 1.2250167080201209,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.010090242190334204,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.1949462890625,
+          "protocol": "burden",
+          "seconds": 1.301741958130151,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.026089045544113457,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.1949462890625,
+          "protocol": "burden",
+          "seconds": 1.2308512080926448,
+          "seed": 1002,
+          "task": 1
+        }
+      ],
+      "sources": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      },
+      "tolerance": 0.025
+    }
+  },
+  {
+    "path": "runs/hardness_calibration_20261111/prior_shift_32768/gate.json",
+    "gate": {
+      "all_pass": false,
+      "cells": [
+        {
+          "budget": 32768,
+          "late_gap": 0.015503099614594708,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "prior_shift",
+          "seconds": 3.883340708212927,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.021465981898039103,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "prior_shift",
+          "seconds": 3.9016609999816865,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.02316057792109681,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "prior_shift",
+          "seconds": 3.8977119580376893,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.012349873207211037,
+          "method": "idac",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "prior_shift",
+          "seconds": 3.225450749974698,
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.01873437499999999,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "prior_shift",
+          "seconds": 3.364606583956629,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.024734375000000006,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "prior_shift",
+          "seconds": 3.9882269999943674,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.010195312499999993,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "prior_shift",
+          "seconds": 3.1779539159033448,
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.018429687500000007,
+          "method": "ucb_q",
+          "pomd_zero_fraction": 0.0,
+          "protocol": "prior_shift",
+          "seconds": 3.845916375052184,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.021108371680739743,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.064300537109375,
+          "protocol": "prior_shift",
+          "seconds": 5.69775441614911,
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.22622703314544002,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.064300537109375,
+          "protocol": "prior_shift",
+          "seconds": 5.129816583124921,
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.021216214365476025,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.064300537109375,
+          "protocol": "prior_shift",
+          "seconds": 5.629406042164192,
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 32768,
+          "late_gap": 0.22745593108138973,
+          "method": "pomd",
+          "pomd_zero_fraction": 0.064300537109375,
+          "protocol": "prior_shift",
+          "seconds": 5.013993917033076,
+          "seed": 1002,
+          "task": 1
+        }
+      ],
+      "sources": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      },
+      "tolerance": 0.025
+    }
+  },
+  {
+    "path": "runs/hardness_prior_calibration_20261111/gate.json",
+    "gate": {
+      "all_pass": false,
+      "cells": [
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ids_correlated",
+          "protocol": "prior_shift",
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ids_correlated",
+          "protocol": "prior_shift",
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ids_product",
+          "protocol": "prior_shift",
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ceac_exact",
+          "protocol": "prior_shift",
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ceac_exact",
+          "protocol": "prior_shift",
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ids_product",
+          "protocol": "prior_shift",
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ids_correlated",
+          "protocol": "prior_shift",
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.053894062907503704,
+          "method": "ceac_actor",
+          "protocol": "prior_shift",
+          "seed": 1001,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.04210923005641681,
+          "method": "ceac_actor",
+          "protocol": "prior_shift",
+          "seed": 1002,
+          "task": 0
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ids_correlated",
+          "protocol": "prior_shift",
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ids_product",
+          "protocol": "prior_shift",
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ids_product",
+          "protocol": "prior_shift",
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ceac_exact",
+          "protocol": "prior_shift",
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.0,
+          "method": "ceac_exact",
+          "protocol": "prior_shift",
+          "seed": 1002,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.1100471264614512,
+          "method": "ceac_actor",
+          "protocol": "prior_shift",
+          "seed": 1001,
+          "task": 1
+        },
+        {
+          "budget": 8192,
+          "late_gap": 0.061948400878425264,
+          "method": "ceac_actor",
+          "protocol": "prior_shift",
+          "seed": 1002,
+          "task": 1
+        }
+      ],
+      "sources": {
+        "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+        "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+        "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+        "ceac_hardness/__init__.py": "2b5ac27304ae523263bfb3be6b176ee401e772853517e502145fdb0b7424b7eb",
+        "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+        "ceac_hardness/deployment.py": "c19135b5ba5af761cd87ee37f7e9da45c9a3efb56ee077dedcc98b2198358228",
+        "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+        "ceac_hardness/environment.py": "85bfd510e76b825f37a1fa6c8d712ecc98f51d55ad1c6467d866412f0738b1f2",
+        "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+        "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+        "ceac_hardness/model.py": "2f2f93b71dea2c9fffc2feb2fd53fd8bd4c1f80639a9ce54884c96ee515a0dd0",
+        "ceac_hardness/run.py": "7bac49e6d158acb5da9061a4f1341cbec27728477ecc01246bcf596215818022"
+      },
+      "tolerance": 0.025
+    }
+  }
+]

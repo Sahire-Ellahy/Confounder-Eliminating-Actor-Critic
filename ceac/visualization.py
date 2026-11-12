@@ -19,7 +19,7 @@ LABELS = {
 STYLES = {
     "ceac": ("#cf202f", "-", "o"), "ceac_actor": ("#8b3e2f", ":", "v"),
     "oracle": ("#161616", "--", "*"), "ucb_q": ("#07854d", "-.", "x"),
-    "idac": ("#7c2fc5", "-", "^"), "pomd": ("#e87500", "--", "s"), "ids": ("#0058c7", "--", "D"),
+    "idac": ("#7c2fc5", (0, (5, 1, 1, 1)), "^"), "pomd": ("#ad5700", "--", "s"), "ids": ("#0058c7", "--", "D"),
     "ids_rare": ("#bd319b", "-.", "s"), "ids_zero": ("#c90078", ":", "X"),
 }
 
@@ -76,21 +76,67 @@ def trace_values(runs, field):
     return np.asarray(curves, dtype=float)
 
 
+def plot_summary(axis, x, stats, *, color, linestyle, marker, label, lw=2,
+                 marker_slot=0, marker_slots=1, time_trace=False):
+    """Draw markers above every line, on measured samples without offsets.
+
+    A separate scatter layer prevents later mean lines from hiding coincident
+    curves' markers. For time traces, stagger the sampled episodes by method
+    (or dose). Dose-response endpoints stay at their exact measured x values.
+    """
+    x = np.asarray(x)
+    line, = axis.plot(x, stats["mean"], color=color, linestyle=linestyle,
+                      lw=lw, marker=marker, markevery=[], markersize=6,
+                      markerfacecolor="none", label=label, zorder=3)
+    if stats["lower"] is not None:
+        axis.fill_between(x, stats["lower"], stats["upper"], color=color,
+                          alpha=.10, lw=0, zorder=1)
+    indices = np.arange(len(x))
+    if time_trace:
+        step = max(marker_slots, len(x)//8)
+        offset = marker_slot * step // marker_slots
+        indices = np.arange(offset, len(x), step)
+    if len(indices) == 0:
+        indices = np.array([marker_slot % len(x)])
+    # Hollow symbols keep interiors transparent when endpoints coincide.
+    marker_colors = ({"color":color} if marker in {"x","+"} else
+                     {"facecolors":"none", "edgecolors":color})
+    axis.scatter(x[indices], stats["mean"][indices], marker=marker, s=38,
+                 linewidths=1.4, zorder=10, label="_nolegend_", **marker_colors)
+    return line
+
+
+def pad_plot_axis(axis, coordinate="y", fraction=.05):
+    """Pad shared data bounds in display scale; include zero and all SD bands.
+
+    On symlog axes linear padding can create a huge negative empty region.
+    Transforming first keeps a small visual margin around zero, without
+    clipping genuinely negative changes or the lower descriptive band.
+    """
+    shared = axis.get_shared_y_axes() if coordinate == "y" else axis.get_shared_x_axes()
+    limits = [getattr(a.dataLim, "interval"+coordinate)
+              for a in shared.get_siblings(axis) if a.axison]
+    finite = np.asarray(limits).ravel()
+    finite = finite[np.isfinite(finite)]
+    low, high = min(0., finite.min(initial=0.)), max(0., finite.max(initial=0.))
+    target = axis.yaxis if coordinate == "y" else axis.xaxis
+    transform = target.get_transform()
+    edges = np.asarray(transform.transform([low, high]), dtype=float)
+    span = edges[1]-edges[0]
+    if span == 0:
+        span = float(transform.transform([getattr(transform, "linthresh", 1.)])[0])
+    lower, upper = transform.inverted().transform(edges + np.array([-1, 1])*span*fraction)
+    (axis.set_ylim if coordinate == "y" else axis.set_xlim)(lower, upper)
+
+
 def plot_seed_trace(axis, values, method, band):
     stats = seed_summary(values, band)
     x = np.arange(1, values.shape[1]+1)
     color, style, marker = STYLES[method]
-    line, = axis.plot(x, stats["mean"], color=color, linestyle=style,
-                      lw=4 if method == "ceac" else 2,
-                      marker=marker,
-                      markevery=((tuple(STYLES).index(method)*max(1,len(x)//(8*len(STYLES)))) % max(1,len(x)//8),
-                                 max(1,len(x)//8)), markersize=6,
-                      markerfacecolor="white", label=LABELS[method],
-                      zorder=5 if method == "ceac" else 3)
-    if stats["lower"] is not None:
-        axis.fill_between(x, stats["lower"], stats["upper"], color=color,
-                          alpha=.12, lw=0, zorder=1)
-    return line
+    return plot_summary(axis, x, stats, color=color, linestyle=style, marker=marker,
+                        label=LABELS[method], lw=2.6 if method == "ceac" else 1.9,
+                        marker_slot=tuple(STYLES).index(method), marker_slots=len(STYLES),
+                        time_trace=True)
 
 
 def export_trace_statistics(root, runs, band="sd"):
@@ -405,6 +451,8 @@ def make_figures(root, verified_runs, band="sd", sensitivity=None):
                                "pdf.fonttype": 42, "ps.fonttype": 42})
     from .benchmarks import STRENGTH_PROFILES
     from .pathology_report import make_strength_figures
+    from .breadth_report import make_breadth_figures
+    from .breadth import BREADTH_PROFILES
     destination = Path(root)/"figures"; destination.mkdir(exist_ok=True)
     groups = sorted({(r["result"].get("benchmark","legacy"),r["result"]["environment"],r["result"]["context"]) for r in verified_runs})
     sets = {
@@ -415,8 +463,9 @@ def make_figures(root, verified_runs, band="sd", sensitivity=None):
     }
     if sensitivity is None:
         sensitivity=nuisance_sensitivity_rows(verified_runs)
-    groups = [g for g in groups if g[0] not in STRENGTH_PROFILES]
+    groups = [g for g in groups if g[0] not in STRENGTH_PROFILES and g[0] not in BREADTH_PROFILES]
     artifacts=make_strength_figures(destination, verified_runs, plt, band)
+    artifacts.extend(make_breadth_figures(destination, verified_runs, plt, band))
     artifacts.extend(make_aggregate_nuisance_figures(destination, verified_runs, plt, band))
     artifacts.extend(make_headline_figures(destination, verified_runs, plt, band))
     for benchmark,kind,context in groups:

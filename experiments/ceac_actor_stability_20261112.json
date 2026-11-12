@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "status": "prospective_protocol_not_executed",
+  "purpose": "Select actor step sizes and test guarded policy geometry while retaining reward critic, evidence critic and evidence-priced replay.",
+  "preserve_sources": [
+    "ceac_pseudocode",
+    "ceac_hardness"
+  ],
+  "algorithm_contract": {
+    "ordinary": "Section 3 score-function actor; predictable actor/reward/evidence step schedules",
+    "projected_ordinary": "Explicit CEAC optimizer variant: same two TD errors, score step, then KL projection onto an interior simplex",
+    "natural_mirror": "Explicit CEAC optimizer variant: fresh on-policy TD estimate, statewise natural/mirror step, KL trust limit and interior-simplex projection",
+    "critic_update_order": "Freeze both TD errors, update actor, then both critics",
+    "replay": "Unchanged immutable policy labels and empirical certified evidence prices; no off-policy actor gradients",
+    "information_access": "No evaluator Q values, true task labels or exact expected gradients enter learning"
+  },
+  "schedule": {
+    "clock": "Fresh actor visits to the particular state; not total environment episodes",
+    "offset": 1024,
+    "actor_exponent": 0.9,
+    "critic_exponent": 0.6,
+    "total_floor_exponent": 0.45,
+    "critic_initial": 0.24,
+    "evidence_step": "critic_step / (0.01 + squared_frobenius_norm(beta))",
+    "evidence_step_ridge": 0.01,
+    "floor": "pi(a|s) >= epsilon_s(k) / number_of_valid_actions(s)",
+    "floor_initial_total_mass": 0.02,
+    "projection": "KL projection q_i=max(epsilon/K, c*w_i), c chosen to make sum(q)=1; not clip then renormalize",
+    "trust_limit": "KL(new_policy_state || old_policy_state) <= 0.01 * (1+k/1024)^(-1.35); exponent equals 2*actor_exponent - total_floor_exponent",
+    "trust_limit_initial": 0.01,
+    "trust_limit_exponent": 1.35,
+    "trust_backtracking": "Shrink actor step until the post-projection KL bound holds; record every contraction"
+  },
+  "candidates": [
+    {
+      "id": "original_reference",
+      "geometry": "ordinary",
+      "actor_initial": 0.4,
+      "critic_initial": 0.12,
+      "schedule": "original_constant",
+      "evidence_step": "original_constant",
+      "total_floor": 0.0
+    },
+    {
+      "id": "scheduled_score_004",
+      "geometry": "ordinary",
+      "actor_initial": 0.04,
+      "total_floor": 0.0
+    },
+    {
+      "id": "scheduled_score_008",
+      "geometry": "ordinary",
+      "actor_initial": 0.08,
+      "total_floor": 0.0
+    },
+    {
+      "id": "projected_score_004",
+      "geometry": "projected_ordinary",
+      "actor_initial": 0.04,
+      "total_floor": 0.02
+    },
+    {
+      "id": "projected_score_008",
+      "geometry": "projected_ordinary",
+      "actor_initial": 0.08,
+      "total_floor": 0.02
+    },
+    {
+      "id": "guarded_natural_001",
+      "geometry": "natural_mirror",
+      "actor_initial": 0.01,
+      "total_floor": 0.02
+    },
+    {
+      "id": "guarded_natural_003",
+      "geometry": "natural_mirror",
+      "actor_initial": 0.03,
+      "total_floor": 0.02
+    }
+  ],
+  "calibration": {
+    "protocol": "prior_shift",
+    "dose": 0,
+    "tasks": [
+      0,
+      1
+    ],
+    "seeds": [
+      2001,
+      2002,
+      2003,
+      2004
+    ],
+    "episodes": 32768,
+    "cells": 56,
+    "gate": {
+      "maximum_final_actor_augmented_gap": 0.005,
+      "maximum_late_behavior_reward_gap": 0.025,
+      "require_nonzero_priced_actor_updates": true
+    },
+    "ranking": [
+      "minimum worst-cell final actor augmented gap",
+      "minimum mean cumulative external regret",
+      "simpler geometry then lexicographic candidate id"
+    ]
+  },
+  "confirmation": {
+    "status": "only after candidate selection is frozen",
+    "seeds": [
+      3001,
+      3002,
+      3003,
+      3004,
+      3005
+    ],
+    "methods": [
+      "original_reference",
+      "selected_full_ceac_optimizer"
+    ],
+    "prior_shift": {
+      "doses": [
+        0,
+        0.25,
+        0.5,
+        0.75,
+        1
+      ],
+      "tasks": [
+        0,
+        1
+      ],
+      "episodes": 32768
+    },
+    "burden": {
+      "doses": [
+        0,
+        4,
+        16,
+        64
+      ],
+      "kinds": [
+        "undertow_junction",
+        "false_beacon_junction"
+      ],
+      "tasks": [
+        0,
+        1
+      ],
+      "episodes": 131072
+    },
+    "comparison": "Matched new seeds and physical budgets; historical seeds 0/1/2 remain descriptive regression checks, never hyperparameter selection. Any new headline comparison to external algorithms needs those comparators evaluated on the same confirmation seeds."
+  },
+  "required_diagnostics": [
+    "external regret and late behavior reward gap",
+    "unconstrained and floor-constrained actor augmented-objective gaps",
+    "minimum valid action probability and total nuisance probability",
+    "actual visits to the currently best priced action",
+    "actor entropy, Fisher conditioning and policy KL per update",
+    "reward/evidence TD and gradient second moments",
+    "effective evidence critic step: alpha_I times squared norm(beta)",
+    "floor mass and its cumulative sum",
+    "replay counts, price levels and confidence radii"
+  ],
+  "notes": [
+    "These are optimizer settings for the complete CEAC loop, not actor-only ablations or external comparator methods.",
+    "Natural-gradient and projected updates must be labeled as optimizer variants; they are not literally the currently implemented score-function equation.",
+    "The old kernels and studies must remain reconstructible. Implement variants outside frozen numerical-source packages until source-version migration is explicitly handled.",
+    "The schedule exponents satisfy a standard bounded-noise surrogate condition; this is not a convergence or Graves-Lai regret theorem for adaptive CEAC.",
+    "No selection has been made and no new training has been launched by this protocol file."
+  ]
+}

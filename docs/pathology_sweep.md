@@ -1,5 +1,11 @@
 # Physical pathology sweep and standard overlays
 
+**Interpretation corrected:** rho is a physical diversion parameter, not a
+validated learning-hardness score. This sweep did not establish a transition
+from a learnable mild case to failure at stronger pathology. See the
+[replacement design](hardness_redesign.md) before planning another full sweep.
+
+
 The maintained sweep varies a physical diversion probability rho at fixed
 geometry, horizon, nuisance alphabet (four symbols), useful diagnostic quality,
 reward range and route payoff gap. It uses rho = 0.05, 0.25, 0.50 and 0.75.
@@ -88,17 +94,41 @@ From the repository root:
 
 The report automatically creates, for each environment/mode:
 
+- A headline **strength-on-x** view: total regret (symlog), paired extra
+  regret above the mildest dose (linear, signed), and late expected value gap.
+  The two environments share one figure, with intervention-specific labels.
+- An annotated CEAC-advantage matrix: comparator regret minus CEAC regret
+  at every dose. Negative entries retain CEAC losses. Bold entries indicate
+  lower CEAC regret in every recorded paired seed, not a significance test.
+- A generated comparison table separating total regret saved, the increase
+  in that advantage over mild dose, and late value-gap reduction. Counts of
+  lower/tied/higher CEAC regret accompany the paired mean and sample SD.
+
 - All seven methods in the main overlays at each strength, including both
   Bayesian prior treatments, with consistent colors and a labeled symlog
   regret axis. Full-support IDS is blue; misspecified-prior IDS is fuchsia.
 - STEERING-style training traces: one method per panel, strength-colored
-  curves, and shared linear regret axes.
+  curves, and shared symlog regret axes (linear within ±0.01), including signed
+  added regret. Markers sit above all lines at staggered recorded episodes;
+  data values are never offset. Zero has a visible margin inside the axes.
 - Paired added-regret traces relative to rho=0.05; subtraction happens within
   each seed before computing variation, and negative values are retained.
+- A strongest-dose endpoint comparison with one row per method, numeric means
+  and sample SD. Exact ties and near-equal controls remain individually readable.
 - Strength diagnostics: cumulative regret, late expected value gap, terminal
   success, nuisance visits, lost progress/dwell, and useful task information.
 - Dedicated Bayesian prior-support overlays supplement the main figures;
   the misspecified-prior arm also has its own strength-colored method panel.
+
+The file ceac_comparisons.json retains each matched method-minus-CEAC
+contrast and its summary. The extra advantage is
+
+$$[R_A(\rho)-R_C(\rho)]-[R_A(\rho_{min})-R_C(\rho_{min})],$$
+
+computed within each seed before aggregation. This distinguishes an existing
+baseline advantage from added robustness as dose increases. Matching rejects
+duplicate endpoints, missing seed/dose/method pairs and unequal budgets.
+The independent unit remains the training seed, not episodes or prompts.
 
 The file pathology_statistics.json retains per-seed endpoints, paired added
 regret and descriptive diagnostic flags. The compressed trace_statistics.csv.gz
@@ -107,8 +137,9 @@ not confidence intervals; method panels require the same seed identities and
 episode budgets. Missing doses, changed runtime sources, changed non-strength
 configuration, or inconsistent trace/endpoint values fail validation.
 
-The notebook imports the same drawing functions from ceac/pathology_report.py
-and reads a hash-verified portable export. It never launches training.
+The diagnostic notebook imports the drawing functions from ceac/pathology_report.py.
+The compact main notebook audits whether this sweep establishes learning hardness.
+Both read a hash-verified portable export. It never launches training.
 All modes are present; its MODE setting switches the main displayed mode.
 
 POMD bonus saturation, nuisance exposure and a finite-budget value gap are
@@ -149,3 +180,20 @@ The plots therefore distinguish finite-budget poor learning, extra
 nuisance cost, and prior-support failure. They do not establish that
 evidence-directed exploration or a learned CEAC critic is the unique cause
 of recovery, given the model-information differences between methods.
+
+## Reading the CEAC comparison
+
+At the strongest dose in mode 1, CEAC has roughly 1.37 regret in DeepSea and
+1.55 in Frozen Lake, versus about 1,128–1,133 and 1,155–1,173 for the three
+primitive optimism/IDAC controls. The much smaller incremental-cost panel
+is essential: most of that separation already exists at the mild dose.
+Full-support IDS has about 0.088 and 0.064 regret, respectively, so this is
+not a claim that CEAC dominates all evidence-directed algorithms. Both
+attain zero last-window expected value gap. The offline oracle remains an
+explicit privileged reference, not a finite-time regret lower bound.
+
+The current False Beacon dose is activation probability, **not breadth**.
+Physical geometry, nuisance alphabet and the one-step dwell length remain
+fixed. A breadth claim requires a separately identified experiment; these
+results must not be relabeled to imply one. Likewise, excluded-prior IDS's
+mode-1 failure is due to prior support, not stronger physical diversion.

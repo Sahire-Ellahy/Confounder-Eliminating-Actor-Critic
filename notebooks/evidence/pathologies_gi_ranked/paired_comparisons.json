@@ -1,0 +1,178 @@
+[
+  {
+    "comparator": "idac",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 25802.765012850738,
+    "regret_saved_sd": 10010.91908932095
+  },
+  {
+    "comparator": "ucb_q",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 15179.873317140205,
+    "regret_saved_sd": 43.37473231033166
+  },
+  {
+    "comparator": "pomd",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 42168.725896562195,
+    "regret_saved_sd": 43.95318029469517
+  },
+  {
+    "comparator": "ids_additive",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 30337.87204672975,
+    "regret_saved_sd": 5.082459904454358
+  },
+  {
+    "comparator": "ids_product",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": false,
+    "regret_saved_mean": -4.94132671805484,
+    "regret_saved_sd": 29.004780126468255
+  },
+  {
+    "comparator": "ids_empirical",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 2248.259592022522,
+    "regret_saved_sd": 2906.2062197703062
+  },
+  {
+    "comparator": "ids_action",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 78.03018587913489,
+    "regret_saved_sd": 32.075846545519916
+  },
+  {
+    "comparator": "ceac",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 21397.831975611552,
+    "regret_saved_sd": 16.582852219607265
+  },
+  {
+    "comparator": "ceac_natural",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 21692.324880523378,
+    "regret_saved_sd": 85.28090476453546
+  },
+  {
+    "comparator": "ceac_ranked_natural",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 324.45826057294846,
+    "regret_saved_sd": 5.541149794330356
+  },
+  {
+    "comparator": "oracle",
+    "dose": 3,
+    "kind": "gi_arrayed",
+    "ranked_wins_all_seeds": false,
+    "regret_saved_mean": -39.1733259819246,
+    "regret_saved_sd": 5.082459904453702
+  },
+  {
+    "comparator": "idac",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 24419.520194299956,
+    "regret_saved_sd": 16031.829020404773
+  },
+  {
+    "comparator": "ucb_q",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 17765.642982206937,
+    "regret_saved_sd": 11.24432120319542
+  },
+  {
+    "comparator": "pomd",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 46098.65014157196,
+    "regret_saved_sd": 62.0472830424131
+  },
+  {
+    "comparator": "ids_additive",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 30340.562761877012,
+    "regret_saved_sd": 9.329337728685152
+  },
+  {
+    "comparator": "ids_product",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": false,
+    "regret_saved_mean": -27.304531938796583,
+    "regret_saved_sd": 6.275004645021085
+  },
+  {
+    "comparator": "ids_empirical",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 425.5254150105073,
+    "regret_saved_sd": 161.26550748143075
+  },
+  {
+    "comparator": "ids_action",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": false,
+    "regret_saved_mean": -3.9136622437353474,
+    "regret_saved_sd": 21.62354645272439
+  },
+  {
+    "comparator": "ceac",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 4115.588513937429,
+    "regret_saved_sd": 80.00553843119722
+  },
+  {
+    "comparator": "ceac_natural",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 4413.724979544925,
+    "regret_saved_sd": 74.71626213267822
+  },
+  {
+    "comparator": "ceac_ranked_natural",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 315.814299888021,
+    "regret_saved_sd": 11.156866213610343
+  },
+  {
+    "comparator": "oracle",
+    "dose": 3,
+    "kind": "gi_multiplexed",
+    "ranked_wins_all_seeds": false,
+    "regret_saved_mean": -36.48261083466184,
+    "regret_saved_sd": 9.329337728685124
+  }
+]

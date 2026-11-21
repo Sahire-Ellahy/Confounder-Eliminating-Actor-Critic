@@ -1,0 +1,954 @@
+[
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "idac",
+    "dose": 1,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.003069944041456158,
+    "per_seed_regret_saved": [
+      500.352448807718,
+      320.58393513455707,
+      1630.89985250123
+    ],
+    "regret_saved_mean": 817.2787454811684,
+    "regret_saved_sd": 710.3264453534567,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 34715.45767885267,
+    "added_advantage_sd": 1625.8954930769273,
+    "ceac_wins_all_seeds": true,
+    "comparator": "idac",
+    "dose": 2,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.4704419391336953,
+    "per_seed_regret_saved": [
+      36455.151551087954,
+      33195.076187005965,
+      36947.98153490758
+    ],
+    "regret_saved_mean": 35532.73642433383,
+    "regret_saved_sd": 2039.4145942220161,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 45175.96123703455,
+    "added_advantage_sd": 11409.403562267786,
+    "ceac_wins_all_seeds": true,
+    "comparator": "idac",
+    "dose": 3,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.6261984746363388,
+    "per_seed_regret_saved": [
+      53500.197702579324,
+      32405.026985339304,
+      52074.495259628515
+    ],
+    "regret_saved_mean": 45993.23998251571,
+    "regret_saved_sd": 11789.308979174073,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 56724.82063416356,
+    "added_advantage_sd": 492.4874594835154,
+    "ceac_wins_all_seeds": true,
+    "comparator": "idac",
+    "dose": 4,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.8914845842290734,
+    "per_seed_regret_saved": [
+      57475.42195085925,
+      57362.51935324317,
+      57788.35683483175
+    ],
+    "regret_saved_mean": 57542.09937964473,
+    "regret_saved_sd": 220.6100628110756,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ucb_q",
+    "dose": 1,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.0021077540527131215,
+    "per_seed_regret_saved": [
+      947.1840772305857,
+      916.6186683587066,
+      847.0541195089925
+    ],
+    "regret_saved_mean": 903.6189550327616,
+    "regret_saved_sd": 51.315168500644866,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 19687.74116325769,
+    "added_advantage_sd": 99.92359194843625,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ucb_q",
+    "dose": 2,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.16718936702053108,
+    "per_seed_regret_saved": [
+      20540.27745493327,
+      20594.534168446124,
+      20639.268731491964
+    ],
+    "regret_saved_mean": 20591.360118290453,
+    "regret_saved_sd": 49.57190892504455,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 27240.251427281128,
+    "added_advantage_sd": 14641.557331830409,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ucb_q",
+    "dose": 3,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.311473998201984,
+    "per_seed_regret_saved": [
+      36538.40201673826,
+      11250.66730624684,
+      36642.54182395657
+    ],
+    "regret_saved_mean": 28143.87038231389,
+    "regret_saved_sd": 14630.035676709502,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 43535.354609981754,
+    "added_advantage_sd": 46.882457674909396,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ucb_q",
+    "dose": 4,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.6206717606986857,
+    "per_seed_regret_saved": [
+      44472.78664056851,
+      44410.733815897474,
+      44433.400238577546
+    ],
+    "regret_saved_mean": 44438.97356501451,
+    "regret_saved_sd": 31.399597737763855,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "pomd",
+    "dose": 1,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.0066975139438005355,
+    "per_seed_regret_saved": [
+      6049.269751820917,
+      6117.3624837476655,
+      6105.062642593018
+    ],
+    "regret_saved_mean": 6090.5649593872,
+    "regret_saved_sd": 36.287630799822026,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 44827.97568922813,
+    "added_advantage_sd": 55.58110542676346,
+    "ceac_wins_all_seeds": true,
+    "comparator": "pomd",
+    "dose": 2,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.7859565327138108,
+    "per_seed_regret_saved": [
+      50918.77824427635,
+      50882.19808881599,
+      50954.64561275366
+    ],
+    "regret_saved_mean": 50918.54064861534,
+    "regret_saved_sd": 36.224346370202575,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 41967.79875629128,
+    "added_advantage_sd": 14784.695915267252,
+    "ceac_wins_all_seeds": true,
+    "comparator": "pomd",
+    "dose": 3,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.7393229565353173,
+    "per_seed_regret_saved": [
+      56560.85401677023,
+      31013.267306278198,
+      56600.969823987034
+    ],
+    "regret_saved_mean": 48058.36371567849,
+    "regret_saved_sd": 14761.500127826106,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 51323.612605583075,
+    "added_advantage_sd": 116.47898243513934,
+    "ceac_wins_all_seeds": true,
+    "comparator": "pomd",
+    "dose": 4,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.8950363440320189,
+    "per_seed_regret_saved": [
+      57338.66664051897,
+      57570.72981585071,
+      57333.13623854116
+    ],
+    "regret_saved_mean": 57414.177564970276,
+    "regret_saved_sd": 135.60642233429036,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ids_decoy",
+    "dose": 1,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.3999723373860465,
+    "per_seed_regret_saved": [
+      25777.00407725579,
+      25761.758668383925,
+      25775.174119534222
+    ],
+    "regret_saved_mean": 25771.312288391313,
+    "regret_saved_sd": 8.324117235470018,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -48.2775034122836,
+    "added_advantage_sd": 4.505786900947918,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ids_decoy",
+    "dose": 2,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.3999185336871978,
+    "per_seed_regret_saved": [
+      25733.885454955605,
+      25711.48616846782,
+      25723.73273151366
+    ],
+    "regret_saved_mean": 25723.03478497903,
+    "regret_saved_sd": 11.215942038649954,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -8695.092572731779,
+    "added_advantage_sd": 14753.227730185907,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ids_decoy",
+    "dose": 3,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.2665729565353173,
+    "per_seed_regret_saved": [
+      25578.710016751276,
+      31.12330625924369,
+      25618.82582396808
+    ],
+    "regret_saved_mean": 17076.219715659532,
+    "regret_saved_sd": 14761.500127826106,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -806.670723366391,
+    "added_advantage_sd": 143.86380218621358,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ids_decoy",
+    "dose": 4,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.3998957190320191,
+    "per_seed_regret_saved": [
+      24889.13064057361,
+      25121.193815905353,
+      24883.6002385958
+    ],
+    "regret_saved_mean": 24964.641565024922,
+    "regret_saved_sd": 135.60642233429147,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": false,
+    "comparator": "ids_product",
+    "dose": 1,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": -2.7662613953545613e-05,
+    "per_seed_regret_saved": [
+      -437.39592276944927,
+      -452.64133164131664,
+      -439.2258804910187
+    ],
+    "regret_saved_mean": -443.08771163392817,
+    "regret_saved_sd": 8.324117235470819,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -48.27750341228411,
+    "added_advantage_sd": 4.505786900947579,
+    "ceac_wins_all_seeds": false,
+    "comparator": "ids_product",
+    "dose": 2,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": -8.146631280224947e-05,
+    "per_seed_regret_saved": [
+      -480.51454506963614,
+      -502.9138315574206,
+      -490.6672685115802
+    ],
+    "regret_saved_mean": -491.3652150462123,
+    "regret_saved_sd": 11.21594203865038,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -8695.092572731779,
+    "added_advantage_sd": 14753.227730185907,
+    "ceac_wins_all_seeds": false,
+    "comparator": "ids_product",
+    "dose": 3,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": -0.13342704346468276,
+    "per_seed_regret_saved": [
+      -635.6899832739658,
+      -26183.276693765998,
+      -595.5741760571608
+    ],
+    "regret_saved_mean": -9138.180284365708,
+    "regret_saved_sd": 14761.500127826108,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -806.6707233663916,
+    "added_advantage_sd": 143.86380218621449,
+    "ceac_wins_all_seeds": false,
+    "comparator": "ids_product",
+    "dose": 4,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": -0.00010428096798100308,
+    "per_seed_regret_saved": [
+      -1325.2693594516322,
+      -1093.2061841198881,
+      -1330.799761429439
+    ],
+    "regret_saved_mean": -1249.7584350003199,
+    "regret_saved_sd": 135.60642233429155,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ceac_natural",
+    "dose": 1,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.0013465759314985025,
+    "per_seed_regret_saved": [
+      159.84760081139007,
+      154.80802017844252,
+      156.54218374868213
+    ],
+    "regret_saved_mean": 157.06593491283823,
+    "regret_saved_sd": 2.560288987685015,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 287.61686618407447,
+    "added_advantage_sd": 8.110015857191973,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ceac_natural",
+    "dose": 2,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.003591306430684272,
+    "per_seed_regret_saved": [
+      453.9918566514175,
+      444.9764512375482,
+      435.08009540177255
+    ],
+    "regret_saved_mean": 444.6828010969127,
+    "regret_saved_sd": 9.45929972010161,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -7850.735449796233,
+    "added_advantage_sd": 14714.172255064208,
+    "ceac_wins_all_seeds": false,
+    "comparator": "ceac_natural",
+    "dose": 3,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": -0.12738760309525998,
+    "per_seed_regret_saved": [
+      754.7009560432429,
+      -24686.293545421307,
+      850.58404472788
+    ],
+    "regret_saved_mean": -7693.669514883396,
+    "regret_saved_sd": 14716.122178552501,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 1044.117680438797,
+    "added_advantage_sd": 269.3179487149444,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ceac_natural",
+    "dose": 4,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": 0.008206004529245017,
+    "per_seed_regret_saved": [
+      1149.0476935254128,
+      1491.4697664562007,
+      963.0333860732921
+    ],
+    "regret_saved_mean": 1201.1836153516354,
+    "regret_saved_sd": 268.0482564512405,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": false,
+    "comparator": "oracle",
+    "dose": 1,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": -2.7662613953545613e-05,
+    "per_seed_regret_saved": [
+      -437.39592276944927,
+      -452.64133164131664,
+      -439.2258804910187
+    ],
+    "regret_saved_mean": -443.08771163392817,
+    "regret_saved_sd": 8.324117235470819,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -48.27750341228411,
+    "added_advantage_sd": 4.505786900947579,
+    "ceac_wins_all_seeds": false,
+    "comparator": "oracle",
+    "dose": 2,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": -8.146631280224947e-05,
+    "per_seed_regret_saved": [
+      -480.51454506963614,
+      -502.9138315574206,
+      -490.6672685115802
+    ],
+    "regret_saved_mean": -491.3652150462123,
+    "regret_saved_sd": 11.21594203865038,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -8695.092572731779,
+    "added_advantage_sd": 14753.227730185907,
+    "ceac_wins_all_seeds": false,
+    "comparator": "oracle",
+    "dose": 3,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": -0.13342704346468276,
+    "per_seed_regret_saved": [
+      -635.6899832739658,
+      -26183.276693765998,
+      -595.5741760571608
+    ],
+    "regret_saved_mean": -9138.180284365708,
+    "regret_saved_sd": 14761.500127826108,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -806.6707233663916,
+    "added_advantage_sd": 143.86380218621449,
+    "ceac_wins_all_seeds": false,
+    "comparator": "oracle",
+    "dose": 4,
+    "kind": "bidirectional_lock",
+    "late_gap_reduction_mean": -0.00010428096798100308,
+    "per_seed_regret_saved": [
+      -1325.2693594516322,
+      -1093.2061841198881,
+      -1330.799761429439
+    ],
+    "regret_saved_mean": -1249.7584350003199,
+    "regret_saved_sd": 135.60642233429155,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "idac",
+    "dose": 1,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.005853517522118482,
+    "per_seed_regret_saved": [
+      18975.703002050857,
+      237.990956661108,
+      1443.767353986468
+    ],
+    "regret_saved_mean": 6885.820437566144,
+    "regret_saved_sd": 10487.488712621354,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 35262.830551342304,
+    "added_advantage_sd": 6479.818394227006,
+    "ceac_wins_all_seeds": true,
+    "comparator": "idac",
+    "dose": 2,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.6263876989797957,
+    "per_seed_regret_saved": [
+      49233.5557396395,
+      33186.60051755012,
+      44025.796709535716
+    ],
+    "regret_saved_mean": 42148.65098890845,
+    "regret_saved_sd": 8186.510246575605,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 42486.442986696675,
+    "added_advantage_sd": 15812.727385415646,
+    "ceac_wins_all_seeds": true,
+    "comparator": "idac",
+    "dose": 3,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.671470496306403,
+    "per_seed_regret_saved": [
+      44316.19978387777,
+      45860.97954970133,
+      57939.61093920937
+    ],
+    "regret_saved_mean": 49372.26342426282,
+    "regret_saved_sd": 7459.63596381352,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 49105.19164625943,
+    "added_advantage_sd": 12589.498935077841,
+    "ceac_wins_all_seeds": true,
+    "comparator": "idac",
+    "dose": 4,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.8305019733092647,
+    "per_seed_regret_saved": [
+      53544.632632966306,
+      56746.58519769308,
+      57681.81842081736
+    ],
+    "regret_saved_mean": 55991.012083825575,
+    "regret_saved_sd": 2169.618539881783,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ucb_q",
+    "dose": 1,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.004320920721579801,
+    "per_seed_regret_saved": [
+      985.2991306397557,
+      847.1838685853263,
+      847.0813480411971
+    ],
+    "regret_saved_mean": 893.1881157554263,
+    "regret_saved_sd": 79.77049532804313,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 15205.563067373418,
+    "added_advantage_sd": 20.138858169149703,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ucb_q",
+    "dose": 2,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.09157321343731312,
+    "per_seed_regret_saved": [
+      16170.029156279064,
+      16072.111187679806,
+      16054.113205427662
+    ],
+    "regret_saved_mean": 16098.751183128843,
+    "regret_saved_sd": 62.381038253541085,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 32295.546391848926,
+    "added_advantage_sd": 103.82291736908867,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ucb_q",
+    "dose": 3,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.35622098975518224,
+    "per_seed_regret_saved": [
+      33242.147579776676,
+      33260.34443465181,
+      33063.71150838457
+    ],
+    "regret_saved_mean": 33188.73450760435,
+    "regret_saved_sd": 108.65470138134208,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 41548.27385981773,
+    "added_advantage_sd": 392.54269013557877,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ucb_q",
+    "dose": 4,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.5706786761357163,
+    "per_seed_regret_saved": [
+      42195.03035112569,
+      42825.74901779268,
+      42303.60655780108
+    ],
+    "regret_saved_mean": 42441.461975573155,
+    "regret_saved_sd": 337.201121405875,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "pomd",
+    "dose": 1,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.006138015375590169,
+    "per_seed_regret_saved": [
+      5978.352726709419,
+      6084.918548998887,
+      6034.642277611144
+    ],
+    "regret_saved_mean": 6032.637851106483,
+    "regret_saved_sd": 53.31118001195494,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 41173.096732778125,
+    "added_advantage_sd": 123.47423715872704,
+    "ceac_wins_all_seeds": true,
+    "comparator": "pomd",
+    "dose": 2,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.48293959973977113,
+    "per_seed_regret_saved": [
+      47223.41554952221,
+      47115.44167124954,
+      47278.34653088207
+    ],
+    "regret_saved_mean": 47205.7345838846,
+    "regret_saved_sd": 82.879193603595,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 50468.775323200076,
+    "added_advantage_sd": 15.994581722900152,
+    "ceac_wins_all_seeds": true,
+    "comparator": "pomd",
+    "dose": 3,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.8714293230885154,
+    "per_seed_regret_saved": [
+      56461.35957981259,
+      56556.772434687395,
+      56486.10750841969
+    ],
+    "regret_saved_mean": 56501.41317430656,
+    "regret_saved_sd": 49.51364231219951,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 51454.48812448839,
+    "added_advantage_sd": 223.8529222229716,
+    "ceac_wins_all_seeds": true,
+    "comparator": "pomd",
+    "dose": 4,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.8936995094690497,
+    "per_seed_regret_saved": [
+      57545.2783511436,
+      57684.75301781948,
+      57231.346557821555
+    ],
+    "regret_saved_mean": 57487.12597559488,
+    "regret_saved_sd": 232.22968926998132,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ids_decoy",
+    "dose": 1,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.3999719623882465,
+    "per_seed_regret_saved": [
+      25734.83913066495,
+      25774.103868610557,
+      25770.56134806643
+    ],
+    "regret_saved_mean": 25759.834782447313,
+    "regret_saved_sd": 21.719215431737076,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -39.919599289615384,
+    "added_advantage_sd": 34.76210053643899,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ids_decoy",
+    "dose": 2,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.39993779677064656,
+    "per_seed_regret_saved": [
+      25734.9331563078,
+      25711.423187708744,
+      25713.389205456544
+    ],
+    "regret_saved_mean": 25719.9151831577,
+    "regret_saved_sd": 13.043041999438541,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -158.64560816183317,
+    "added_advantage_sd": 36.00570186178581,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ids_decoy",
+    "dose": 3,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.3999293230885157,
+    "per_seed_regret_saved": [
+      25561.13557979151,
+      25656.548434666318,
+      25585.88350839861
+    ],
+    "regret_saved_mean": 25601.18917428548,
+    "regret_saved_sd": 49.51364231220211,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -636.2288068769049,
+    "added_advantage_sd": 236.1770243736887,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ids_decoy",
+    "dose": 4,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.3998713844690496,
+    "per_seed_regret_saved": [
+      25181.758351119126,
+      25321.23301779501,
+      24867.826557797085
+    ],
+    "regret_saved_mean": 25123.60597557041,
+    "regret_saved_sd": 232.22968926998087,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": false,
+    "comparator": "ids_product",
+    "dose": 1,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": -2.8037611753532088e-05,
+    "per_seed_regret_saved": [
+      -479.5608693602905,
+      -440.296131414685,
+      -443.8386519588133
+    ],
+    "regret_saved_mean": -454.5652175779296,
+    "regret_saved_sd": 21.719215431736338,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -39.91959928961605,
+    "added_advantage_sd": 34.762100536439384,
+    "ceac_wins_all_seeds": false,
+    "comparator": "ids_product",
+    "dose": 2,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": -6.220322935354611e-05,
+    "per_seed_regret_saved": [
+      -479.4668437174395,
+      -502.9768123164981,
+      -501.01079456869934
+    ],
+    "regret_saved_mean": -494.4848168675456,
+    "regret_saved_sd": 13.043041999439678,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -158.64560816183274,
+    "added_advantage_sd": 36.005701861784495,
+    "ceac_wins_all_seeds": false,
+    "comparator": "ids_product",
+    "dose": 3,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": -7.067691148443377e-05,
+    "per_seed_regret_saved": [
+      -653.2644202337308,
+      -557.8515653589247,
+      -628.5164916266315
+    ],
+    "regret_saved_mean": -613.2108257397623,
+    "regret_saved_sd": 49.51364231220071,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -634.7221402102393,
+    "added_advantage_sd": 237.9394354383912,
+    "ceac_wins_all_seeds": false,
+    "comparator": "ids_product",
+    "dose": 4,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": -0.00012861553095047215,
+    "per_seed_regret_saved": [
+      -1032.641648906117,
+      -888.6469822302327,
+      -1346.573442228157
+    ],
+    "regret_saved_mean": -1089.287357788169,
+    "regret_saved_sd": 234.15958861985624,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ceac_natural",
+    "dose": 1,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.0013526572743337753,
+    "per_seed_regret_saved": [
+      129.49635701128574,
+      156.35324727998938,
+      161.5719592122927
+    ],
+    "regret_saved_mean": 149.14052116785595,
+    "regret_saved_sd": 17.211293606693236,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 261.656799748207,
+    "added_advantage_sd": 40.416526816675194,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ceac_natural",
+    "dose": 2,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.003468269135648056,
+    "per_seed_regret_saved": [
+      432.1650436687887,
+      378.21642644468284,
+      422.01049263471714
+    ],
+    "regret_saved_mean": 410.7973209160629,
+    "regret_saved_sd": 28.669055444717632,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 554.0265226253915,
+    "added_advantage_sd": 45.09149105589636,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ceac_natural",
+    "dose": 3,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.005635372284375495,
+    "per_seed_regret_saved": [
+      656.8246946059758,
+      685.0164903325501,
+      767.6599464412163
+    ],
+    "regret_saved_mean": 703.1670437932474,
+    "regret_saved_sd": 57.60377770200945,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 942.383488997505,
+    "added_advantage_sd": 377.73784732738744,
+    "ceac_wins_all_seeds": true,
+    "comparator": "ceac_natural",
+    "dose": 4,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": 0.007771755164006328,
+    "per_seed_regret_saved": [
+      1274.9871760915848,
+      1331.468040466704,
+      668.1168139377935
+    ],
+    "regret_saved_mean": 1091.5240101653608,
+    "regret_saved_sd": 367.767266587318,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": 0.0,
+    "added_advantage_sd": 0.0,
+    "ceac_wins_all_seeds": false,
+    "comparator": "oracle",
+    "dose": 1,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": -2.8037611753532088e-05,
+    "per_seed_regret_saved": [
+      -479.5608693602905,
+      -440.296131414685,
+      -443.8386519588133
+    ],
+    "regret_saved_mean": -454.5652175779296,
+    "regret_saved_sd": 21.719215431736338,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -39.91959928961605,
+    "added_advantage_sd": 34.762100536439384,
+    "ceac_wins_all_seeds": false,
+    "comparator": "oracle",
+    "dose": 2,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": -6.220322935354611e-05,
+    "per_seed_regret_saved": [
+      -479.4668437174395,
+      -502.9768123164981,
+      -501.01079456869934
+    ],
+    "regret_saved_mean": -494.4848168675456,
+    "regret_saved_sd": 13.043041999439678,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -158.64560816183274,
+    "added_advantage_sd": 36.005701861784495,
+    "ceac_wins_all_seeds": false,
+    "comparator": "oracle",
+    "dose": 3,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": -7.067691148443377e-05,
+    "per_seed_regret_saved": [
+      -653.2644202337308,
+      -557.8515653589247,
+      -628.5164916266315
+    ],
+    "regret_saved_mean": -613.2108257397623,
+    "regret_saved_sd": 49.51364231220071,
+    "task": 1
+  },
+  {
+    "added_advantage_mean": -636.228806876906,
+    "added_advantage_sd": 236.1770243736881,
+    "ceac_wins_all_seeds": false,
+    "comparator": "oracle",
+    "dose": 4,
+    "kind": "combination_lock",
+    "late_gap_reduction_mean": -0.00012861553095047215,
+    "per_seed_regret_saved": [
+      -1032.641648906117,
+      -893.1669822302326,
+      -1346.573442228157
+    ],
+    "regret_saved_mean": -1090.7940244548356,
+    "regret_saved_sd": 232.22968926998064,
+    "task": 1
+  }
+]

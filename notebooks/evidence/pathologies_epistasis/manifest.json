@@ -1,0 +1,503 @@
+{
+  "files": {
+    "architecture.pdf": "9f784c0eb2ac02c7192c747b50f3c556157122d957c0e04eeda8295abbffe015",
+    "architecture.png": "491dba9277ea89f8929806666a031d63ed1f6db8719332941c57591d6af2f4f7",
+    "assessment.md": "32139354e4f5495594e2c1b9d1fc922577d598540f22c5835e1629c19bf9b118",
+    "ceac_comparisons.json": "300d3022272020634d1e6952668d05bd12f2ba0fe71e41a99b00972c2727668b",
+    "dose_response.pdf": "f707c35e00f5d894533869fb9e99c3db569c19b408949cf2ce92adab644836d5",
+    "dose_response.png": "6f234f5eabe21abf9c202316754b53eb11659bf2d9f614747121d905c65f5784",
+    "endpoints.csv": "5681f53b7e7b245e57fae24e0ca2efc1c8d4a37199539c1c12f18730228ad700",
+    "endpoints.json": "c3dd5bb095aca3c5a709c31c54f8eaeaae89ea9e54498e2b8936d24ecd1695df",
+    "epistatic_signalling_task1_cumulative_regret.pdf": "9800cfc19dc4d7f39a3eb72bcc210a648498d293526918472aa77084eb5b944d",
+    "epistatic_signalling_task1_cumulative_regret.png": "3272c244bd9d7675a00a5aa7dbb24710b20e91726fef7340fdb6d8d21cff2729",
+    "epistatic_signalling_task1_window_gap.pdf": "b86dd39614953866349860f77fbf9f69eaa5ef0fa73e80cdd16040ee1c01e0ec",
+    "epistatic_signalling_task1_window_gap.png": "800096c0aa82cf0431b8cbda34d3b973f7ef1d6e61b1574eae828ddd0f08e521",
+    "evidence.json.gz": "adef2acf2629acda9d4f767d2eaffd7ecd5a76ddb8b8feabefb8cf1ba72928a9",
+    "mechanism_breakdown.pdf": "05ab2ffd46667e6a89460f82702e3760feb85590a3d0a8a0eefad9dfa16ed2f5",
+    "mechanism_breakdown.png": "cb453e831c800141db7a2bc8fece3f66af486e6ba80dd33faa72b67cfcf825ff",
+    "seed_endpoints.csv": "9a4390c536bda8d83905d23196665141213ec0731dd200ad4409c73e20ae83f0"
+  },
+  "raw_source_bundle_sha256": "070146284b2238382eef40f951e58efa7f2b055748d0c799c911b06aa40780f0",
+  "registration": {
+    "calibration_gates": [
+      {
+        "data": {
+          "all_pass": true,
+          "cells": [
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.020022239983484357,
+              "method": "ceac",
+              "priced_actor_updates": 60663,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.020024543595877752,
+              "method": "ceac",
+              "priced_actor_updates": 60663,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.020384040327820752,
+              "method": "ceac_natural",
+              "priced_actor_updates": 60663,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.020381945786378426,
+              "method": "ceac_natural",
+              "priced_actor_updates": 60663,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.018901851705866463,
+              "method": "idac",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.002337876350539385,
+              "method": "idac",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0,
+              "method": "ids_action",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0,
+              "method": "ids_action",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0,
+              "method": "ids_product",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0,
+              "method": "ids_product",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.009826690832435482,
+              "method": "pomd",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.00993801370412363,
+              "method": "pomd",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.006875000000000006,
+              "method": "ucb_q",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.006328125000000006,
+              "method": "ucb_q",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 2.349801900071273e-05,
+              "method": "ceac",
+              "priced_actor_updates": 60663,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 1.6059164224489168e-05,
+              "method": "ceac",
+              "priced_actor_updates": 60663,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0008687183152328117,
+              "method": "ceac_natural",
+              "priced_actor_updates": 60663,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0008701738601707364,
+              "method": "ceac_natural",
+              "priced_actor_updates": 60663,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.003957006598583945,
+              "method": "idac",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.002618294946501974,
+              "method": "idac",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0,
+              "method": "ids_action",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0,
+              "method": "ids_action",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0,
+              "method": "ids_product",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0,
+              "method": "ids_product",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.017094511740071157,
+              "method": "pomd",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.020088866844680944,
+              "method": "pomd",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0,
+              "method": "ucb_q",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "kind": "epistatic_signalling",
+              "late_gap": 0.0016406250000000002,
+              "method": "ucb_q",
+              "priced_actor_updates": 0,
+              "protocol": "epistasis",
+              "seed": 1002,
+              "task": 1
+            }
+          ],
+          "sources": {
+            "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+            "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+            "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+            "ceac_gi/__init__.py": "6b785b6bc671d85b1287377a4d052e65aabf718a243c36dfb2fff38ca960665d",
+            "ceac_gi/data.py": "cdfc1de9e90eac26b018994f45466c13e67accac7c63a5a749fbecee65aa9694",
+            "ceac_gi/environment.py": "6ee23f9c1de74c87b31273eee8c1b5741d1248f3ac683bdb3fa9498998afacb2",
+            "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+            "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+            "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+            "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+            "ceac_pathologies/__init__.py": "d25b0321836820cf1521fd7902c8430bbe6537fa79270534472d4eeecb72adab",
+            "ceac_pathologies/agent.py": "a49de4f175866d70972d54272b9e6314d03e2e0dccd42286b94ed3153286761e",
+            "ceac_pathologies/environments.py": "75f96e4c1c0bcaecd40a49d9695da0471b7512b7c84a69b309b7e15adcde6fea",
+            "ceac_pathologies/ids_action.py": "b3eacc0941ce01a2fabbd1907862222bd48607f933fe625dc0675d8fbd8f9c90",
+            "ceac_pathologies/model.py": "a2f5fb139c6bb68c17c455a81fdaad656841fc005a5ea11469e0caecaf13156f",
+            "ceac_pathologies/run.py": "d92b984e660d3b7073259532a82e3dc7a9bf2b0265840e963910bf69146c7eab",
+            "ceac_pseudocode/design.py": "c79737e97b896890ec37cf2f84f5a0379733fad334ebf5f6a1f38d774918fdae",
+            "ceac_pseudocode/learning.py": "3d573fed19ca1b2b6a2482746e9274573bec2a5de50d9f70ddcbcf26e6934cf0",
+            "ceac_stability/actor.py": "90b2d4ca84474dfac1327bfc8e3a8d566470e1ead1e75679a7d38619e05db2d5"
+          },
+          "tolerance": 0.025
+        },
+        "path": "runs/pathologies_epistasis_cal_20261120_v2/gate.json",
+        "sha256": "e9773644d5ab06dc37244777b36862fd5b21b67b95603eb757f42aa6d4de2a82"
+      }
+    ],
+    "configuration": {
+      "calibration_seeds": [
+        1001,
+        1002
+      ],
+      "easy_gap_tolerance": 0.025,
+      "epistasis": {
+        "doses": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "episodes": 65536,
+        "intervention": "pleiotropic passenger modules k in {0,1,2,3} alongside 1-in-128 rare synthetic-rescue epistatic subtype: adds k high-MI zero-value passenger-omics channels and 4^k - 1 zero-KL aberrant pleiotropic knockouts",
+        "kinds": [
+          "epistatic_signalling"
+        ],
+        "methods": [
+          "idac",
+          "ucb_q",
+          "pomd",
+          "ids_canonical",
+          "ids_product",
+          "ids_action",
+          "ceac",
+          "ceac_natural",
+          "oracle"
+        ],
+        "tasks": [
+          1
+        ]
+      },
+      "evaluation_seeds": [
+        0,
+        1,
+        2
+      ],
+      "gi_screen": {
+        "calibrate_all_kinds": true,
+        "data": "Horlbeck et al. 2018 Cell, K562 CRISPRi gene-level GI map (Mendeley 10.17632/rdzk59n6j4.1, GI_map_treeview.zip sha256 d389b3eb...f9115)",
+        "doses": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "episodes": 65536,
+        "frozen_before_outcomes": "halfwidth 0.04 chosen from the episode-0 IDS allocation check only; no learning outcomes inspected",
+        "intervention": "k in {0,1,2,3} panel genes with unknown SYNTHETIC main-effect bits revealed by single knockouts; GI-scored rewards make them decision-irrelevant. Assay noise sigma=1.25, hit threshold -3, assay floor 0.01, profiling halfwidth 0.04 are declared, not estimated.",
+        "kinds": [
+          "gi_arrayed",
+          "gi_multiplexed"
+        ],
+        "methods": [
+          "idac",
+          "ucb_q",
+          "pomd",
+          "ids_additive",
+          "ids_product",
+          "ids_empirical",
+          "ids_action",
+          "ceac",
+          "ceac_natural",
+          "oracle"
+        ],
+        "panel_rule": "ceac_gi.data.select_panel(size=10, strong=-5.0, background_floor=-2.5, seed=2018): FDPS-PPP2R1A GI=-5.24, all other 44 pairs > -2.5",
+        "tasks": [
+          1
+        ]
+      },
+      "locks": {
+        "doses": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "episodes": 65536,
+        "intervention": "sequential gated lock depth L (horizon H = L + 1) with anti-shaped live step cost, 3-lane diffusing dead sink, and opposing decoy lock in bidirectional_lock; useful returns and diagnostic KL fixed across L",
+        "kinds": [
+          "combination_lock",
+          "bidirectional_lock"
+        ],
+        "methods": [
+          "idac",
+          "ucb_q",
+          "pomd",
+          "ids_decoy",
+          "ids_product",
+          "ceac",
+          "ceac_natural",
+          "oracle"
+        ],
+        "tasks": [
+          1
+        ]
+      },
+      "notes": [
+        "Easy-case calibration (L=1 for locks, k=0 for epistasis) checks both tasks 0 and 1 on independent seeds 1001 and 1002.",
+        "Combination Lock and Bidirectional Lock share the identical L=1 easy baseline.",
+        "Primary CEAC uses Section-3 reward critic, price-conditioned evidence critic, and policy-labeled replay with coordinate-free row dominance and public confounder-equivalence reference certification.",
+        "ceac_natural evaluates the registered guarded natural/mirror actor extension from ceac_stability under the identical replay and two-critic loop.",
+        "ids_product receives the identical candidate model class and uniform full-support prior as CEAC; ids_decoy and ids_canonical test restricted biological/historical priors."
+      ],
+      "schema": 1,
+      "status": "calibration_gated_pathological_search_suite"
+    },
+    "driver_sha256": "69fdad35fe9c14897135b84004011cb6d91adf91fd8cfe0830150638f99bb306",
+    "episodes": 65536,
+    "jobs": 108,
+    "metric": "exact pre-trajectory expected policy gap; final 256 episodes; seed is replicate",
+    "phase": "sweep",
+    "protocol": "epistasis",
+    "python": "3.11.13",
+    "schema": 1,
+    "scope": "stationary multi-step combination locks and epistatic signalling discovery; replay-driven two-critic CEAC",
+    "sources": {
+      "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+      "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+      "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+      "ceac_gi/__init__.py": "6b785b6bc671d85b1287377a4d052e65aabf718a243c36dfb2fff38ca960665d",
+      "ceac_gi/data.py": "cdfc1de9e90eac26b018994f45466c13e67accac7c63a5a749fbecee65aa9694",
+      "ceac_gi/environment.py": "6ee23f9c1de74c87b31273eee8c1b5741d1248f3ac683bdb3fa9498998afacb2",
+      "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+      "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+      "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+      "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+      "ceac_pathologies/__init__.py": "d25b0321836820cf1521fd7902c8430bbe6537fa79270534472d4eeecb72adab",
+      "ceac_pathologies/agent.py": "a49de4f175866d70972d54272b9e6314d03e2e0dccd42286b94ed3153286761e",
+      "ceac_pathologies/environments.py": "75f96e4c1c0bcaecd40a49d9695da0471b7512b7c84a69b309b7e15adcde6fea",
+      "ceac_pathologies/ids_action.py": "b3eacc0941ce01a2fabbd1907862222bd48607f933fe625dc0675d8fbd8f9c90",
+      "ceac_pathologies/model.py": "a2f5fb139c6bb68c17c455a81fdaad656841fc005a5ea11469e0caecaf13156f",
+      "ceac_pathologies/run.py": "d92b984e660d3b7073259532a82e3dc7a9bf2b0265840e963910bf69146c7eab",
+      "ceac_pseudocode/design.py": "c79737e97b896890ec37cf2f84f5a0379733fad334ebf5f6a1f38d774918fdae",
+      "ceac_pseudocode/learning.py": "3d573fed19ca1b2b6a2482746e9274573bec2a5de50d9f70ddcbcf26e6934cf0",
+      "ceac_stability/actor.py": "90b2d4ca84474dfac1327bfc8e3a8d566470e1ead1e75679a7d38619e05db2d5"
+    }
+  },
+  "schema": 1
+}

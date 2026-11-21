@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "status": "calibration_gated_pathological_search_suite",
+  "calibration_seeds": [
+    1001,
+    1002
+  ],
+  "evaluation_seeds": [
+    0,
+    1,
+    2
+  ],
+  "easy_gap_tolerance": 0.025,
+  "locks": {
+    "episodes": 65536,
+    "kinds": [
+      "combination_lock",
+      "bidirectional_lock"
+    ],
+    "doses": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "tasks": [
+      1
+    ],
+    "methods": [
+      "idac",
+      "ucb_q",
+      "pomd",
+      "ids_decoy",
+      "ids_product",
+      "ceac",
+      "ceac_natural",
+      "oracle"
+    ],
+    "intervention": "sequential gated lock depth L (horizon H = L + 1) with anti-shaped live step cost, 3-lane diffusing dead sink, and opposing decoy lock in bidirectional_lock; useful returns and diagnostic KL fixed across L"
+  },
+  "epistasis": {
+    "episodes": 65536,
+    "kinds": [
+      "epistatic_signalling"
+    ],
+    "doses": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "tasks": [
+      1
+    ],
+    "methods": [
+      "idac",
+      "ucb_q",
+      "pomd",
+      "ids_canonical",
+      "ids_product",
+      "ids_action",
+      "ceac",
+      "ceac_natural",
+      "oracle"
+    ],
+    "intervention": "pleiotropic passenger modules k in {0,1,2,3} alongside 1-in-128 rare synthetic-rescue epistatic subtype: adds k high-MI zero-value passenger-omics channels and 4^k - 1 zero-KL aberrant pleiotropic knockouts"
+  },
+  "gi_screen": {
+    "episodes": 65536,
+    "kinds": [
+      "gi_arrayed",
+      "gi_multiplexed"
+    ],
+    "calibrate_all_kinds": true,
+    "doses": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "tasks": [
+      1
+    ],
+    "methods": [
+      "idac",
+      "ucb_q",
+      "pomd",
+      "ids_additive",
+      "ids_product",
+      "ids_empirical",
+      "ids_action",
+      "ceac",
+      "ceac_natural",
+      "oracle"
+    ],
+    "data": "Horlbeck et al. 2018 Cell, K562 CRISPRi gene-level GI map (Mendeley 10.17632/rdzk59n6j4.1, GI_map_treeview.zip sha256 d389b3eb...f9115)",
+    "panel_rule": "ceac_gi.data.select_panel(size=10, strong=-5.0, background_floor=-2.5, seed=2018): FDPS-PPP2R1A GI=-5.24, all other 44 pairs > -2.5",
+    "intervention": "k in {0,1,2,3} panel genes with unknown SYNTHETIC main-effect bits revealed by single knockouts; GI-scored rewards make them decision-irrelevant. Assay noise sigma=1.25, hit threshold -3, assay floor 0.01, profiling halfwidth 0.04 are declared, not estimated.",
+    "frozen_before_outcomes": "halfwidth 0.04 chosen from the episode-0 IDS allocation check only; no learning outcomes inspected"
+  },
+  "notes": [
+    "Easy-case calibration (L=1 for locks, k=0 for epistasis) checks both tasks 0 and 1 on independent seeds 1001 and 1002.",
+    "Combination Lock and Bidirectional Lock share the identical L=1 easy baseline.",
+    "Primary CEAC uses Section-3 reward critic, price-conditioned evidence critic, and policy-labeled replay with coordinate-free row dominance and public confounder-equivalence reference certification.",
+    "ceac_natural evaluates the registered guarded natural/mirror actor extension from ceac_stability under the identical replay and two-critic loop.",
+    "ids_product receives the identical candidate model class and uniform full-support prior as CEAC; ids_decoy and ids_canonical test restricted biological/historical priors."
+  ]
+}

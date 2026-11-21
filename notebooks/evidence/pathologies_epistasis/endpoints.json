@@ -1,0 +1,1358 @@
+[
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 181989,
+    "ceac_priced_actor_updates": 181989,
+    "decoy_fraction": 0.0,
+    "dose": 0,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 1.8294935373270742e-05,
+    "late_gap_sd": 4.118464822663007e-06,
+    "method": "ceac",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.008249918619791666,
+    "protocol": "epistasis",
+    "regret_mean": 438.45577930764495,
+    "regret_sd": 5.190530058263081,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      1.9254960945001755e-05,
+      2.1848595314800153e-05,
+      1.3781249860010322e-05
+    ],
+    "seed_regrets": [
+      437.1413651258784,
+      434.0488143235677,
+      444.1771584734889
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 181989,
+    "ceac_priced_actor_updates": 181989,
+    "decoy_fraction": 0.0,
+    "dose": 1,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 2.4999072352258962e-05,
+    "late_gap_sd": 1.1507283964981422e-05,
+    "method": "ceac",
+    "passenger_omics_fraction": 0.00016276041666666666,
+    "pleiotropic_fraction": 0.0003153483072916667,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.0081329345703125,
+    "protocol": "epistasis",
+    "regret_mean": 456.27073248535027,
+    "regret_sd": 18.927290236851743,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      1.5524453058812088e-05,
+      3.7804298470036236e-05,
+      2.1668465527928567e-05
+    ],
+    "seed_regrets": [
+      477.0449378677046,
+      451.7629672363383,
+      440.00429235200806
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 181989,
+    "ceac_priced_actor_updates": 181989,
+    "decoy_fraction": 0.0,
+    "dose": 2,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 2.467502708037141e-05,
+    "late_gap_sd": 1.4141712951036632e-06,
+    "method": "ceac",
+    "passenger_omics_fraction": 0.00021870930989583334,
+    "pleiotropic_fraction": 0.0007476806640625,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.0079345703125,
+    "protocol": "epistasis",
+    "regret_mean": 477.34597343805444,
+    "regret_sd": 30.931709983114924,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      2.6189446407177096e-05,
+      2.3388874103518788e-05,
+      2.4446760730418345e-05
+    ],
+    "seed_regrets": [
+      512.8876126974988,
+      462.6353158209021,
+      456.5149917957624
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 183821,
+    "ceac_priced_actor_updates": 183821,
+    "decoy_fraction": 0.0,
+    "dose": 3,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 4.9828486611976575e-05,
+    "late_gap_sd": 3.7172148214091095e-05,
+    "method": "ceac",
+    "passenger_omics_fraction": 0.00022379557291666666,
+    "pleiotropic_fraction": 0.0025990804036458335,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.19503275553385416,
+    "protocol": "epistasis",
+    "regret_mean": 5738.062288525775,
+    "regret_sd": 8943.909139584179,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      9.26951092072273e-05,
+      2.6495674509505185e-05,
+      3.0294676119197242e-05
+    ],
+    "seed_regrets": [
+      16065.588281780512,
+      561.4213602630945,
+      587.1772235337193
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 181989,
+    "ceac_priced_actor_updates": 181989,
+    "decoy_fraction": 0.0,
+    "dose": 0,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0008749809914958942,
+    "late_gap_sd": 3.283761703806227e-06,
+    "method": "ceac_natural",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.010182698567708334,
+    "protocol": "epistasis",
+    "regret_mean": 536.146734763157,
+    "regret_sd": 1.0763178052549502,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0008712034510291802,
+      0.0008765856280562416,
+      0.0008771538954022609
+    ],
+    "seed_regrets": [
+      537.1587071566162,
+      535.0159334545214,
+      536.2655636783338
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 181989,
+    "ceac_priced_actor_updates": 181989,
+    "decoy_fraction": 0.0,
+    "dose": 1,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0017967488299903357,
+    "late_gap_sd": 8.745102857229453e-06,
+    "method": "ceac_natural",
+    "passenger_omics_fraction": 0.0009765625,
+    "pleiotropic_fraction": 0.0025075276692708335,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.008961995442708334,
+    "protocol": "epistasis",
+    "regret_mean": 656.2224694285283,
+    "regret_sd": 6.802564940316337,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0018067871627015387,
+      0.0017926787322665601,
+      0.0017907805950029081
+    ],
+    "seed_regrets": [
+      657.9556353688076,
+      661.9907935138651,
+      648.720979402912
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 181989,
+    "ceac_priced_actor_updates": 181989,
+    "decoy_fraction": 0.0,
+    "dose": 2,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0024689616797609996,
+    "late_gap_sd": 1.86400958727566e-05,
+    "method": "ceac_natural",
+    "passenger_omics_fraction": 0.0015411376953125,
+    "pleiotropic_fraction": 0.005177815755208333,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.009541829427083334,
+    "protocol": "epistasis",
+    "regret_mean": 832.5574173595651,
+    "regret_sd": 129.43900988572074,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.002448836910045672,
+      0.0024856345416872515,
+      0.0024724135875500756
+    ],
+    "seed_regrets": [
+      982.0206882077035,
+      757.8984505513084,
+      757.7531133196834
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 181989,
+    "ceac_priced_actor_updates": 181989,
+    "decoy_fraction": 0.0,
+    "dose": 3,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0029601995300668252,
+    "late_gap_sd": 2.1640921967799234e-05,
+    "method": "ceac_natural",
+    "passenger_omics_fraction": 0.0011342366536458333,
+    "pleiotropic_fraction": 0.007893880208333334,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.0083770751953125,
+    "protocol": "epistasis",
+    "regret_mean": 933.9899977883166,
+    "regret_sd": 34.55730584061433,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0029397615362566245,
+      0.002982870266223011,
+      0.0029579667877208385
+    ],
+    "seed_regrets": [
+      951.9394830890632,
+      955.8789776943764,
+      894.1515325815104
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 0,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0024096465786608867,
+    "late_gap_sd": 0.00022725616996185864,
+    "method": "idac",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.017552693684895832,
+    "protocol": "epistasis",
+    "regret_mean": 734.1135081857971,
+    "regret_sd": 331.59678868541084,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.002153692499398646,
+      0.002487513751324541,
+      0.0025877334852594733
+    ],
+    "seed_regrets": [
+      418.38724049680286,
+      704.375674056085,
+      1079.5776100045032
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 1,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.27377769299920723,
+    "late_gap_sd": 0.025981396023192153,
+    "method": "idac",
+    "passenger_omics_fraction": 0.04132080078125,
+    "pleiotropic_fraction": 0.3426717122395833,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.0435333251953125,
+    "protocol": "epistasis",
+    "regret_mean": 24508.005561324564,
+    "regret_sd": 7664.847850172884,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.24396568147501554,
+      0.2857740740475225,
+      0.2915933234750836
+    ],
+    "seed_regrets": [
+      17276.28784668263,
+      23704.974655582828,
+      32542.754181708242
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 2,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.5393270758296341,
+    "late_gap_sd": 0.18814876279879753,
+    "method": "idac",
+    "passenger_omics_fraction": 0.10843912760416667,
+    "pleiotropic_fraction": 0.5535227457682291,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.06998189290364583,
+    "protocol": "epistasis",
+    "regret_mean": 37652.37532787812,
+    "regret_sd": 8300.307266266007,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.7565804946979129,
+      0.4298812600218601,
+      0.4315194727691293
+    ],
+    "seed_regrets": [
+      47223.82505850759,
+      33297.47903050328,
+      32435.821894623503
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 3,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.6966713066308938,
+    "late_gap_sd": 0.18453912471155953,
+    "method": "idac",
+    "passenger_omics_fraction": 0.043874104817708336,
+    "pleiotropic_fraction": 0.794921875,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.0114288330078125,
+    "protocol": "epistasis",
+    "regret_mean": 48489.033237319265,
+    "regret_sd": 11896.829445835248,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.8430825142313806,
+      0.48938547585428416,
+      0.7575459298070166
+    ],
+    "seed_regrets": [
+      56303.98055171011,
+      34797.414256271375,
+      54365.70490397631
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 0,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_action",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": true,
+    "probe_fraction": 4.57763671875e-05,
+    "protocol": "epistasis",
+    "regret_mean": 4.993333333333333,
+    "regret_sd": 2.274496281230931,
+    "responder_posterior_mean": 1.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      5.659999999999999,
+      6.86,
+      2.46
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 1,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_action",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": true,
+    "probe_fraction": 5.5948893229166664e-05,
+    "protocol": "epistasis",
+    "regret_mean": 3.5399999999999996,
+    "regret_sd": 2.0345023961647226,
+    "responder_posterior_mean": 1.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      5.699999999999999,
+      1.6600000000000001,
+      3.26
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 2,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_action",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": true,
+    "probe_fraction": 5.5948893229166664e-05,
+    "protocol": "epistasis",
+    "regret_mean": 25.806666666666644,
+    "regret_sd": 40.091701551983675,
+    "responder_posterior_mean": 1.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      72.09999999999994,
+      2.86,
+      2.46
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 3,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_action",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": true,
+    "probe_fraction": 7.62939453125e-05,
+    "protocol": "epistasis",
+    "regret_mean": 11.433333333333337,
+    "regret_sd": 3.8417357188298826,
+    "responder_posterior_mean": 1.0000000000000002,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      15.340000000000007,
+      7.660000000000001,
+      11.300000000000002
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 0,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.4000000000000001,
+    "late_gap_sd": 0.0,
+    "method": "ids_canonical",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": false,
+    "probe_fraction": 0.0,
+    "protocol": "epistasis",
+    "regret_mean": 26214.40000002524,
+    "regret_sd": 0.0,
+    "responder_posterior_mean": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.4000000000000001,
+      0.4000000000000001,
+      0.4000000000000001
+    ],
+    "seed_regrets": [
+      26214.40000002524,
+      26214.40000002524,
+      26214.40000002524
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 1,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.4000000000000001,
+    "late_gap_sd": 0.0,
+    "method": "ids_canonical",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": false,
+    "probe_fraction": 0.0,
+    "protocol": "epistasis",
+    "regret_mean": 26214.40000002524,
+    "regret_sd": 0.0,
+    "responder_posterior_mean": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.4000000000000001,
+      0.4000000000000001,
+      0.4000000000000001
+    ],
+    "seed_regrets": [
+      26214.40000002524,
+      26214.40000002524,
+      26214.40000002524
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 2,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.4000000000000001,
+    "late_gap_sd": 0.0,
+    "method": "ids_canonical",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": false,
+    "probe_fraction": 0.0,
+    "protocol": "epistasis",
+    "regret_mean": 26214.40000002524,
+    "regret_sd": 0.0,
+    "responder_posterior_mean": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.4000000000000001,
+      0.4000000000000001,
+      0.4000000000000001
+    ],
+    "seed_regrets": [
+      26214.40000002524,
+      26214.40000002524,
+      26214.40000002524
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 3,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.4000000000000001,
+    "late_gap_sd": 0.0,
+    "method": "ids_canonical",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": false,
+    "probe_fraction": 0.0,
+    "protocol": "epistasis",
+    "regret_mean": 26214.40000002524,
+    "regret_sd": 0.0,
+    "responder_posterior_mean": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.4000000000000001,
+      0.4000000000000001,
+      0.4000000000000001
+    ],
+    "seed_regrets": [
+      26214.40000002524,
+      26214.40000002524,
+      26214.40000002524
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 0,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": true,
+    "probe_fraction": 4.57763671875e-05,
+    "protocol": "epistasis",
+    "regret_mean": 7.660000000000003,
+    "regret_sd": 5.381449618829486,
+    "responder_posterior_mean": 1.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      9.260000000000002,
+      12.060000000000004,
+      1.6600000000000001
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 1,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "passenger_omics_fraction": 0.0127716064453125,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": true,
+    "probe_fraction": 6.103515625e-05,
+    "protocol": "epistasis",
+    "regret_mean": 338.2970333333233,
+    "regret_sd": 428.58633620418755,
+    "responder_posterior_mean": 1.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      35.668599999999955,
+      828.7251999999704,
+      150.4972999999997
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 2,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "passenger_omics_fraction": 0.006093343098958333,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": true,
+    "probe_fraction": 7.120768229166667e-05,
+    "protocol": "epistasis",
+    "regret_mean": 161.7332666666675,
+    "regret_sd": 117.91567112493482,
+    "responder_posterior_mean": 1.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      297.7341000000031,
+      88.0816999999998,
+      99.38399999999969
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 3,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "ids_product",
+    "passenger_omics_fraction": 0.0351715087890625,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "prior_supported": true,
+    "probe_fraction": 9.1552734375e-05,
+    "protocol": "epistasis",
+    "regret_mean": 928.2171666666673,
+    "regret_sd": 1235.7096729849538,
+    "responder_posterior_mean": 1.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      165.40049999999994,
+      265.32600000000235,
+      2353.9249999999997
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 0,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.0,
+    "protocol": "epistasis",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 1,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.0,
+    "protocol": "epistasis",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 2,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.0,
+    "protocol": "epistasis",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 3,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0,
+    "late_gap_sd": 0.0,
+    "method": "oracle",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.0,
+    "protocol": "epistasis",
+    "regret_mean": 0.0,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seed_regrets": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 0,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.019213592842363455,
+    "late_gap_sd": 0.0011605213220787195,
+    "method": "pomd",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0271759033203125,
+    "probe_fraction": 0.09174092610677083,
+    "protocol": "epistasis",
+    "regret_mean": 5046.829655611288,
+    "regret_sd": 19.619568826122677,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.02020836618556789,
+      0.01793862708427759,
+      0.019493785257244885
+    ],
+    "seed_regrets": [
+      5059.4304662529075,
+      5024.224583495248,
+      5056.833917085711
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 1,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.24662881387732152,
+    "late_gap_sd": 0.007793100621427088,
+    "method": "pomd",
+    "passenger_omics_fraction": 0.10310872395833333,
+    "pleiotropic_fraction": 0.2773284912109375,
+    "pomd_zero_fraction": 0.08235677083333333,
+    "probe_fraction": 0.0982666015625,
+    "protocol": "epistasis",
+    "regret_mean": 24544.62933928725,
+    "regret_sd": 37.660430532014544,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.2449640643930455,
+      0.25511977035249855,
+      0.23980260688642047
+    ],
+    "seed_regrets": [
+      24525.798364000068,
+      24520.09848979181,
+      24587.991164069874
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 2,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.75601,
+    "late_gap_sd": 0.0,
+    "method": "pomd",
+    "passenger_omics_fraction": 0.09975179036458333,
+    "pleiotropic_fraction": 0.75006103515625,
+    "pomd_zero_fraction": 0.5114339192708334,
+    "probe_fraction": 0.050120035807291664,
+    "protocol": "epistasis",
+    "regret_mean": 49545.87135995313,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.75601,
+      0.75601,
+      0.75601
+    ],
+    "seed_regrets": [
+      49545.87135995313,
+      49545.87135995313,
+      49545.87135995313
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 3,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.8510188405797104,
+    "late_gap_sd": 0.0,
+    "method": "pomd",
+    "passenger_omics_fraction": 0.04364013671875,
+    "pleiotropic_fraction": 0.9136505126953125,
+    "pomd_zero_fraction": 1.0,
+    "probe_fraction": 0.014261881510416666,
+    "protocol": "epistasis",
+    "regret_mean": 55772.370736156714,
+    "regret_sd": 0.0,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.8510188405797104,
+      0.8510188405797104,
+      0.8510188405797104
+    ],
+    "seed_regrets": [
+      55772.370736156714,
+      55772.370736156714,
+      55772.370736156714
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 0,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.0010677083333333335,
+    "late_gap_sd": 0.00184932508099802,
+    "method": "ucb_q",
+    "passenger_omics_fraction": 0.0,
+    "pleiotropic_fraction": 0.0,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.01708984375,
+    "protocol": "epistasis",
+    "regret_mean": 983.4666666666286,
+    "regret_sd": 51.34320727548351,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.0,
+      0.0032031250000000002,
+      0.0
+    ],
+    "seed_regrets": [
+      950.9999999999626,
+      1042.6599999999612,
+      956.7399999999622
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 1,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.00559921875,
+    "late_gap_sd": 0.00716397801672855,
+    "method": "ucb_q",
+    "passenger_omics_fraction": 0.020390828450520832,
+    "pleiotropic_fraction": 0.044921875,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.018915812174479168,
+    "protocol": "epistasis",
+    "regret_mean": 4208.393633333529,
+    "regret_sd": 58.50802648920976,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.013672265624999999,
+      0.003125390625,
+      0.0
+    ],
+    "seed_regrets": [
+      4224.545400000185,
+      4143.50640000021,
+      4257.129100000193
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 2,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.06221484375,
+    "late_gap_sd": 0.0016017181231555455,
+    "method": "ucb_q",
+    "passenger_omics_fraction": 0.039861043294270836,
+    "pleiotropic_fraction": 0.2388763427734375,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.019561767578125,
+    "protocol": "epistasis",
+    "regret_mean": 16196.601233330162,
+    "regret_sd": 85.7796212125414,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.063829296875,
+      0.0621890625,
+      0.060626171874999996
+    ],
+    "seed_regrets": [
+      16175.300899996826,
+      16291.024099996792,
+      16123.478699996867
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  },
+  {
+    "block_fraction": 0.0,
+    "ceac_actor_updates": 0,
+    "ceac_priced_actor_updates": 0,
+    "decoy_fraction": 0.0,
+    "dose": 3,
+    "kind": "epistatic_signalling",
+    "late_gap_mean": 0.49666992187500014,
+    "late_gap_sd": 0.12874930518575797,
+    "method": "ucb_q",
+    "passenger_omics_fraction": 0.042516072591145836,
+    "pleiotropic_fraction": 0.8031463623046875,
+    "pomd_zero_fraction": 0.0,
+    "probe_fraction": 0.015874226888020832,
+    "protocol": "epistasis",
+    "regret_mean": 49277.51863337772,
+    "regret_sd": 114.60760379752074,
+    "seed_ids": [
+      0,
+      1,
+      2
+    ],
+    "seed_late_gaps": [
+      0.6372691406250002,
+      0.46820664062500006,
+      0.3845339843750001
+    ],
+    "seed_regrets": [
+      49366.3900000442,
+      49318.002400044665,
+      49148.1635000443
+    ],
+    "seeds": 3,
+    "sink_fraction": 0.0,
+    "task": 1,
+    "wrong_pair_fraction": 0.0
+  }
+]

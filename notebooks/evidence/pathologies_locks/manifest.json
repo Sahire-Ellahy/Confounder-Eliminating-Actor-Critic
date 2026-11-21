@@ -1,0 +1,397 @@
+{
+  "files": {
+    "architecture.pdf": "59907db06b4da91bf763f0d4870ff101243b09dd3c0b2b6d3d36a1225e11b81d",
+    "architecture.png": "f967b4988daaecd304388c72b08ef883c6c7c8f091387ece2adaeb4750569f93",
+    "assessment.md": "d28daf1ee9205b1345a32aa5afbcb01bd1739edb2909f3c2e976ecd52fb3f01e",
+    "bidirectional_lock_task1_cumulative_regret.pdf": "ebdbf2fc976bac0cd1750c0fe78a9e61be90e682df0350b472b4cb9c36285a09",
+    "bidirectional_lock_task1_cumulative_regret.png": "3b93efb7664d0753413de285befd538f084735f1d45376bf9f9d60a6a428e767",
+    "bidirectional_lock_task1_window_gap.pdf": "c65c728427288157c1e6be125c232d3089b8674b0d0efa1c9ff87e19e8d17a81",
+    "bidirectional_lock_task1_window_gap.png": "b0b46b3f729925c5082f57d8f284889d4cd514194d12d8e05dcb1c6637fa6450",
+    "ceac_comparisons.json": "90b03175ba80daa0a20e17a83a328e9eea80e3f66427a99a701d470bf5860d8b",
+    "combination_lock_task1_cumulative_regret.pdf": "644f257d3d6d3a5e13177d6d98bb75f5dadf4c49a92cc9a4f08f7b4a7560f75a",
+    "combination_lock_task1_cumulative_regret.png": "c4356d92482dd6c9b74b16f831a9a99eb3e51feb6bdd1f7933debb1ff7e5a828",
+    "combination_lock_task1_window_gap.pdf": "55b27fc4be817c3f91e8eba61b4dd64a20984c2fc428f5ad4afc24df04d87259",
+    "combination_lock_task1_window_gap.png": "829589e62fcb501c9f3df0bcf4ff87b2ef19abfc28bca418bd11912bb2c244fc",
+    "dose_response.pdf": "8035716c28aebea7eca8c7ce0f793fc0a54b78bfd853a7e76ed999015eada10f",
+    "dose_response.png": "482ec5b78fbea2730948673b38e1f569437b275c2b033328c51ff111ecbdd680",
+    "endpoints.csv": "d505dcf91c239dc18700ee8a7284bafda8100a7754617ae6a7f7a99524ba240a",
+    "endpoints.json": "456a0b9bbaa694b505d932efe2ca8ec4d60242ecf2d34a78727a92c570e1d4d2",
+    "evidence.json.gz": "f8283feda670fe27fa2627d186f6d0c57aaa0473014dda04f7f704b62f4212ea",
+    "mechanism_breakdown.pdf": "279a1f2b50d3512b333f7b954b93e8bf0aec8b36c2328fa387bc4e23b8a72cfa",
+    "mechanism_breakdown.png": "fb4900ab56fc32612fdfabd6e6a934dfb29d46268edcf7f387d6847c1a232ca9",
+    "seed_endpoints.csv": "2d54ebd78df9ef7fecd822e477fdde3dd9fd99275ec71ada10e38b4d311d2ca5"
+  },
+  "raw_source_bundle_sha256": "b8b55ecbdfd759fa81d7f4208ea1cbac2ba5e6633a559e9cb2e08c2daf435658",
+  "registration": {
+    "calibration_gates": [
+      {
+        "data": {
+          "all_pass": true,
+          "cells": [
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "late_gap": 0.020035429827453263,
+              "method": "ceac",
+              "priced_actor_updates": 60663,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "late_gap": 0.020023271733870127,
+              "method": "ceac",
+              "priced_actor_updates": 60663,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "late_gap": 0.0206708248447972,
+              "method": "ceac_natural",
+              "priced_actor_updates": 60663,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "late_gap": 0.02066810301311546,
+              "method": "ceac_natural",
+              "priced_actor_updates": 60663,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.003335946035720995,
+              "method": "idac",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.02271706365787674,
+              "method": "idac",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.0,
+              "method": "ids_product",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.0,
+              "method": "ids_product",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.010533037100953699,
+              "method": "pomd",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.011342013434693104,
+              "method": "pomd",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.011015625000000006,
+              "method": "ucb_q",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 0
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.010781250000000006,
+              "method": "ucb_q",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 0
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "late_gap": 7.580410372160819e-06,
+              "method": "ceac",
+              "priced_actor_updates": 60663,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "late_gap": 1.996663588181482e-05,
+              "method": "ceac",
+              "priced_actor_updates": 60663,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "late_gap": 0.0013772332899308535,
+              "method": "ceac_natural",
+              "priced_actor_updates": 60663,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 60663,
+              "budget": 65536,
+              "late_gap": 0.0013820490185958057,
+              "method": "ceac_natural",
+              "priced_actor_updates": 60663,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.0027712851900177984,
+              "method": "idac",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.0030327006048301713,
+              "method": "idac",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.0,
+              "method": "ids_product",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.0,
+              "method": "ids_product",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.006627794125926044,
+              "method": "pomd",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.006442711175306319,
+              "method": "pomd",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.0,
+              "method": "ucb_q",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1001,
+              "task": 1
+            },
+            {
+              "actor_updates": 0,
+              "budget": 65536,
+              "late_gap": 0.0032031250000000002,
+              "method": "ucb_q",
+              "priced_actor_updates": 0,
+              "protocol": "locks",
+              "seed": 1002,
+              "task": 1
+            }
+          ],
+          "sources": {
+            "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+            "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+            "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+            "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+            "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+            "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+            "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+            "ceac_pathologies/__init__.py": "d25b0321836820cf1521fd7902c8430bbe6537fa79270534472d4eeecb72adab",
+            "ceac_pathologies/agent.py": "a49de4f175866d70972d54272b9e6314d03e2e0dccd42286b94ed3153286761e",
+            "ceac_pathologies/environments.py": "75f96e4c1c0bcaecd40a49d9695da0471b7512b7c84a69b309b7e15adcde6fea",
+            "ceac_pathologies/model.py": "884a8db485a468648483bb8b961b90791e106cc2ea4a76d2e58ee1160c03ada7",
+            "ceac_pathologies/run.py": "f37bb0b07eb32239f3897fc0119a5a19c3e2a4c9d2ab3c8260089b04c374940f",
+            "ceac_pseudocode/design.py": "c79737e97b896890ec37cf2f84f5a0379733fad334ebf5f6a1f38d774918fdae",
+            "ceac_pseudocode/learning.py": "3d573fed19ca1b2b6a2482746e9274573bec2a5de50d9f70ddcbcf26e6934cf0",
+            "ceac_stability/actor.py": "90b2d4ca84474dfac1327bfc8e3a8d566470e1ead1e75679a7d38619e05db2d5"
+          },
+          "tolerance": 0.025
+        },
+        "path": "runs/pathologies_locks_cal_20261119_v1/gate.json",
+        "sha256": "8652640e65b55a03397a4c72ec06ec95ddf21645cb660234c0f8eb6c7cd3cf97"
+      }
+    ],
+    "configuration": {
+      "calibration_seeds": [
+        1001,
+        1002
+      ],
+      "easy_gap_tolerance": 0.025,
+      "epistasis": {
+        "doses": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "episodes": 65536,
+        "intervention": "pleiotropic passenger modules k in {0,1,2,3} alongside 1-in-128 rare synthetic-rescue epistatic subtype: adds k high-MI zero-value passenger-omics channels and 4^k - 1 zero-KL aberrant pleiotropic knockouts",
+        "kinds": [
+          "epistatic_signalling"
+        ],
+        "methods": [
+          "idac",
+          "ucb_q",
+          "pomd",
+          "ids_canonical",
+          "ids_product",
+          "ceac",
+          "ceac_natural",
+          "oracle"
+        ],
+        "tasks": [
+          1
+        ]
+      },
+      "evaluation_seeds": [
+        0,
+        1,
+        2
+      ],
+      "locks": {
+        "doses": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "episodes": 65536,
+        "intervention": "sequential gated lock depth L (horizon H = L + 1) with anti-shaped live step cost, 3-lane diffusing dead sink, and opposing decoy lock in bidirectional_lock; useful returns and diagnostic KL fixed across L",
+        "kinds": [
+          "combination_lock",
+          "bidirectional_lock"
+        ],
+        "methods": [
+          "idac",
+          "ucb_q",
+          "pomd",
+          "ids_decoy",
+          "ids_product",
+          "ceac",
+          "ceac_natural",
+          "oracle"
+        ],
+        "tasks": [
+          1
+        ]
+      },
+      "notes": [
+        "Easy-case calibration (L=1 for locks, k=0 for epistasis) checks both tasks 0 and 1 on independent seeds 1001 and 1002.",
+        "Combination Lock and Bidirectional Lock share the identical L=1 easy baseline.",
+        "Primary CEAC uses Section-3 reward critic, price-conditioned evidence critic, and policy-labeled replay with coordinate-free row dominance and public confounder-equivalence reference certification.",
+        "ceac_natural evaluates the registered guarded natural/mirror actor extension from ceac_stability under the identical replay and two-critic loop.",
+        "ids_product receives the identical candidate model class and uniform full-support prior as CEAC; ids_decoy and ids_canonical test restricted biological/historical priors."
+      ],
+      "schema": 1,
+      "status": "calibration_gated_pathological_search_suite"
+    },
+    "driver_sha256": "89aaad0d73d38a2847a971d93ada53332c9e45d7619a1d08895450057c063f4a",
+    "episodes": 65536,
+    "jobs": 192,
+    "metric": "exact pre-trajectory expected policy gap; final 256 episodes; seed is replicate",
+    "phase": "sweep",
+    "protocol": "locks",
+    "python": "3.11.13",
+    "schema": 1,
+    "scope": "stationary multi-step combination locks and epistatic signalling discovery; replay-driven two-critic CEAC",
+    "sources": {
+      "ceac/contracts.py": "51828cae085e945b1523a824c9f6a67eb942cac6ac896f27b0863d87be3e86d8",
+      "ceac/model.py": "4f43c8e214d288c2c4c87921b5d350b595bc532832b374d1a297bc8b42b034a6",
+      "ceac/primitives.py": "bec054a548ad8db0fc3008ee6910ca398e4fd5596a59d84f33d7d0dd72536b1c",
+      "ceac_hardness/agents.py": "3b0ef5e090db58878d600588b30a8bd650fd46c365d9ed79d585a20975130bf8",
+      "ceac_hardness/design.py": "7edad6edac6427d72a788a4f3f600780268ff32e937577235b2992dd647ae82b",
+      "ceac_hardness/ids.py": "8cbacd586770f21faf40365c85ee8674482c3c3c8234fb4a56746eca55865f46",
+      "ceac_hardness/learning.py": "072e7a6fddea58dc6924ef1ce4b7688b84562b8f6f8d37675dc421aa7253fe96",
+      "ceac_pathologies/__init__.py": "d25b0321836820cf1521fd7902c8430bbe6537fa79270534472d4eeecb72adab",
+      "ceac_pathologies/agent.py": "a49de4f175866d70972d54272b9e6314d03e2e0dccd42286b94ed3153286761e",
+      "ceac_pathologies/environments.py": "75f96e4c1c0bcaecd40a49d9695da0471b7512b7c84a69b309b7e15adcde6fea",
+      "ceac_pathologies/model.py": "884a8db485a468648483bb8b961b90791e106cc2ea4a76d2e58ee1160c03ada7",
+      "ceac_pathologies/run.py": "f37bb0b07eb32239f3897fc0119a5a19c3e2a4c9d2ab3c8260089b04c374940f",
+      "ceac_pseudocode/design.py": "c79737e97b896890ec37cf2f84f5a0379733fad334ebf5f6a1f38d774918fdae",
+      "ceac_pseudocode/learning.py": "3d573fed19ca1b2b6a2482746e9274573bec2a5de50d9f70ddcbcf26e6934cf0",
+      "ceac_stability/actor.py": "90b2d4ca84474dfac1327bfc8e3a8d566470e1ead1e75679a7d38619e05db2d5"
+    }
+  },
+  "schema": 1
+}

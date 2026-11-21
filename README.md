@@ -12,6 +12,7 @@ The verified studies contain 144 physical-burden cells and 90 fixed-prior-shift 
 - [Actor-failure diagnosis](audits/ceac_actor_failure_20261112/assessment.md): dense evidence, early sampling noise, softmax saturation, and conservative replay prices.
 - [Actor-stability assessment](notebooks/evidence/actor_stability/assessment.md) and [protocol](docs/actor_stability_protocol.md): implemented schedules, interior-simplex constraints and guarded natural/mirror updates. Calibration preserves the original endpoint-first selection; a separately registered comparison tests the natural update's learning-cost tradeoff.
 - [Implementation and reproduction](docs/hardness_implementation.md), [pseudocode fidelity audit](audits/ceac_pseudocode_fidelity_20261111.md).
+- **Pathological Search Suite ([notebook](notebooks/Pathological_Search_Suite.ipynb) & [protocol](docs/pathological_search_suite.md))**: extends evaluation beyond two-step junctions to [Sequential Combination & Bidirectional Locks](notebooks/evidence/pathologies_locks/assessment.md) ($L \in \{1, 2, 3, 4\}$), [Epistatic Signalling Discovery under Pleiotropic Confounding](notebooks/evidence/pathologies_epistasis/assessment.md) ($k \in \{0, 1, 2, 3\}$, $M \le 1,024$), and [Pairwise Interaction Screening on the Horlbeck 2018 K562 Matrix with Greedy Price-Ranked CEAC](notebooks/evidence/pathologies_gi_ranked/assessment.md) (`ceac_gi` & `ceac_ranked`, including optimal-action-MI IDS `ids_action`).
 
 The original three-seed physical-burden study shows substantial deterioration of IDAC and optimistic POMD while CEAC’s final losses stay small on those seeds. Fresh five-seed optimizer confirmation exposes additional original-CEAC failures at Undertow B=64; the guarded natural update reduces those large actor errors, with a probability-floor cost in other cases. The original comparison figures retain their recorded optimizer and seed set. UCB’s increased learning cost is distinct from persistent final loss. The frozen correlated prior fails at full reversal; product-support IDS remains successful. **CEAC has a held-out task-0 actor-learning exception**, preserved in the means, bands and [saved-observation audit](audits/ceac_primary_actor_replay_20261111.json). The study does not support universal robustness or isolate each component’s causal effect.
 
@@ -154,6 +155,9 @@ studies remain local and keep their original source identities.
 | `ceac_pseudocode/` | Primary two-critic CEAC, replay master, calibration and studies |
 | `ceac_hardness/` | Junction variants, finite model compiler, IDS, primitive controls and reports |
 | `ceac_stability/` | Separately versioned full-CEAC optimizer settings, frozen calibration and fresh-seed assessment |
+| `ceac_pathologies/` | Multi-step combination locks, signalling activation under pleiotropy, sparse DAG compiler and optimal-action IDS |
+| `ceac_gi/` | Verified Horlbeck 2018 K562 pairwise interaction panel benchmark (`gi_arrayed` and `gi_multiplexed`) |
+| `ceac_ranked/` | Greedy maximally-disagreeing column admission and dynamic evidence-price ranked replay extension |
 | `ceac_walkthrough/` | Explanatory maps, scientific assessment and portable evidence loader |
 | `notebooks/` | Compact main walkthrough, detailed diagnostic appendix and verified evidence |
 | `scripts/` | Staged breadth launcher, evidence export and notebook verification |

@@ -10,7 +10,7 @@
     "hardness_prior": "f70ef390238572b636651cf6f120102ebbc21dfc8fee0fdc48e6971831544119",
     "mechanisms": "42da881778c0bf083e2946350f44ca5aed8b55a211e71705a28be81d0d22aae7"
   },
-  "notebook_sha256": "2e1d2269a59cb854501b7e0499edcca9b74e6fb0047d67e62b92f86834de58d8",
+  "notebook_sha256": "9f3c0e117a64bdbdb238fc60b9cc533de022bdf59ee7699deea78b19b4c8fbea",
   "packages": {
     "ipykernel": "7.4.0",
     "matplotlib": "3.11.2",

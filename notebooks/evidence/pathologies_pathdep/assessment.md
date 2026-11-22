@@ -77,3 +77,36 @@ Verified **288** held-out sweep cells (`seeds = 0, 1, 2`, `32,768` episodes / `9
 | Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | CEAC · guarded natural | +17,702.2 ± 3.8 | True |
 | Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | CEAC · greedy + price-ranked (guarded natural) | +333.6 ± 6.8 | True |
 | Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | Oracle Graves–Lai | -40.1 ± 5.2 | False |
+
+## Held-Out Reward & Evidence Critic TD / Bellman Error Audit
+
+Evaluated at 12 log-spaced checkpoints (`t = 16 .. 32,768`) on **512 independent held-out evaluation rollouts** per checkpoint (`256` on-policy + `256` exploratory DAG-probe rollouts in an isolated `eval_env` with zero training-state mutation; bit-for-bit cumulative regret parity verified against the registered sweep).
+
+![Held-out Reward and Evidence Critic Bellman error trajectories](pathdep_critic_bellman_traces.png)
+
+![Held-out Evidence Critic scaling across k](pathdep_critic_dose_scaling.png)
+
+| Benchmark (`k = 3`, `t = 32,768`) | Algorithm | Held-Out Reward Bellman RMSE | Native Evidence Critic RMSE | Bounded Stage-Epistemic RMSE |
+|---|---|---:|---:|---:|
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | IDAC · occupancy ratio | 0.1822 | 1.2078 | 1.2078 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | UCB Q-learning | 5.6582 | 10.5133 | 10.5133 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | Optimistic POMD | 0.6090 | 9.7921 | 9.7921 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | IDS · null / no-rewiring prior | 0.0326 | 11,968.7937 | 0.3887 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | IDS · full-model MI I(θ,ξ; Z) | 0.0172 | 16,650.0229 | 0.0202 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | IDS · optimal-policy MI I(Π*; Z) (Russo–Van Roy) | 0.0206 | 16,715.7610 | 0.0191 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | IDS · on-path quotient MI I(C*_onpath; Z) | 0.0186 | 16,770.4400 | 0.3430 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | CEAC · reward + evidence critics | 0.0033 | 0.0044 | 0.0044 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | CEAC · guarded natural | 0.0021 | 0.0039 | 0.0039 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | CEAC · greedy disagreement + price-ranked replay | 0.0482 | 0.0000 | 0.0000 |
+| Path-Dependent Signalling Rewiring (EGFR/MEK Priming, H = 3) | CEAC · greedy + price-ranked (guarded natural) | 0.0223 | 0.0000 | 0.0000 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | IDAC · occupancy ratio | 0.1706 | 1.2874 | 1.2874 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | UCB Q-learning | 6.0541 | 10.2993 | 10.2993 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | Optimistic POMD | 0.6200 | 9.8996 | 9.8996 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | IDS · null / no-rewiring prior | 0.0307 | 11,044.3534 | 0.3584 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | IDS · full-model MI I(θ,ξ; Z) | 0.0079 | 36,010.7142 | 0.0082 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | IDS · optimal-policy MI I(Π*; Z) (Russo–Van Roy) | 0.0133 | 36,027.4020 | 0.0091 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | IDS · on-path quotient MI I(C*_onpath; Z) | 0.0196 | 36,061.2976 | 0.3080 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | CEAC · reward + evidence critics | 0.0000 | 0.0026 | 0.0026 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | CEAC · guarded natural | 0.0039 | 0.0034 | 0.0034 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | CEAC · greedy disagreement + price-ranked replay | 0.0233 | 0.0000 | 0.0000 |
+| Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3) | CEAC · greedy + price-ranked (guarded natural) | 0.0085 | 0.0000 | 0.0000 |

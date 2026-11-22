@@ -119,7 +119,7 @@ def pathdep_source_identity() -> dict[str, str]:
     out = dict(base_source_identity())
     for pkg in ("ceac_ranked", "ceac_pathdep"):
         for p in sorted((ROOT / pkg).glob("*.py")):
-            if p.name != "study.py":
+            if p.name not in {"study.py", "critic_audit.py"}:
                 out[str(p.relative_to(ROOT))] = digest(p)
     return out
 

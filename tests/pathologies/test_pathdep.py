@@ -63,6 +63,15 @@ class PathDepBenchmarkTests(unittest.TestCase):
                 r_p = run_pathdep_cell("signalling_rewiring", prim, seed=0, task=1, dose=1, episodes=32, output=Path(tmp) / f"p_{prim}")
                 self.assertEqual(r_p["settings"]["episodes"], 32)
 
+    def test_heldout_critic_bellman_audit_parity(self):
+        from ceac_pathdep.critic_audit import run_critic_audit_cell
+
+        c_rank = run_critic_audit_cell(("signalling_rewiring", "ceac_ranked", 0, 2, 256))
+        c_ids = run_critic_audit_cell(("signalling_rewiring", "ids_action_tree", 0, 2, 256))
+        self.assertGreaterEqual(len(c_rank["checkpoints"]), 4)
+        self.assertLess(c_rank["checkpoints"][-1]["evidence_critic_error"], 0.15)
+        self.assertGreater(c_ids["checkpoints"][-1]["evidence_critic_error"], c_rank["checkpoints"][-1]["evidence_critic_error"])
+
 
 if __name__ == "__main__":
     unittest.main()

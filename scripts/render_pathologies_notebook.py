@@ -97,11 +97,17 @@ from ceac_pathdep.study import (
     draw_pathdep_overlaid_performance,
     load_pathdep_export,
 )
+from ceac_pathdep.critic_audit import (
+    draw_critic_bellman_traces,
+    draw_critic_dose_scaling,
+    load_critic_audit,
+)
 
 locks = load_export(ROOT / "notebooks/evidence/pathologies_locks")
 epistasis = load_export(ROOT / "notebooks/evidence/pathologies_epistasis")
 gi_ranked = load_gi_ranked_export(ROOT / "notebooks/evidence/pathologies_gi_ranked")
 pathdep = load_pathdep_export(ROOT / "notebooks/evidence/pathologies_pathdep")
+critic_audit = load_critic_audit(ROOT / "notebooks/evidence/pathologies_pathdep")
 
 print(
     f"Verified portable exports: {len(locks['runs'])} lock cells, "
@@ -331,6 +337,18 @@ plt.show()""",
     code(
         "pathdep-discovery-traces",
         """fig = draw_pathdep_discovery_traces(pathdep, dose=3)
+plt.show()""",
+    )
+
+    code(
+        "pathdep-critic-bellman-traces",
+        """fig = draw_critic_bellman_traces(critic_audit, dose=3)
+plt.show()""",
+    )
+
+    code(
+        "pathdep-critic-dose-scaling",
+        """fig = draw_critic_dose_scaling(critic_audit)
 plt.show()""",
     )
 

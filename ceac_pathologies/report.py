@@ -548,6 +548,87 @@ def draw_mechanisms(bundle: dict):
     return fig
 
 
+def _windowed_event_rate(trace: list[dict], keys: tuple[str, ...]) -> tuple[np.ndarray, np.ndarray]:
+    """Compute exact per-window event percentages across 512-episode intervals."""
+    pts = trace[1:] if len(trace) > 1 and trace[0]["episode"] == 1 else trace
+    xs = np.array([t["episode"] for t in pts], dtype=float) / 1000.0
+    rates = np.zeros(len(pts), dtype=float)
+    for i, row in enumerate(pts):
+        if i == 0:
+            dt = float(row["episode"])
+            de = sum(float(row["events"].get(k, 0)) for k in keys)
+        else:
+            prev = pts[i - 1]
+            dt = float(row["episode"] - prev["episode"])
+            de = sum(float(row["events"].get(k, 0) - prev["events"].get(k, 0)) for k in keys)
+        rates[i] = 100.0 * de / max(dt, 1.0)
+    return xs, rates
+
+
+def draw_epistasis_discovery_traces(bundle: dict, dose: int = 3, task: int = 1):
+    """Render 4-panel time-trace view of performance gap and discovery mechanics on epistasis."""
+    import matplotlib.pyplot as plt
+    _apply_style()
+
+    runs = [r for r in bundle["runs"] if r["kind"] == "epistatic_signalling" and r["task"] == task and r["dose"] == dose]
+    methods = [m for m in METHOD_ORDER if any(r["method"] == m for r in runs)]
+
+    fig, axes = plt.subplots(2, 2, figsize=(13.2, 8.3))
+    panels = [
+        ("gap", "Policy Suboptimality Gap ↓", "Rolling 256-episode policy gap ↓", (-0.03, 1.03)),
+        (("synergy",), "Causal Responder Lock-On Rate ↑ (K1 ∧ K2 Synergy)", "Episodes selecting causal synergy (%)", (-3.0, 105.0)),
+        (("passenger_omics",), "Non-Causal Passenger-Omics Distraction ↓", "Episodes profiling passenger omics (%)", (-3.0, 105.0)),
+        (("pleiotropic",), "Off-Pathway Pleiotropic State Capture ↓", "Episodes entering off-pathway arms (%)", (-3.0, 105.0)),
+    ]
+    xticks = [0.512, 1.0, 2.0, 5.0, 10.0, 25.0, 65.536]
+    xticklabels = ["0.5k", "1k", "2k", "5k", "10k", "25k", "65k"]
+
+    for ax, (spec, title, ylab, ylim) in zip(axes.flat, panels):
+        for method in methods:
+            cells = sorted([r for r in runs if r["method"] == method], key=lambda r: r["seed"])
+            if not cells:
+                continue
+            if spec == "gap":
+                pts_list = [r["trace"][1:] if len(r["trace"]) > 1 and r["trace"][0]["episode"] == 1 else r["trace"] for r in cells]
+                xs = np.array([t["episode"] for t in pts_list[0]], dtype=float) / 1000.0
+                vals = np.array([[t["window_gap"] for t in pts] for pts in pts_list], dtype=float)
+            else:
+                series = [_windowed_event_rate(r["trace"], spec) for r in cells]
+                xs = series[0][0]
+                vals = np.array([s[1] for s in series], dtype=float)
+            mean = vals.mean(axis=0)
+            sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
+            color = METHOD_COLORS[method]
+            ls = "--" if method == "ids_product" else (":" if method == "oracle" else "-")
+            lw = 2.3 if method.startswith("ceac") or method == "ids_action" else 1.55
+            zord = 6 if method.startswith("ceac") or method == "ids_action" else 3
+            ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=color, alpha=0.12, linewidth=0)
+            ax.plot(xs, mean, label=LABELS[method], color=color, lw=lw, linestyle=ls, zorder=zord)
+        ax.set_xscale("log")
+        ax.set_xlim(0.50, 67.0)
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(xticklabels)
+        ax.minorticks_off()
+        ax.set_ylim(*ylim)
+        ax.set_title(title, fontsize=11, pad=8)
+        ax.set_xlabel("Training episodes (log scale)", fontsize=9.8, labelpad=5)
+        ax.set_ylabel(ylab, fontsize=9.8)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
+
+    n_mod = 128 * (2 ** dose)
+    n_pleio = (4 ** dose) - 1
+    fig.suptitle(
+        f"Epistatic Signalling / Protein Activation · Performance & Discovery Time Traces (k = {dose}, M = {n_mod:,}, {n_pleio} off-pathway arms)",
+        fontsize=12.8,
+        y=0.985,
+    )
+    fig.tight_layout(rect=(0.0, 0.13, 1.0, 0.945))
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.11), ncol=3, frameon=False, fontsize=9.2)
+    return fig
+
+
 def summary_markdown(bundle: dict, rows: list[dict], contrasts: list[dict]) -> str:
     protocol = bundle["registration"]["protocol"]
     cfg = bundle["registration"]["configuration"]
@@ -577,6 +658,15 @@ def summary_markdown(bundle: dict, rows: list[dict], contrasts: list[dict]) -> s
     for kind in sorted({r["kind"] for r in rows}):
         lines.append(f"![{KINDS[kind]} cumulative regret fans]({kind}_task1_cumulative_regret.png)")
         lines.append("")
+        lines.append(f"![{KINDS[kind]} expected policy gap trajectories]({kind}_task1_window_gap.png)")
+        lines.append("")
+    if protocol == "epistasis":
+        lines += [
+            "## Discovery-Process Effectiveness Over Time (`k = 3`, `M = 1,024`)",
+            "",
+            "![Epistatic Signalling discovery and performance time traces](epistatic_signalling_discovery_traces.png)",
+            "",
+        ]
     lines += [
         "## Weakest-to-Strongest Pathology Summary (Task 1)",
         "",
@@ -690,6 +780,13 @@ def export(folder: Path | str, output: Path | str):
     for suffix in ("png", "pdf"):
         arch_fig.savefig(output / f"architecture.{suffix}", dpi=180, bbox_inches="tight")
     plt.close(arch_fig)
+
+    if bundle["registration"]["protocol"] == "epistasis":
+        max_dose = max(r["dose"] for r in bundle["runs"])
+        disc_fig = draw_epistasis_discovery_traces(bundle, dose=max_dose, task=1)
+        for suffix in ("png", "pdf"):
+            disc_fig.savefig(output / f"epistatic_signalling_discovery_traces.{suffix}", dpi=180, bbox_inches="tight")
+        plt.close(disc_fig)
 
     with gzip.open(output / "evidence.json.gz", "wt") as f:
         json.dump(bundle, f, allow_nan=False, separators=(",", ":"))

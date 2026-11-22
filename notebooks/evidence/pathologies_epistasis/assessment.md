@@ -14,6 +14,12 @@ Verified **108** completed cells (3 held-out seeds per condition, 65,536 episode
 
 ![Epistatic Signalling Pathway cumulative regret fans](epistatic_signalling_task1_cumulative_regret.png)
 
+![Epistatic Signalling Pathway expected policy gap trajectories](epistatic_signalling_task1_window_gap.png)
+
+## Discovery-Process Effectiveness Over Time (`k = 3`, `M = 1,024`)
+
+![Epistatic Signalling discovery and performance time traces](epistatic_signalling_discovery_traces.png)
+
 ## Weakest-to-Strongest Pathology Summary (Task 1)
 
 | Environment | Algorithm | Final gap: min → max | Regret: min → max | Primary distraction (max dose) |

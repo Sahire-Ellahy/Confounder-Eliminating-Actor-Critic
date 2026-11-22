@@ -376,6 +376,169 @@ def draw_gi_ranked_mechanisms(summary_rows: list[dict]):
     return fig_m
 
 
+def _load_compact_traces(results: list[dict]) -> list[dict]:
+    """Load compact columnar trajectories from each completed cell's trace.jsonl.gz."""
+    traces = []
+    for r in sorted(results, key=lambda x: (x["kind"], x["task"], x["dose"], x["method"], x["seed"])):
+        cell_dir = Path(r["folder"])
+        if not cell_dir.is_absolute():
+            cell_dir = ROOT / cell_dir
+        with gzip.open(cell_dir / "trace.jsonl.gz", "rt") as f:
+            rows = [json.loads(line) for line in f]
+        traces.append(
+            dict(
+                kind=r["kind"],
+                dose=int(r["dose"]),
+                task=int(r["task"]),
+                method=r["method"],
+                seed=int(r["seed"]),
+                episode=[int(t["episode"]) for t in rows],
+                window_gap=[round(float(t["window_gap"]), 6) for t in rows],
+                cumulative_regret=[round(float(t["cumulative_regret"]), 3) for t in rows],
+                sl_pair=[int(t["events"].get("sl_pair", 0)) for t in rows],
+                pair_test=[int(t["events"].get("pair_test", 0)) for t in rows],
+                block=[int(t["events"].get("block", 0)) for t in rows],
+                passenger_omics=[int(t["events"].get("passenger_omics", 0)) for t in rows],
+                control=[int(t["events"].get("control", 0)) for t in rows],
+            )
+        )
+    return traces
+
+
+def _compact_window_rate(tr: dict, keys: tuple[str, ...]) -> tuple[np.ndarray, np.ndarray]:
+    eps = tr["episode"]
+    start = 1 if len(eps) > 1 and eps[0] == 1 else 0
+    xs = np.array(eps[start:], dtype=float) / 1000.0
+    rates = np.zeros(len(xs), dtype=float)
+    for out_i, idx in enumerate(range(start, len(eps))):
+        if out_i == 0:
+            dt = float(eps[idx])
+            de = sum(float(tr[k][idx]) for k in keys)
+        else:
+            dt = float(eps[idx] - eps[idx - 1])
+            de = sum(float(tr[k][idx] - tr[k][idx - 1]) for k in keys)
+        rates[out_i] = 100.0 * de / max(dt, 1.0)
+    return xs, rates
+
+
+def draw_gi_ranked_learning(gi_bundle: dict, kind: str, metric: str = "cumulative_regret"):
+    """Small-multiple per-algorithm time traces across confounding doses k = 0..3."""
+    import math
+    import matplotlib.pyplot as plt
+    from ceac_pathologies.report import DOSE_COLORS
+
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    traces = [t for t in gi_bundle["traces"] if t["kind"] == kind and t["task"] == 1]
+    summary_rows = [r for r in gi_bundle["summary_rows"] if r["kind"] == kind and r["task"] == 1]
+    methods = [m for m in RANKED_ORDER if any(t["method"] == m for t in traces)]
+    doses = sorted({t["dose"] for t in traces})
+    cols = 3
+    rows_n = math.ceil(len(methods) / cols)
+    fig, axes = plt.subplots(rows_n, cols, figsize=(13.8, 3.25 * rows_n), squeeze=False, sharex=True, sharey=True)
+    badge_box = dict(boxstyle="round,pad=0.22", facecolor="white", edgecolor="none", alpha=0.88)
+
+    for idx, (ax, m) in enumerate(zip(axes.flat, methods)):
+        for dose, color in zip(doses, DOSE_COLORS):
+            cells = sorted([t for t in traces if t["method"] == m and t["dose"] == dose], key=lambda x: x["seed"])
+            xs = np.array(cells[0]["episode"], dtype=float) / 1000.0
+            vals = np.array([c[metric] for c in cells], dtype=float)
+            mean = vals.mean(axis=0)
+            sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
+            ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=color, alpha=0.14, linewidth=0)
+            ax.plot(xs, mean, color=color, lw=1.7, label=f"k = {dose}", zorder=3)
+        lo_row = next(r for r in summary_rows if r["method"] == m and r["dose"] == doses[0])
+        hi_row = next(r for r in summary_rows if r["method"] == m and r["dose"] == doses[-1])
+        if metric == "window_gap":
+            ax.text(
+                0.97, 0.96, f"Gap: {lo_row['late_gap_mean']:.3f} → {hi_row['late_gap_mean']:.3f}",
+                ha="right", va="top", transform=ax.transAxes, fontsize=8.3, color="#222222", bbox=badge_box, zorder=8,
+            )
+            ax.set_ylim(-0.04, 1.08)
+            ax.set_yticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+        else:
+            ax.text(
+                0.03, 0.96, f"Regret (k={doses[-1]}): {hi_row['regret_mean']:,.0f}",
+                ha="left", va="top", transform=ax.transAxes, fontsize=8.3, color="#222222", bbox=badge_box, zorder=8,
+            )
+        ax.set_title(RANKED_LABELS[m], fontsize=9.8, pad=7)
+        ax.grid(alpha=0.18)
+        ax.spines[["top", "right"]].set_visible(False)
+        ax.set_xlim(0, xs[-1])
+        if idx + cols >= len(methods):
+            ax.xaxis.set_tick_params(labelbottom=True)
+    for ax in list(axes.flat)[len(methods):]:
+        ax.set_visible(False)
+
+    fig.supxlabel("Training episodes (thousands)", fontsize=11, y=0.012)
+    fig.supylabel("Expected policy gap ↓" if metric == "window_gap" else "Cumulative expected regret ↓", fontsize=11, x=0.01)
+    fig.suptitle(f"{KINDS[kind]} · Non-causal main-effect confounding sweep (k = 0..3) · Task 1", fontsize=13.2, y=0.992)
+    handles, labels = axes.flat[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=len(doses), frameon=False, bbox_to_anchor=(0.5, 0.962), fontsize=9.8)
+    fig.tight_layout(rect=(0.028, 0.032, 0.995, 0.935))
+    return fig
+
+
+def draw_gi_discovery_traces(gi_bundle: dict, dose: int = 3):
+    """Render 3x2 visual discovery-effectiveness trajectories across arrayed and multiplexed GI screens."""
+    import matplotlib.pyplot as plt
+
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    traces = [t for t in gi_bundle["traces"] if t["task"] == 1 and t["dose"] == dose]
+    methods = [m for m in RANKED_ORDER if m != "oracle" and any(t["method"] == m for t in traces)]
+    kinds = ["gi_arrayed", "gi_multiplexed"]
+    row_specs = [
+        (("sl_pair",), "True Interacting Pair (FDPS–PPP2R1A) Lock-On ↑", "Active pair selection (%)"),
+        (("passenger_omics",), "Non-Causal Main-Effect Confounder Distraction ↓", "Main-effect profiling (%)"),
+        (("pair_test", "block"), "Inactive Pair & Pooled-Block Screening Overhead ↓", "Inactive pair / block tests (%)"),
+    ]
+    xticks = [0.512, 1.0, 2.0, 5.0, 10.0, 25.0, 65.536]
+    xticklabels = ["0.5k", "1k", "2k", "5k", "10k", "25k", "65k"]
+
+    fig, axes = plt.subplots(3, 2, figsize=(13.6, 10.8), sharex=False, sharey=True)
+    for r_idx, (keys, row_title, ylab) in enumerate(row_specs):
+        for c_idx, kind in enumerate(kinds):
+            ax = axes[r_idx, c_idx]
+            for m in methods:
+                cells = sorted([t for t in traces if t["kind"] == kind and t["method"] == m], key=lambda x: x["seed"])
+                if not cells:
+                    continue
+                series = [_compact_window_rate(c, keys) for c in cells]
+                xs = series[0][0]
+                vals = np.array([s[1] for s in series], dtype=float)
+                mean = vals.mean(axis=0)
+                sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
+                col = RANKED_COLORS[m]
+                is_ranked = m.startswith("ceac_ranked")
+                ls = "--" if m in {"ceac", "ceac_natural", "ids_product"} else "-"
+                lw = 2.4 if is_ranked else (1.9 if m == "ids_action" else 1.45)
+                zord = 7 if is_ranked else (5 if m in {"ids_action", "ceac"} else 3)
+                ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=col, alpha=0.11, linewidth=0)
+                ax.plot(xs, mean, label=RANKED_LABELS[m], color=col, lw=lw, linestyle=ls, zorder=zord)
+            ax.set_xscale("log")
+            ax.set_xlim(0.50, 67.0)
+            ax.set_xticks(xticks)
+            ax.set_xticklabels(xticklabels)
+            ax.minorticks_off()
+            ax.set_ylim(-3.0, 105.0)
+            short_kind = "Arrayed K562 Screen" if kind == "gi_arrayed" else "Multiplexed Pooled-Block Screen"
+            ax.set_title(f"{short_kind} · {row_title}", fontsize=10.3, pad=7)
+            ax.set_xlabel("Training episodes (log scale)", fontsize=9.5, labelpad=4)
+            if c_idx == 0:
+                ax.set_ylabel(ylab, fontsize=9.8)
+            ax.grid(alpha=0.2)
+            ax.spines[["top", "right"]].set_visible(False)
+
+    fig.suptitle(
+        f"Horlbeck 2018 K562 Pair Screen · Discovery Process Effectiveness Over Time (k = {dose}, M = {46 * (2 ** dose):,})",
+        fontsize=13.0,
+        y=0.99,
+    )
+    fig.tight_layout(rect=(0.0, 0.115, 1.0, 0.958))
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.098), ncol=3, frameon=False, fontsize=8.8)
+    return fig
+
+
 def export_gi_comparison(study_dir: Path, cal_dir: Path | None, out_dir: Path):
     import matplotlib
     matplotlib.use("Agg")
@@ -436,6 +599,21 @@ def export_gi_comparison(study_dir: Path, cal_dir: Path | None, out_dir: Path):
         fig_m.savefig(out_dir / f"gi_ranked_mechanisms.{ext}", dpi=180, bbox_inches="tight")
     plt.close(fig_m)
 
+    traces = _load_compact_traces(results)
+    bundle_for_plots = dict(summary_rows=summary_rows, traces=traces)
+
+    fig_disc = draw_gi_discovery_traces(bundle_for_plots, dose=max(doses))
+    for ext in ("png", "pdf"):
+        fig_disc.savefig(out_dir / f"gi_discovery_traces.{ext}", dpi=180, bbox_inches="tight")
+    plt.close(fig_disc)
+
+    for kind in kinds:
+        for metric in ("window_gap", "cumulative_regret"):
+            fig_l = draw_gi_ranked_learning(bundle_for_plots, kind, metric=metric)
+            for ext in ("png", "pdf"):
+                fig_l.savefig(out_dir / f"{kind}_task1_{metric}.{ext}", dpi=180, bbox_inches="tight")
+            plt.close(fig_l)
+
     # Paired seed-by-seed regret saved by ceac_ranked at k = max(doses)
     by_key = {(r["kind"], r["dose"], r["method"], r["seed"]): r for r in results if r["task"] == 1}
     seeds = sorted({r["seed"] for r in results})
@@ -478,6 +656,20 @@ def export_gi_comparison(study_dir: Path, cal_dir: Path | None, out_dir: Path):
         "## Mechanism Diagnostics (Active Bank Compression & Confounder Immunity)",
         "",
         "![Active bank size and main-effect profiling](gi_ranked_mechanisms.png)",
+        "",
+        "## Visual Discovery-Process Time Traces (`k = 3`, `M = 368`)",
+        "",
+        "![K562 pair discovery and distraction trajectories](gi_discovery_traces.png)",
+        "",
+        "## Per-Algorithm Performance Time Traces (`k = 0 .. 3`)",
+        "",
+        "![Arrayed screen expected policy gap](gi_arrayed_task1_window_gap.png)",
+        "",
+        "![Arrayed screen cumulative regret](gi_arrayed_task1_cumulative_regret.png)",
+        "",
+        "![Multiplexed screen expected policy gap](gi_multiplexed_task1_window_gap.png)",
+        "",
+        "![Multiplexed screen cumulative regret](gi_multiplexed_task1_cumulative_regret.png)",
         "",
     ]
     if cal_results:
@@ -548,6 +740,7 @@ def export_gi_comparison(study_dir: Path, cal_dir: Path | None, out_dir: Path):
         paired_rows=paired_rows,
         calibration_rows=cal_results,
         sweep_rows=results,
+        traces=traces,
         sources=ranked_source_identity(),
     )
     with gzip.open(out_dir / "evidence.json.gz", "wt") as f:
@@ -567,6 +760,7 @@ def main():
     parser.add_argument("--tag", default="20261120_ranked_v1")
     parser.add_argument("--workers", type=int, default=10)
     parser.add_argument("--episodes", type=int, default=65536)
+    parser.add_argument("--export-only", action="store_true", help="Re-export figures and portable bundle from completed study")
     args = parser.parse_args()
 
     from ceac_gi.environment import build_config
@@ -574,6 +768,11 @@ def main():
     cal_dir = ROOT / "runs" / f"gi_ranked_cal_{args.tag}"
     sweep_dir = ROOT / "runs" / f"gi_ranked_sweep_{args.tag}"
     out_dir = ROOT / "notebooks" / "evidence" / "pathologies_gi_ranked"
+
+    if args.export_only:
+        export_gi_comparison(sweep_dir, cal_dir, out_dir)
+        print(f"Exported GI ranked study to {out_dir}", flush=True)
+        return
 
     cal_dir.mkdir(parents=True, exist_ok=True)
     sweep_dir.mkdir(parents=True, exist_ok=True)

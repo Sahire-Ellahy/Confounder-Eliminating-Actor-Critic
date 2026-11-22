@@ -68,6 +68,7 @@ from ceac_pathologies.report import (
     KINDS,
     LABELS,
     draw_architecture,
+    draw_epistasis_discovery_traces,
     draw_learning,
     draw_mechanisms,
     draw_response,
@@ -77,6 +78,8 @@ from ceac_pathologies.report import (
 )
 from ceac_ranked.study import (
     RANKED_LABELS,
+    draw_gi_discovery_traces,
+    draw_gi_ranked_learning,
     draw_gi_ranked_mechanisms,
     draw_gi_ranked_response,
     load_gi_ranked_export,
@@ -168,7 +171,14 @@ plt.show()""",
 
     code(
         "epistasis-learning-fans",
-        """fig = draw_learning(epistasis, "epistatic_signalling", task=1, metric="cumulative_regret")
+        """for metric in ("window_gap", "cumulative_regret"):
+    fig = draw_learning(epistasis, "epistatic_signalling", task=1, metric=metric)
+    plt.show()""",
+    )
+
+    code(
+        "epistasis-discovery-traces",
+        """fig = draw_epistasis_discovery_traces(epistasis, dose=3, task=1)
 plt.show()""",
     )
 
@@ -212,6 +222,20 @@ plt.show()""",
         "gi-mechanisms",
         """fig = draw_gi_ranked_mechanisms(gi_ranked["summary_rows"])
 plt.show()""",
+    )
+
+    code(
+        "gi-discovery-traces",
+        """fig = draw_gi_discovery_traces(gi_ranked, dose=3)
+plt.show()""",
+    )
+
+    code(
+        "gi-learning-fans",
+        """for kind in ("gi_arrayed", "gi_multiplexed"):
+    for metric in ("window_gap", "cumulative_regret"):
+        fig = draw_gi_ranked_learning(gi_ranked, kind, metric=metric)
+        plt.show()""",
     )
 
     code(

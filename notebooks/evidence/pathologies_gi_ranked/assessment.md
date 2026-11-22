@@ -13,6 +13,20 @@ Verified **288** held-out sweep cells (`seeds = 0, 1, 2`, `65,536` episodes/cell
 
 ![Active bank size and main-effect profiling](gi_ranked_mechanisms.png)
 
+## Visual Discovery-Process Time Traces (`k = 3`, `M = 368`)
+
+![K562 pair discovery and distraction trajectories](gi_discovery_traces.png)
+
+## Per-Algorithm Performance Time Traces (`k = 0 .. 3`)
+
+![Arrayed screen expected policy gap](gi_arrayed_task1_window_gap.png)
+
+![Arrayed screen cumulative regret](gi_arrayed_task1_cumulative_regret.png)
+
+![Multiplexed screen expected policy gap](gi_multiplexed_task1_window_gap.png)
+
+![Multiplexed screen cumulative regret](gi_multiplexed_task1_cumulative_regret.png)
+
 ## Easy-Case Calibration Comparison (`dose = 0`, `seeds 1001, 1002`, Tasks 0 & 1)
 
 | Screen Variant | Task | Algorithm | Active Bank Columns | Final Gap (mean) | Cumulative Regret (mean) |

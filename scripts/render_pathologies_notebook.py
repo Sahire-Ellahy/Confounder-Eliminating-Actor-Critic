@@ -18,6 +18,7 @@ from nbclient import NotebookClient
 from jupyter_client import KernelManager
 from ceac_pathologies.report import load_export as load_pathology_export
 from ceac_ranked.study import load_gi_ranked_export
+from ceac_pathdep.study import load_pathdep_export
 
 
 def build_notebook() -> nbf.NotebookNode:
@@ -44,6 +45,7 @@ This notebook loads, verifies, and renders all three benchmark families extendin
 1. **Sequential Combination Lock & Bidirectional ("Diabolical") Combination Lock (`ceac_pathologies`, `locks`)** — Sweeps gated lock horizon $L \\in \\{1, 2, 3, 4\\}$ ($H = L + 1$) with anti-shaped step costs, a 3-lane diffusing dead-end sink, and an opposing $0.50$ decoy chain while holding route returns and diagnostic KL strictly invariant across depth.
 2. **Epistatic Signalling / Protein Activation under Pleiotropic Confounding (`ceac_pathologies`, `epistasis`)** — Tests discovery of a $1$-in-$128$ rare synthetic-rescue responder amidst $k \\in \\{0, 1, 2, 3\\}$ non-causal passenger-omics channels ($M = 128 \\cdot 2^k \\in \\{128, 256, 512, 1024\\}$) and $4^k - 1 \\in \\{0, 3, 15, 63\\}$ zero-reward off-pathway pleiotropic states.
 3. **Pairwise Interaction Screen on the Published Horlbeck 2018 K562 Matrix + Greedy Price-Ranked CEAC (`ceac_gi` & `ceac_ranked`)** — Evaluates sequential pairwise discovery on a verified 10-variable / 45-pair human K562 interaction score panel (`FDPS–PPP2R1A`, $\\text{GI} = -5.24$) under $k \\in \\{0, 1, 2, 3\\}$ non-causal single-variable main-effect confounders, comparing certified Section-3 `ceac` against the **greedy maximally-disagreeing + dynamic evidence-price ranked replay** extension (`ceac_ranked`) and Russo–Van Roy optimal-action-MI IDS (`ids_action`).
+4. **Path-Dependent Signalling Rewiring & Canalized K562 Genetic Risk (`ceac_pathdep`, $H = 3$)** — Tests multi-step state-contingent optimal interventions (`signalling_rewiring` EGFR/MEK priming and `canalized_gi` K562 `PPP2R1A` hub de-canalization), separating CEAC's additive pairwise KL evidence critic $Q_I(s, a; \\beta)$ from **both** Russo–Van Roy optimal-policy MI $I(\\Pi^\\star; Z)$ (`ids_action_tree`) and quotiented on-path class MI $I(C_{\\text{on-path}}^\\star; Z)$ (`ids_action_onpath`).
 
 All figures are rendered live from compact, SHA-256-verified portable exports under `notebooks/evidence/`; raw `/runs` trajectories are never required and no training is launched when executing the notebook.""",
     )
@@ -86,15 +88,26 @@ from ceac_ranked.study import (
     draw_gi_ranked_response,
     load_gi_ranked_export,
 )
+from ceac_pathdep.study import (
+    PATHDEP_KINDS,
+    PATHDEP_LABELS,
+    draw_pathdep_architecture,
+    draw_pathdep_discovery_traces,
+    draw_pathdep_dose_response,
+    draw_pathdep_overlaid_performance,
+    load_pathdep_export,
+)
 
 locks = load_export(ROOT / "notebooks/evidence/pathologies_locks")
 epistasis = load_export(ROOT / "notebooks/evidence/pathologies_epistasis")
 gi_ranked = load_gi_ranked_export(ROOT / "notebooks/evidence/pathologies_gi_ranked")
+pathdep = load_pathdep_export(ROOT / "notebooks/evidence/pathologies_pathdep")
 
 print(
     f"Verified portable exports: {len(locks['runs'])} lock cells, "
-    f"{len(epistasis['runs'])} signalling-activation cells, and "
-    f"{len(gi_ranked['sweep_rows'])} GI sweep + {len(gi_ranked['calibration_rows'])} GI calibration cells. "
+    f"{len(epistasis['runs'])} signalling-activation cells, "
+    f"{len(gi_ranked['sweep_rows'])} GI sweep + {len(gi_ranked['calibration_rows'])} GI calibration cells, and "
+    f"{len(pathdep['sweep_rows'])} path-dependent sweep + {len(pathdep['calibration_rows'])} calibration cells. "
     "No training launched."
 )""",
     )
@@ -284,8 +297,60 @@ for kind in ("gi_arrayed", "gi_multiplexed"):
     )
 
     md(
+        "pathdep-section",
+        """## 4. Path-Dependent Signalling Rewiring & Canalized K562 Genetic Risk (`ceac_pathdep`, $H = 3$)
+
+Evaluates two $H = 3$ multi-step problems where the **optimal action is strictly path-dependent** (requiring a Step-1 priming or capacitor-hub de-canalization action at cost $-0.015$ with zero immediate KL before selecting the optimal Step-2 co-target or K562 modifier inside the primed state):
+
+1. **`signalling_rewiring` ($H = 3$)**: Time-staggered `EGFR/MEK` priming unlocks $R = 8$ primary post-translational bypass rescues ($0.92$ vs. $0.10$), while unprimed Step-1 co-targeting fails ($0.25$) due to intact feedback.
+2. **`canalized_gi` ($H = 3$, Horlbeck 2018 K562 `PPP2R1A` Hub)**: Step-1 `PPP2R1A` hub de-canalization unlocks second-step K562 risk-modifier interactions (`FDPS`, $\\text{GI} = -5.2413$, hit $\\approx 0.96$), while reverse-order single knockdowns under an intact hub are buffered ($0.4999$).
+
+Both benchmarks test CEAC (`ceac`, `ceac_ranked`) head-to-head against **two** multi-step Optimal-Action IDS controls:
+- **`ids_action_tree` ($I(\\Pi^\\star; Z)$)**: Full MDP Bellman optimal policies $\\Pi^\\star(\\theta, \\xi)$ split by $2^k$ across off-path stress/non-hub rescue rules $\\xi \\in \\{0, 1\\}^k$, trapping policy-tree IDS on non-causal modifier assays.
+- **`ids_action_onpath` ($I(C_{\\text{on-path}}^\\star; Z)$)**: Even after quotienting out all off-path differences, scalar MI over-weights cheap peripheral clade / eQTL expression reporters ($0.49998$ return) that reduce tail entropy on peripheral candidates while providing **zero KL** between `Null` and the realized responder.""",
+    )
+
+    code(
+        "pathdep-architecture",
+        """fig = draw_pathdep_architecture()
+plt.show()""",
+    )
+
+    code(
+        "pathdep-dose-response",
+        """fig = draw_pathdep_dose_response(pathdep["summary_rows"])
+plt.show()""",
+    )
+
+    code(
+        "pathdep-overlaid-performance",
+        """fig = draw_pathdep_overlaid_performance(pathdep, dose=3)
+plt.show()""",
+    )
+
+    code(
+        "pathdep-discovery-traces",
+        """fig = draw_pathdep_discovery_traces(pathdep, dose=3)
+plt.show()""",
+    )
+
+    code(
+        "pathdep-summary-table",
+        """pd_map = { (r["kind"], r["method"], r["dose"]): r for r in pathdep["summary_rows"] if r["task"] == 1 }
+print(f"{'Benchmark':36s} | {'Method':48s} | {'k=0 Reg':>8s} | {'k=3 Reg':>8s} | {'k=3 Gap':>7s} | {'Echo%':>6s} | {'Mod%':>6s}")
+print("-" * 134)
+for kind in ("signalling_rewiring", "canalized_gi"):
+    for m in ("idac", "pomd", "ucb_q", "ids_null", "ids_product", "ids_action_tree", "ids_action_onpath", "ceac", "ceac_natural", "ceac_ranked", "ceac_ranked_natural", "oracle"):
+        r0, r3 = pd_map[(kind, m, 0)], pd_map[(kind, m, 3)]
+        print(
+            f"{PATHDEP_KINDS[kind][:36]:36s} | {PATHDEP_LABELS[m][:48]:48s} | {r0['regret_mean']:8,.1f} | "
+            f"{r3['regret_mean']:8,.1f} | {r3['late_gap_mean']:7.4f} | {r3['echo_pct']:5.1f}% | {r3['offpath_omics_pct']:5.1f}%"
+        )""",
+    )
+
+    md(
         "runners-section",
-        """## 4. Experimental Runners & Reproducible CLI Entrypoints
+        """## 5. Experimental Runners & Reproducible CLI Entrypoints
 
 All studies and portable evidence bundles can be reproduced from the repository root or invoked programmatically via the entrypoints below (disabled by default during notebook verification so rendering remains instantaneous and deterministic):""",
     )
@@ -296,6 +361,7 @@ All studies and portable evidence bundles can be reproduced from the repository 
     "unit_tests": ".venv/bin/python -m unittest discover -s tests/pathologies -v",
     "locks_and_epistasis_suite": ".venv/bin/python scripts/run_pathologies_suite.py --tag repro_v1 --workers 10 --protocols locks epistasis",
     "gi_ranked_study": ".venv/bin/python -m ceac_ranked.study --tag repro_ranked_v1 --workers 10",
+    "pathdep_signalling_and_gi_study": ".venv/bin/python -m ceac_pathdep.study --tag 20261122_pathdep_v1 --workers 10 --episodes 32768",
     "rebuild_this_notebook": ".venv/bin/python scripts/render_pathologies_notebook.py --execute",
 }
 for name, cmd in RUNNER_COMMANDS.items():
@@ -327,9 +393,11 @@ def execute_and_audit(nb_path: Path):
     locks_dir = ROOT / "notebooks/evidence/pathologies_locks"
     epi_dir = ROOT / "notebooks/evidence/pathologies_epistasis"
     gi_dir = ROOT / "notebooks/evidence/pathologies_gi_ranked"
+    pd_dir = ROOT / "notebooks/evidence/pathologies_pathdep"
     load_pathology_export(locks_dir)
     load_pathology_export(epi_dir)
     load_gi_ranked_export(gi_dir)
+    load_pathdep_export(pd_dir)
 
     notebook = nbf.read(nb_path, as_version=4)
     nbf.validate(notebook)
@@ -400,7 +468,7 @@ def execute_and_audit(nb_path: Path):
         },
         evidence_manifests={
             name: hashlib.sha256((ROOT / "notebooks/evidence" / name / "manifest.json").read_bytes()).hexdigest()
-            for name in ("pathologies_locks", "pathologies_epistasis", "pathologies_gi_ranked")
+            for name in ("pathologies_locks", "pathologies_epistasis", "pathologies_gi_ranked", "pathologies_pathdep")
         },
     )
     (ROOT / "notebooks/pathologies_execution.json").write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n")

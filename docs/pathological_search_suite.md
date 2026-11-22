@@ -67,7 +67,20 @@ To address combinatorial pair-screen scaling without modifying the certified Sec
 
 ---
 
-## 4. Calibration-Gated Reproduction & Executed Notebook
+## 4. Path-Dependent Signalling Rewiring & Canalized K562 Genetic Risk (`ceac_pathdep`, $H = 3$)
+
+Tests multi-step environments where the **optimal intervention is strictly path-dependent** (requiring a Step-1 priming or capacitor-hub de-canalization step with step tension $-0.015$ and zero immediate KL before selecting a Step-2 bypass kinase or K562 risk modifier inside the primed state):
+
+1. **`signalling_rewiring` ($H = 3$)**: Models time-staggered oncogenic signalling rewiring (`EGFR/MEK` Step-1 priming followed by selecting among $R = 8$ primary post-translational bypass co-targets + $k$ peripheral clades; unprimed co-targeting fails at $0.25$ due to intact negative feedback).
+2. **`canalized_gi` ($H = 3$, Horlbeck 2018 K562 `PPP2R1A` Hub)**: Models cryptic genetic variation buffered by `PPP2R1A` (`FDPS` real interaction $\text{GI} = -5.2413$ vs. neutral K562 modifiers, unlocked only after Step-1 `PPP2R1A` de-canalization; reverse-order single knockdowns while `PPP2R1A` is intact are buffered at $0.4999$).
+
+Both studies compare `ceac` and `ceac_ranked` (`PathDepGreedyCEAC`) against **two** multi-step generalizations of Russo–Van Roy Optimal-Action IDS (`MultiStepActionIDS`):
+- **`ids_action_tree` ($I(\Pi^\star; Z)$)**: Full MDP optimal-policy classes $\Pi^\star(\theta, \xi)$ split by $2^k$ due to counterfactual local rescue rules $\xi \in \{0, 1\}^k$ inside unvisited off-path stress/non-hub branches, trapping policy-tree IDS into profiling non-causal modifier assays.
+- **`ids_action_onpath` ($I(C_{\text{on-path}}^\star; Z)$)**: Even after quotienting out all off-path differences via `model.decision_classes()`, scalar mutual information assigns low information ratios to cheap peripheral clade / eQTL expression reporters ($0.49998$ return) that reduce tail entropy on peripheral candidates while providing **zero KL** between `Null` and the realized responder. CEAC's vector-valued pairwise log-likelihood constraints and backward Bellman evidence critic $Q_I(s, a; \beta)$ avoid both traps.
+
+---
+
+## 5. Calibration-Gated Reproduction & Executed Notebook
 
 From the repository root:
 

@@ -1,12 +1,13 @@
 {
-  "code_cells": 21,
+  "code_cells": 26,
   "evidence_manifests": {
     "pathologies_epistasis": "bad980b54e6ac88c5e8ab8638e200ad6ee43e3ca615ad03cea4962ef88761c6c",
     "pathologies_gi_ranked": "e011deb1d1bcfd0fe979c512d26c13bf719de956e696bb3f6d65d290fed6d008",
-    "pathologies_locks": "7a69fc691ba6c63c1065bf08d26753c1cfd198f9cb936259f5aebd7e354f8fd5"
+    "pathologies_locks": "7a69fc691ba6c63c1065bf08d26753c1cfd198f9cb936259f5aebd7e354f8fd5",
+    "pathologies_pathdep": "2125c537334d77a0caa10ef1d43a5b6d3dbcb8ada748bd8b00582c8209962f61"
   },
   "notebook": "notebooks/Pathological_Search_Suite.ipynb",
-  "notebook_sha256": "ce25705b9364fe9e7984565a4ee354432fe7782a453896568d4218a7f2f8e063",
+  "notebook_sha256": "3534c91daa53f68fff982a6981dc9c1137369e0c5a0dbd259364549bc5791b9e",
   "packages": {
     "ipykernel": "7.4.0",
     "matplotlib": "3.11.2",
@@ -15,7 +16,7 @@
     "scipy": "1.17.1"
   },
   "python": "3.11.13",
-  "rendered_figures": 21,
+  "rendered_figures": 25,
   "schema": 1,
   "status": "complete",
   "training_launched": false

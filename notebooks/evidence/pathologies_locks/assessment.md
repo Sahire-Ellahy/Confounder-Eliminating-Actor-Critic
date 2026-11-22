@@ -14,7 +14,11 @@ Verified **192** completed cells (3 held-out seeds per condition, 65,536 episode
 
 ![Bidirectional Combination Lock cumulative regret fans](bidirectional_lock_task1_cumulative_regret.png)
 
+![Bidirectional Combination Lock expected policy gap trajectories](bidirectional_lock_task1_window_gap.png)
+
 ![Combination Lock cumulative regret fans](combination_lock_task1_cumulative_regret.png)
+
+![Combination Lock expected policy gap trajectories](combination_lock_task1_window_gap.png)
 
 ## Weakest-to-Strongest Pathology Summary (Task 1)
 

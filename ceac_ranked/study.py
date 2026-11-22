@@ -19,7 +19,7 @@ from pathlib import Path
 import time
 import numpy as np
 from ceac.contracts import Episode, Transition
-from ceac_pathologies.report import LABELS as BASE_LABELS, KINDS
+from ceac_pathologies.report import LABELS as BASE_LABELS, KINDS, log_markevery, style_ceac_legend
 from ceac_pathologies.run import (
     ROOT,
     _sanitize_diagnostics,
@@ -41,18 +41,33 @@ RANKED_LABELS = {
 }
 
 RANKED_COLORS = {
-    "idac": "#C25300",
-    "ucb_q": "#0072B2",
-    "pomd": "#B34697",
-    "ids_additive": "#C93441",
-    "ids_product": "#595959",
-    "ids_empirical": "#8C6D1F",
-    "ids_action": "#111111",
-    "ceac": "#74A892",
-    "ceac_natural": "#9CC5B0",
-    "ceac_ranked": "#007D60",
-    "ceac_ranked_natural": "#004D3B",
-    "oracle": "#3E3163",
+    "idac": "#16A34A",                # Primary Kelly Green
+    "ucb_q": "#7B2CBF",               # Primary Violet
+    "pomd": "#C026D3",                # Vibrant Magenta
+    "ids_additive": "#8C1D18",        # Dark Brick Red
+    "ids_product": "#F77F00",         # Primary Vivid Orange
+    "ids_empirical": "#D99B00",       # Primary Golden Yellow-Ochre
+    "ids_action": "#D62828",          # Primary Crimson Red
+    "ceac": "#2563EB",                # Bold Primary Blue (certified uniform-bank)
+    "ceac_natural": "#60A5FA",        # Bold Sky-Cobalt Blue (certified natural)
+    "ceac_ranked": "#0038A8",         # Bold Deep Royal Blue (ranked CEAC)
+    "ceac_ranked_natural": "#0077FF", # Bold Vivid Azure Blue (ranked natural)
+    "oracle": "#222222",              # Charcoal Black
+}
+
+RANKED_MARKERS = {
+    "idac": "D",
+    "ucb_q": ">",
+    "pomd": "h",
+    "ids_additive": "<",
+    "ids_product": "^",
+    "ids_empirical": "v",
+    "ids_action": "s",
+    "ceac": "*",
+    "ceac_natural": "X",
+    "ceac_ranked": "o",
+    "ceac_ranked_natural": "P",
+    "oracle": "x",
 }
 
 RANKED_ORDER = [
@@ -299,11 +314,18 @@ def draw_gi_ranked_response(summary_rows: list[dict]):
                 ys = np.array([x[field] for x in grp], dtype=float)
                 sds = np.array([x[sd_field] for x in grp], dtype=float)
                 col = RANKED_COLORS[m]
+                is_ceac = m.startswith("ceac")
                 is_ranked = m.startswith("ceac_ranked")
                 ls = "--" if m in {"ceac", "ceac_natural", "ids_product"} else (":" if m == "oracle" else "-")
-                ax.fill_between(xs, np.maximum(0.0, ys - sds), ys + sds, color=col, alpha=0.12, linewidth=0)
-                ax.plot(xs, ys, label=RANKED_LABELS[m], color=col, lw=2.5 if is_ranked else 1.5, linestyle=ls,
-                        marker="o" if is_ranked else "s", markersize=6.5 if is_ranked else 5.0, zorder=7 if is_ranked else 3)
+                lw = 3.2 if is_ranked else (2.5 if is_ceac else 1.6)
+                ms = 7.8 if is_ranked else (7.6 if m == "ceac" else (6.8 if is_ceac else 5.8))
+                mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if RANKED_MARKERS[m] != "x" else {}
+                ax.fill_between(xs, np.maximum(0.0, ys - sds), ys + sds, color=col, alpha=0.13 if is_ceac else 0.09, linewidth=0)
+                ax.plot(
+                    xs, ys, label=RANKED_LABELS[m], color=col, lw=lw, linestyle=ls,
+                    marker=RANKED_MARKERS[m], markersize=ms, zorder=9 if is_ranked else (7 if is_ceac else 3),
+                    **mk_kw,
+                )
             ax.set_title(f"{KINDS[kind]} · {'Final gap' if c_i == 0 else 'Cumulative regret'}", fontsize=11, pad=8)
             ax.set_xlabel("Variables with unknown non-causal main effects k (M = 46 · 2^k)", fontsize=10, labelpad=6)
             ax.set_ylabel(ylab, fontsize=10)
@@ -315,9 +337,10 @@ def draw_gi_ranked_response(summary_rows: list[dict]):
                 ax.set_ylim(-0.03, 1.00)
             ax.grid(alpha=0.2)
             ax.spines[["top", "right"]].set_visible(False)
-    fig.tight_layout(rect=(0.0, 0.13, 1.0, 1.0))
+    fig.tight_layout(rect=(0.0, 0.135, 1.0, 1.0))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.105), ncol=3, frameon=False, fontsize=9)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.11), ncol=3, frameon=False, fontsize=9)
+    style_ceac_legend(leg)
     return fig
 
 
@@ -332,14 +355,18 @@ def draw_gi_ranked_mechanisms(summary_rows: list[dict]):
     for m in ceac_methods:
         grp = sorted([r for r in summary_rows if r["kind"] == "gi_arrayed" and r["task"] == 1 and r["method"] == m], key=lambda x: x["dose"])
         if grp and grp[0]["bank_policies_mean"] is not None:
+            is_ranked = m.startswith("ceac_ranked")
             axes_m[0].plot(
                 [x["dose"] for x in grp],
                 [x["bank_policies_mean"] for x in grp],
                 label=RANKED_LABELS[m],
                 color=RANKED_COLORS[m],
-                lw=2.4 if m.startswith("ceac_ranked") else 1.8,
-                linestyle="-" if m.startswith("ceac_ranked") else "--",
-                marker="o" if m.startswith("ceac_ranked") else "s",
+                lw=3.1 if is_ranked else 2.3,
+                linestyle="-" if is_ranked else "--",
+                marker=RANKED_MARKERS[m],
+                markersize=7.6,
+                markeredgecolor="white",
+                markeredgewidth=0.55,
             )
     axes_m[0].set_title("Arrayed Screen · Active Replay Bank Size ↓", fontsize=11, pad=8)
     axes_m[0].set_xlabel("Variables with unknown non-causal main effects k", labelpad=6)
@@ -354,14 +381,20 @@ def draw_gi_ranked_mechanisms(summary_rows: list[dict]):
             continue
         grp = sorted([r for r in summary_rows if r["kind"] == "gi_arrayed" and r["task"] == 1 and r["method"] == m], key=lambda x: x["dose"])
         if grp:
+            is_ceac = m.startswith("ceac")
+            is_ranked = m.startswith("ceac_ranked")
             axes_m[1].plot(
                 [x["dose"] for x in grp],
                 [x["profiling_pct"] for x in grp],
                 label=RANKED_LABELS[m],
                 color=RANKED_COLORS[m],
-                lw=2.2 if m.startswith("ceac_ranked") else 1.5,
+                lw=3.0 if is_ranked else (2.4 if is_ceac else 1.55),
                 linestyle="--" if m in {"ceac", "ceac_natural", "ids_product"} else "-",
-                marker="o" if m.startswith("ceac_ranked") else "s",
+                marker=RANKED_MARKERS[m],
+                markersize=7.5 if is_ceac else 5.8,
+                markeredgecolor="white",
+                markeredgewidth=0.55,
+                zorder=9 if is_ranked else (7 if is_ceac else 3),
             )
     axes_m[1].set_title("Arrayed Screen · Non-Causal Main-Effect Profiling ↓", fontsize=11, pad=8)
     axes_m[1].set_xlabel("Variables with unknown non-causal main effects k", labelpad=6)
@@ -372,7 +405,8 @@ def draw_gi_ranked_mechanisms(summary_rows: list[dict]):
 
     fig_m.tight_layout(rect=(0.0, 0.22, 1.0, 1.0))
     handles, labels = axes_m[1].get_legend_handles_labels()
-    fig_m.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.19), ncol=3, frameon=False, fontsize=8.8)
+    leg = fig_m.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.19), ncol=3, frameon=False, fontsize=8.8)
+    style_ceac_legend(leg)
     return fig_m
 
 
@@ -460,7 +494,13 @@ def draw_gi_ranked_learning(gi_bundle: dict, kind: str, metric: str = "cumulativ
                 0.03, 0.96, f"Regret (k={doses[-1]}): {hi_row['regret_mean']:,.0f}",
                 ha="left", va="top", transform=ax.transAxes, fontsize=8.3, color="#222222", bbox=badge_box, zorder=8,
             )
-        ax.set_title(RANKED_LABELS[m], fontsize=9.8, pad=7)
+        ax.set_title(
+            RANKED_LABELS[m],
+            fontsize=9.8,
+            pad=7,
+            fontweight="bold" if m.startswith("ceac") else "normal",
+            color="#002B7F" if m.startswith("ceac") else "#111111",
+        )
         ax.grid(alpha=0.18)
         ax.spines[["top", "right"]].set_visible(False)
         ax.set_xlim(0, xs[-1])
@@ -475,6 +515,78 @@ def draw_gi_ranked_learning(gi_bundle: dict, kind: str, metric: str = "cumulativ
     handles, labels = axes.flat[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", ncol=len(doses), frameon=False, bbox_to_anchor=(0.5, 0.962), fontsize=9.8)
     fig.tight_layout(rect=(0.028, 0.032, 0.995, 0.935))
+    return fig
+
+
+def draw_gi_overlaid_performance(gi_bundle: dict, dose: int = 3):
+    """Render 2x2 overlaid performance time traces (Arrayed vs Multiplexed) with distinct markers and bold blue CEAC."""
+    import matplotlib.pyplot as plt
+
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    traces = [t for t in gi_bundle["traces"] if t["task"] == 1 and t["dose"] == dose]
+    methods = [m for m in RANKED_ORDER if any(t["method"] == m for t in traces)]
+    kinds = ["gi_arrayed", "gi_multiplexed"]
+    xticks = [0.512, 1.0, 2.0, 5.0, 10.0, 25.0, 65.536]
+    xticklabels = ["0.5k", "1k", "2k", "5k", "10k", "25k", "65k"]
+
+    fig, axes = plt.subplots(2, 2, figsize=(13.6, 8.6), sharex=False)
+    for c_idx, kind in enumerate(kinds):
+        short_kind = "Arrayed K562 Pair Screen" if kind == "gi_arrayed" else "Multiplexed Pooled-Block Screen"
+        for r_idx, (metric, ylab, symlog) in enumerate([
+            ("window_gap", "Rolling 256-episode policy gap ↓", False),
+            ("cumulative_regret", "Cumulative expected regret (symlog) ↓", True),
+        ]):
+            ax = axes[r_idx, c_idx]
+            for m_idx, m in enumerate(methods):
+                cells = sorted([t for t in traces if t["kind"] == kind and t["method"] == m], key=lambda x: x["seed"])
+                if not cells:
+                    continue
+                start = 1 if len(cells[0]["episode"]) > 1 and cells[0]["episode"][0] == 1 else 0
+                xs = np.array(cells[0]["episode"][start:], dtype=float) / 1000.0
+                vals = np.array([c[metric][start:] for c in cells], dtype=float)
+                mean = vals.mean(axis=0)
+                sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
+                col = RANKED_COLORS[m]
+                is_ceac = m.startswith("ceac")
+                is_ranked = m.startswith("ceac_ranked")
+                ls = "--" if m in {"ceac", "ceac_natural", "ids_product"} else (":" if m == "oracle" else "-")
+                lw = 3.2 if is_ranked else (2.5 if is_ceac else 1.55)
+                ms = 7.6 if is_ranked else (7.4 if m == "ceac" else (6.6 if is_ceac else 5.4))
+                zord = 10 if is_ranked else (8 if is_ceac else (5 if m == "ids_action" else 3))
+                mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if RANKED_MARKERS[m] != "x" else {}
+                ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=col, alpha=0.13 if is_ceac else 0.08, linewidth=0)
+                ax.plot(
+                    xs, mean, label=RANKED_LABELS[m], color=col, lw=lw, linestyle=ls,
+                    marker=RANKED_MARKERS[m], markersize=ms, markevery=log_markevery(len(xs), m_idx),
+                    zorder=zord, **mk_kw,
+                )
+            ax.set_xscale("log")
+            ax.set_xlim(0.50, 67.0)
+            ax.set_xticks(xticks)
+            ax.set_xticklabels(xticklabels)
+            ax.minorticks_off()
+            if symlog:
+                ax.set_yscale("symlog", linthresh=15.0)
+                ax.set_ylim(bottom=0.0)
+            else:
+                ax.set_ylim(-0.03, 1.03)
+            metric_lbl = "Expected Policy Gap" if metric == "window_gap" else "Cumulative Regret"
+            ax.set_title(f"{short_kind} · {metric_lbl}", fontsize=10.6, pad=7)
+            ax.set_xlabel("Training episodes (log scale)", fontsize=9.6, labelpad=4)
+            if c_idx == 0:
+                ax.set_ylabel(ylab, fontsize=9.8)
+            ax.grid(alpha=0.2)
+            ax.spines[["top", "right"]].set_visible(False)
+
+    fig.suptitle(
+        f"Horlbeck 2018 K562 Pair Screen · Overlaid Performance Time Traces (k = {dose}, M = {46 * (2 ** dose):,})",
+        fontsize=13.0,
+        y=0.988,
+    )
+    fig.tight_layout(rect=(0.0, 0.145, 1.0, 0.948))
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.125), ncol=3, frameon=False, fontsize=8.8)
+    style_ceac_legend(leg)
     return fig
 
 
@@ -498,7 +610,7 @@ def draw_gi_discovery_traces(gi_bundle: dict, dose: int = 3):
     for r_idx, (keys, row_title, ylab) in enumerate(row_specs):
         for c_idx, kind in enumerate(kinds):
             ax = axes[r_idx, c_idx]
-            for m in methods:
+            for m_idx, m in enumerate(methods):
                 cells = sorted([t for t in traces if t["kind"] == kind and t["method"] == m], key=lambda x: x["seed"])
                 if not cells:
                     continue
@@ -508,12 +620,18 @@ def draw_gi_discovery_traces(gi_bundle: dict, dose: int = 3):
                 mean = vals.mean(axis=0)
                 sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
                 col = RANKED_COLORS[m]
+                is_ceac = m.startswith("ceac")
                 is_ranked = m.startswith("ceac_ranked")
                 ls = "--" if m in {"ceac", "ceac_natural", "ids_product"} else "-"
-                lw = 2.4 if is_ranked else (1.9 if m == "ids_action" else 1.45)
-                zord = 7 if is_ranked else (5 if m in {"ids_action", "ceac"} else 3)
-                ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=col, alpha=0.11, linewidth=0)
-                ax.plot(xs, mean, label=RANKED_LABELS[m], color=col, lw=lw, linestyle=ls, zorder=zord)
+                lw = 3.2 if is_ranked else (2.5 if is_ceac else 1.55)
+                ms = 7.6 if is_ranked else (7.4 if m == "ceac" else (6.6 if is_ceac else 5.4))
+                zord = 10 if is_ranked else (8 if is_ceac else (5 if m == "ids_action" else 3))
+                ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=col, alpha=0.13 if is_ceac else 0.08, linewidth=0)
+                ax.plot(
+                    xs, mean, label=RANKED_LABELS[m], color=col, lw=lw, linestyle=ls,
+                    marker=RANKED_MARKERS[m], markersize=ms, markevery=log_markevery(len(xs), m_idx),
+                    markeredgecolor="white", markeredgewidth=0.55, zorder=zord,
+                )
             ax.set_xscale("log")
             ax.set_xlim(0.50, 67.0)
             ax.set_xticks(xticks)
@@ -529,13 +647,14 @@ def draw_gi_discovery_traces(gi_bundle: dict, dose: int = 3):
             ax.spines[["top", "right"]].set_visible(False)
 
     fig.suptitle(
-        f"Horlbeck 2018 K562 Pair Screen · Discovery Process Effectiveness Over Time (k = {dose}, M = {46 * (2 ** dose):,})",
+        f"Horlbeck 2018 K562 Pair Screen · Overlaid Discovery Process Time Traces (k = {dose}, M = {46 * (2 ** dose):,})",
         fontsize=13.0,
         y=0.99,
     )
-    fig.tight_layout(rect=(0.0, 0.115, 1.0, 0.958))
+    fig.tight_layout(rect=(0.0, 0.12, 1.0, 0.958))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.098), ncol=3, frameon=False, fontsize=8.8)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.102), ncol=3, frameon=False, fontsize=8.8)
+    style_ceac_legend(leg)
     return fig
 
 
@@ -602,6 +721,11 @@ def export_gi_comparison(study_dir: Path, cal_dir: Path | None, out_dir: Path):
     traces = _load_compact_traces(results)
     bundle_for_plots = dict(summary_rows=summary_rows, traces=traces)
 
+    fig_over = draw_gi_overlaid_performance(bundle_for_plots, dose=max(doses))
+    for ext in ("png", "pdf"):
+        fig_over.savefig(out_dir / f"gi_overlaid_performance_traces.{ext}", dpi=180, bbox_inches="tight")
+    plt.close(fig_over)
+
     fig_disc = draw_gi_discovery_traces(bundle_for_plots, dose=max(doses))
     for ext in ("png", "pdf"):
         fig_disc.savefig(out_dir / f"gi_discovery_traces.{ext}", dpi=180, bbox_inches="tight")
@@ -657,7 +781,9 @@ def export_gi_comparison(study_dir: Path, cal_dir: Path | None, out_dir: Path):
         "",
         "![Active bank size and main-effect profiling](gi_ranked_mechanisms.png)",
         "",
-        "## Visual Discovery-Process Time Traces (`k = 3`, `M = 368`)",
+        "## Overlaid Performance & Discovery-Process Time Traces (`k = 3`, `M = 368`)",
+        "",
+        "![K562 overlaid performance trajectories](gi_overlaid_performance_traces.png)",
         "",
         "![K562 pair discovery and distraction trajectories](gi_discovery_traces.png)",
         "",

@@ -16,7 +16,9 @@ Verified **108** completed cells (3 held-out seeds per condition, 65,536 episode
 
 ![Epistatic Signalling Pathway expected policy gap trajectories](epistatic_signalling_task1_window_gap.png)
 
-## Discovery-Process Effectiveness Over Time (`k = 3`, `M = 1,024`)
+## Overlaid Performance & Discovery-Process Time Traces
+
+![Epistatic Signalling overlaid performance time traces](epistatic_signalling_overlaid_traces.png)
 
 ![Epistatic Signalling discovery and performance time traces](epistatic_signalling_discovery_traces.png)
 

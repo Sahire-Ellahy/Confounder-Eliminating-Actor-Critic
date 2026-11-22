@@ -13,7 +13,9 @@ Verified **288** held-out sweep cells (`seeds = 0, 1, 2`, `65,536` episodes/cell
 
 ![Active bank size and main-effect profiling](gi_ranked_mechanisms.png)
 
-## Visual Discovery-Process Time Traces (`k = 3`, `M = 368`)
+## Overlaid Performance & Discovery-Process Time Traces (`k = 3`, `M = 368`)
+
+![K562 overlaid performance trajectories](gi_overlaid_performance_traces.png)
 
 ![K562 pair discovery and distraction trajectories](gi_discovery_traces.png)
 

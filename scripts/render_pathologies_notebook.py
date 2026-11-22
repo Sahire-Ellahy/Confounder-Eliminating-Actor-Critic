@@ -69,6 +69,7 @@ from ceac_pathologies.report import (
     LABELS,
     draw_architecture,
     draw_epistasis_discovery_traces,
+    draw_epistasis_overlaid_performance,
     draw_learning,
     draw_mechanisms,
     draw_response,
@@ -79,6 +80,7 @@ from ceac_pathologies.report import (
 from ceac_ranked.study import (
     RANKED_LABELS,
     draw_gi_discovery_traces,
+    draw_gi_overlaid_performance,
     draw_gi_ranked_learning,
     draw_gi_ranked_mechanisms,
     draw_gi_ranked_response,
@@ -170,16 +172,22 @@ plt.show()""",
     )
 
     code(
-        "epistasis-learning-fans",
-        """for metric in ("window_gap", "cumulative_regret"):
-    fig = draw_learning(epistasis, "epistatic_signalling", task=1, metric=metric)
-    plt.show()""",
+        "epistasis-overlaid-performance",
+        """fig = draw_epistasis_overlaid_performance(epistasis, task=1)
+plt.show()""",
     )
 
     code(
         "epistasis-discovery-traces",
         """fig = draw_epistasis_discovery_traces(epistasis, dose=3, task=1)
 plt.show()""",
+    )
+
+    code(
+        "epistasis-learning-fans",
+        """for metric in ("window_gap", "cumulative_regret"):
+    fig = draw_learning(epistasis, "epistatic_signalling", task=1, metric=metric)
+    plt.show()""",
     )
 
     code(
@@ -221,6 +229,12 @@ plt.show()""",
     code(
         "gi-mechanisms",
         """fig = draw_gi_ranked_mechanisms(gi_ranked["summary_rows"])
+plt.show()""",
+    )
+
+    code(
+        "gi-overlaid-performance",
+        """fig = draw_gi_overlaid_performance(gi_ranked, dose=3)
 plt.show()""",
     )
 

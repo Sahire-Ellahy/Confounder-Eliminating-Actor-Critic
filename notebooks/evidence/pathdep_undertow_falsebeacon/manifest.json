@@ -1,0 +1,18 @@
+{
+  "cells": 288,
+  "episodes": 32768,
+  "files": {
+    "assessment.md": "6132f9c3961a70b5952f58ded3aaebe8ab4e0a89fa73e87ed9c1e24d54671870",
+    "critic_bellman_audit.json.gz": "4bcdfafde72681d9537567cc9e89b3bbb59af1596ee93c99e29d5269a8a2c69e",
+    "evidence.json.gz": "e164f2e97bea86e47cbf04fe1f8c17a3621411f71528fd6622af1ba425f9f173",
+    "grid_pathdep_critic_bellman_traces.pdf": "9935a959983f80cfc04353e4e72b2b185bb4e0d4d76843b6680abe6b11f8e8cf",
+    "grid_pathdep_critic_bellman_traces.png": "963ffc9ebedaa1dd65b78b7ea8e89f360373e19d549709254c9a5a3f06501380",
+    "grid_pathdep_critic_dose_scaling.pdf": "3f205da06a0eb49336ec52c10392f6f0d595c7927d731e893e84f1b627de5c87",
+    "grid_pathdep_critic_dose_scaling.png": "163301e69f3454e6d24e7ee3a5eef13aa8ba93858b3b7439a859a08ba501d781",
+    "grid_pathdep_dose_response.pdf": "06caeb8599b4ff66e2497e54d19a8e16995d9ef4d21054f37ed53c2892302373",
+    "grid_pathdep_dose_response.png": "840c7f463c76efabb93c043cc12aef62692d023760d4f7bae1c994c71ba87a76",
+    "grid_pathdep_overlaid_performance.pdf": "bf24ccf5a8552edd0d957da0e3e261422040cbcacdd103188faeadcde4ee8df1",
+    "grid_pathdep_overlaid_performance.png": "7acda661cb15d35bff351255815e833b3d3601bb339bd4b8fba80c32c553d3b8"
+  },
+  "schema": 1
+}

@@ -40,11 +40,12 @@ class PathDepBenchmarkTests(unittest.TestCase):
         ceac_r = PathDepGreedyCEAC(m2, rng)
         self.assertEqual(len(ceac_r.bank.policies), 1)
         scores = ceac_r.disagreement_scores(tuple(range(m2.num_models)))
-        # Root actions for modifier assays (3+k .. 3+2k-1) must score strictly 0 causal disagreement
+        # Root actions for modifier assays (3+n_echo .. 3+n_echo+k-1) must score strictly 0 causal disagreement
         k = m2.cfg.complexity
+        n_echo = m2.cfg.echo_count
         for idx, pol in enumerate(ceac_r.candidate_policies):
             a0 = int(np.argmax(pol.probabilities[0]))
-            if 3 + k <= a0 < 3 + 2 * k:
+            if 3 + n_echo <= a0 < 3 + n_echo + k:
                 self.assertEqual(float(scores[idx]), 0.0)
 
     def test_canalized_gi_k562_panel_and_smoke_cell(self):

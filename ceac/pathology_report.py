@@ -9,7 +9,7 @@ from .visualization import (ENVIRONMENT_LABELS, LABELS, STYLES, seed_summary,
                             trace_values, plot_seed_trace, band_description, plot_summary, pad_plot_axis)
 
 METHODS = ("ucb_q", "pomd", "idac", "ids", "ids_zero", "ceac", "oracle")
-DOSE_COLORS = ("#0058c7", "#008747", "#ad5700", "#c90078")
+DOSE_COLORS = ("#9CA3AF", "#6B7280", "#374151", "#111827")
 DOSE_LINES = ("-", "--", "-.", ":")
 METRICS = ("regret", "last_gap", "success", "nuisance_visits", "lost_steps", "information")
 METRIC_LABELS = ("Cumulative pseudo-regret", "Last 32-episode\nexpected value gap",
@@ -112,6 +112,233 @@ def _legend(fig, handles, methods, band, bottom=.06):
     fig.legend([handles[m] for m in methods if m in handles], [LABELS[m] for m in methods if m in handles],
                loc="lower center", bbox_to_anchor=(.5,bottom), ncol=3, frameon=False, fontsize=11)
     fig.text(.5,.018,band_description(band),ha="center",fontsize=10)
+
+
+def draw_single_env_grid_traces(groups, kind, context=0, mode=1, rho=0.75, plt=None, band="sd"):
+    """Single-environment 1x2 overlaid time traces: Expected Return (left) and Cumulative Regret (right)."""
+    if plt is None:
+        import matplotlib.pyplot as plt
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    present = [m for m in METHODS if (kind, context, mode, m) in groups]
+    if not present:
+        raise ValueError(f"No recorded methods for {kind}")
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.0), sharex=True, squeeze=False)
+    handles = {}
+    for m in present:
+        v_ret = trace_values(groups[kind, context, mode, m][rho], "expected_return")
+        v_reg = trace_values(groups[kind, context, mode, m][rho], "cumulative_pseudo_regret")
+        handles[m] = plot_seed_trace(axes[0, 0], v_ret, m, band)
+        plot_seed_trace(axes[0, 1], v_reg, m, band)
+    opt_val = groups[kind, context, mode, present[0]][rho][0]["metrics"][0]["optimal_return"]
+    opt_line = axes[0, 0].axhline(opt_val, color="#1F2937", lw=1.3, ls=":", alpha=.85)
+    axes[0, 0].set_title(f"{ENVIRONMENT_LABELS[kind]} (ρ = {rho:g}) · Expected Return ↑", fontsize=10.8, pad=8)
+    axes[0, 0].set_xlabel("Training episode", fontsize=9.8)
+    axes[0, 0].set_ylabel("Expected return (causal 16-episode mean) ↑", fontsize=9.8)
+    axes[0, 0].grid(alpha=.22)
+    axes[0, 0].spines[["top", "right"]].set_visible(False)
+
+    axes[0, 1].set_yscale("symlog", linthresh=.01)
+    axes[0, 1].set_title(f"{ENVIRONMENT_LABELS[kind]} (ρ = {rho:g}) · Cumulative Regret ↓", fontsize=10.8, pad=8)
+    axes[0, 1].set_xlabel("Training episode", fontsize=9.8)
+    axes[0, 1].set_ylabel("Cumulative pseudo-regret (symlog) ↓", fontsize=9.8)
+    axes[0, 1].grid(alpha=.22)
+    axes[0, 1].spines[["top", "right"]].set_visible(False)
+    pad_plot_axis(axes[0, 1])
+
+    fig.suptitle(f"{ENVIRONMENT_LABELS[kind]} (8×8 / Shore Grid, Mode {mode}, ρ = {rho:g}) · Overlaid Time Traces", fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0, .21, 1, .925))
+    leg = fig.legend(
+        [handles[m] for m in present] + [opt_line],
+        [LABELS[m] for m in present] + ["Optimal policy value"],
+        loc="upper center",
+        bbox_to_anchor=(.5, .19),
+        ncol=3,
+        frameon=False,
+        fontsize=8.9,
+    )
+    for txt in leg.get_texts():
+        if "CEAC" in txt.get_text():
+            txt.set_fontweight("bold")
+            txt.set_color("#0047AB")
+    return fig
+
+
+def draw_single_env_rho_scaling(rows, kind, context=0, mode=1, plt=None, band="sd"):
+    """Single-environment 1x2 dose scaling across rho: Final Value Gap (left) and Cumulative Regret (right)."""
+    if plt is None:
+        import matplotlib.pyplot as plt
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    grids = _endpoint_grid([r for r in rows if (r["environment"], r["context"], r["mode"]) == (kind, context, mode)])
+    if not grids:
+        raise ValueError(f"No recorded strength endpoints for {kind}")
+    grid = grids[kind, context, mode]
+    levels = sorted({rho for _, rho, _ in grid})
+    seeds = sorted({seed for _, _, seed in grid})
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.0), squeeze=False)
+    handles = {}
+    for method in METHODS:
+        if not any(m == method for m, _, _ in grid):
+            continue
+        gaps = np.array([[grid[method, rho, seed]["last_gap"] for rho in levels] for seed in seeds])
+        regs = np.array([[grid[method, rho, seed]["regret"] for rho in levels] for seed in seeds])
+        color, line, marker = STYLES[method]
+        lw = 3.1 if method == "ceac" else 1.85
+        handles[method] = plot_summary(axes[0, 0], levels, seed_summary(gaps, band), color=color, linestyle=line, marker=marker, label=LABELS[method], lw=lw)
+        plot_summary(axes[0, 1], levels, seed_summary(regs, band), color=color, linestyle=line, marker=marker, label=LABELS[method], lw=lw)
+    axes[0, 0].set(title=f"{ENVIRONMENT_LABELS[kind]} · Final Policy Gap vs. ρ ↓", xlabel=DOSE_LABELS[kind] + r" $\rho$", ylabel="Last 32-episode expected value gap ↓", xticks=levels)
+    axes[0, 1].set_yscale("symlog", linthresh=.01)
+    axes[0, 1].set(title=f"{ENVIRONMENT_LABELS[kind]} · Cumulative Regret vs. ρ ↓", xlabel=DOSE_LABELS[kind] + r" $\rho$", ylabel="Cumulative pseudo-regret (symlog) ↓", xticks=levels)
+    for ax in axes.flat:
+        ax.grid(alpha=.22)
+        ax.spines[["top", "right"]].set_visible(False)
+        pad_plot_axis(ax)
+    present = [m for m in METHODS if m in handles]
+    fig.suptitle(f"{ENVIRONMENT_LABELS[kind]} · Physical Diversion Dose Response Across ρ ∈ {{0.05, 0.25, 0.50, 0.75}}", fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0, .21, 1, .925))
+    leg = fig.legend([handles[m] for m in present], [LABELS[m] for m in present], loc="upper center", bbox_to_anchor=(.5, .19), ncol=3, frameon=False, fontsize=8.9)
+    for txt in leg.get_texts():
+        if "CEAC" in txt.get_text():
+            txt.set_fontweight("bold")
+            txt.set_color("#0047AB")
+    return fig
+
+
+def draw_overlaid_pathology_response(rows, context=0, mode=1, plt=None, band="sd"):
+    """Clean 1x2 cumulative-regret dose response across diversion strength rho (Undertow DeepSea | False Beacon Shore)."""
+    if plt is None:
+        import matplotlib.pyplot as plt
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    grids = _endpoint_grid([r for r in rows if (r["context"], r["mode"]) == (context, mode)])
+    if not grids:
+        raise ValueError("No recorded strength endpoints")
+    items = sorted(grids.items())
+    fig, axes = plt.subplots(1, len(items), figsize=(13.4, 5.0), sharey=True, squeeze=False)
+    handles = {}
+    for c_idx, ((kind, _, _), grid) in enumerate(items):
+        ax = axes[0, c_idx]
+        levels = sorted({rho for _, rho, _ in grid})
+        seeds = sorted({seed for _, _, seed in grid})
+        for method in METHODS:
+            if not any(m == method for m, _, _ in grid):
+                continue
+            raw = np.array([[grid[method, rho, seed]["regret"] for rho in levels] for seed in seeds])
+            stats = seed_summary(raw, band)
+            color, line, marker = STYLES[method]
+            handles[method] = plot_summary(
+                ax, levels, stats, color=color, linestyle=line, marker=marker,
+                label=LABELS[method], lw=3.1 if method == "ceac" else 1.85,
+            )
+        ax.set_yscale("symlog", linthresh=.01)
+        ax.set(
+            title=f"{ENVIRONMENT_LABELS[kind]} · Cumulative Regret vs. ρ",
+            xlabel=DOSE_LABELS[kind] + r" $\rho$",
+            xticks=levels,
+        )
+        if c_idx == 0:
+            ax.set_ylabel("Cumulative pseudo-regret (symlog) ↓")
+        ax.grid(alpha=.22)
+        ax.spines[["top", "right"]].set_visible(False)
+    pad_plot_axis(axes[0, 0])
+    present = [m for m in METHODS if m in handles]
+    fig.suptitle(f"Physical Pathology Dose Response (Mode {mode}) · Overlaid Cumulative Regret Across ρ", fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0, .21, 1, .925))
+    leg = fig.legend(
+        [handles[m] for m in present],
+        [LABELS[m] for m in present],
+        loc="upper center",
+        bbox_to_anchor=(.5, .19),
+        ncol=3,
+        frameon=False,
+        fontsize=9.0,
+    )
+    for txt in leg.get_texts():
+        if "CEAC" in txt.get_text():
+            txt.set_fontweight("bold")
+            txt.set_color("#0047AB")
+    return fig
+
+
+def draw_overlaid_grid_return_traces(groups, context=0, mode=1, rho=0.75, plt=None, band="sd"):
+    """Clean 1x2 overlaid expected-return time traces (Undertow DeepSea | False Beacon Shore) at strength rho."""
+    if plt is None:
+        import matplotlib.pyplot as plt
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    kinds = [k for k in ("deepsea", "frozenlake") if any((k, context, mode, m) in groups for m in METHODS)]
+    fig, axes = plt.subplots(1, len(kinds), figsize=(13.4, 5.0), sharex=True, squeeze=False)
+    handles = {}
+    opt_line = None
+    for c_idx, kind in enumerate(kinds):
+        ax = axes[0, c_idx]
+        present = [m for m in METHODS if (kind, context, mode, m) in groups]
+        for method in present:
+            values = trace_values(groups[kind, context, mode, method][rho], "expected_return")
+            handles[method] = plot_seed_trace(ax, values, method, band)
+        opt_val = groups[kind, context, mode, present[0]][rho][0]["metrics"][0]["optimal_return"]
+        opt_line = ax.axhline(opt_val, color="#1F2937", lw=1.3, ls=":", alpha=.85)
+        ax.set_title(f"{ENVIRONMENT_LABELS[kind]} (ρ = {rho:g}) · Overlaid Expected Return", fontsize=11.0, pad=8)
+        ax.set_xlabel("Training episode", fontsize=9.8)
+        if c_idx == 0:
+            ax.set_ylabel("Expected return (causal 16-episode mean) ↑", fontsize=9.8)
+        ax.grid(alpha=.22)
+        ax.spines[["top", "right"]].set_visible(False)
+    present_all = [m for m in METHODS if m in handles]
+    fig.suptitle(f"Undertow DeepSea & False Beacon Shore (ρ = {rho:g}, Mode {mode}) · Overlaid Expected Return Time Traces", fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0, .21, 1, .925))
+    leg_handles = [handles[m] for m in present_all] + ([opt_line] if opt_line is not None else [])
+    leg_labels = [LABELS[m] for m in present_all] + (["Optimal policy value"] if opt_line is not None else [])
+    leg = fig.legend(leg_handles, leg_labels, loc="upper center", bbox_to_anchor=(.5, .19), ncol=3, frameon=False, fontsize=8.9)
+    for txt in leg.get_texts():
+        if "CEAC" in txt.get_text():
+            txt.set_fontweight("bold")
+            txt.set_color("#0047AB")
+    return fig
+
+
+def draw_overlaid_grid_traces(groups, context=0, mode=1, rho=0.75, plt=None, band="sd", prior=False):
+    """Clean 1x2 overlaid time traces (Undertow DeepSea | False Beacon Frozen Lake) at diversion strength rho."""
+    if plt is None:
+        import matplotlib.pyplot as plt
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    methods = ("ceac", "ids", "ids_zero") if prior else METHODS
+    kinds = [k for k in ("deepsea", "frozenlake") if any((k, context, mode, m) in groups for m in methods)]
+    fig, axes = plt.subplots(1, len(kinds), figsize=(13.4, 5.0), sharex=True, sharey=True, squeeze=False)
+    handles = {}
+    for c_idx, kind in enumerate(kinds):
+        ax = axes[0, c_idx]
+        present = [m for m in methods if (kind, context, mode, m) in groups]
+        for method in present:
+            values = trace_values(groups[kind, context, mode, method][rho], "cumulative_pseudo_regret")
+            handles[method] = plot_seed_trace(ax, values, method, band)
+        ax.set_title(f"{ENVIRONMENT_LABELS[kind]} (ρ = {rho:g}) · Overlaid Regret", fontsize=11.0, pad=8)
+        ax.set_xlabel("Training episode", fontsize=9.8)
+        if c_idx == 0:
+            ax.set_ylabel("Cumulative pseudo-regret (symlog) ↓", fontsize=9.8)
+        ax.set_yscale("symlog", linthresh=.01)
+        ax.grid(alpha=.22)
+        ax.spines[["top", "right"]].set_visible(False)
+    pad_plot_axis(axes[0, 0])
+    present_all = [m for m in methods if m in handles]
+    suptitle = (
+        f"Bayesian Prior Support Exclusion (ρ = {rho:g}, Mode {mode}) · Overlaid Regret Time Traces"
+        if prior
+        else f"Undertow DeepSea & False Beacon Shore (ρ = {rho:g}, Mode {mode}) · Overlaid Regret Time Traces"
+    )
+    fig.suptitle(suptitle, fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0, .21, 1, .925))
+    leg = fig.legend(
+        [handles[m] for m in present_all],
+        [LABELS[m] for m in present_all],
+        loc="upper center",
+        bbox_to_anchor=(.5, .19),
+        ncol=min(3, len(present_all)),
+        frameon=False,
+        fontsize=9.0,
+    )
+    for txt in leg.get_texts():
+        if "CEAC" in txt.get_text():
+            txt.set_fontweight("bold")
+            txt.set_color("#0047AB")
+    return fig
 
 
 def draw_method_overlay(groups, kind, context=0, mode=1, plt=None, band="sd", prior=False):

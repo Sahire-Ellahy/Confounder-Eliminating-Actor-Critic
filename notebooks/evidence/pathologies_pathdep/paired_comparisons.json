@@ -4,175 +4,175 @@
     "dose": 3,
     "kind": "signalling_rewiring",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 21522.43814249121,
-    "regret_saved_sd": 192.28868261048416
+    "regret_saved_mean": 19074.02635770058,
+    "regret_saved_sd": 348.1435184163497
   },
   {
     "comparator": "ucb_q",
     "dose": 3,
     "kind": "signalling_rewiring",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 22022.384059614724,
-    "regret_saved_sd": 166.06422052679264
+    "regret_saved_mean": 20349.426488022913,
+    "regret_saved_sd": 852.7476799457443
   },
   {
     "comparator": "pomd",
     "dose": 3,
     "kind": "signalling_rewiring",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 21534.33444344655,
-    "regret_saved_sd": 1.560993550312506
+    "regret_saved_mean": 19220.143640611637,
+    "regret_saved_sd": 2.625183453846558
   },
   {
     "comparator": "ids_null",
     "dose": 3,
     "kind": "signalling_rewiring",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 13721.2261462884,
-    "regret_saved_sd": 1.5609935503135106
+    "regret_saved_mean": 13722.569211356815,
+    "regret_saved_sd": 2.6251834538459384
   },
   {
     "comparator": "ids_product",
     "dose": 3,
     "kind": "signalling_rewiring",
-    "ranked_wins_all_seeds": false,
-    "regret_saved_mean": 66.48565295290642,
-    "regret_saved_sd": 149.0916043479045
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 13725.311521349688,
+    "regret_saved_sd": 2.411951531311994
   },
   {
     "comparator": "ids_action_tree",
     "dose": 3,
     "kind": "signalling_rewiring",
-    "ranked_wins_all_seeds": false,
-    "regret_saved_mean": 15.710626286238911,
-    "regret_saved_sd": 40.26374697531194
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 13724.605701349721,
+    "regret_saved_sd": 2.9483073129939723
   },
   {
     "comparator": "ids_action_onpath",
     "dose": 3,
     "kind": "signalling_rewiring",
-    "ranked_wins_all_seeds": false,
-    "regret_saved_mean": -35.020400380427645,
-    "regret_saved_sd": 2.898487158508157
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 13722.896891349803,
+    "regret_saved_sd": 2.6251834538459384
   },
   {
     "comparator": "ceac",
     "dose": 3,
     "kind": "signalling_rewiring",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 15641.621497962675,
-    "regret_saved_sd": 10.403874593525568
+    "regret_saved_mean": 18350.695227831413,
+    "regret_saved_sd": 14.362861406457414
   },
   {
     "comparator": "ceac_natural",
     "dose": 3,
     "kind": "signalling_rewiring",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 15692.499652974626,
-    "regret_saved_sd": 6.255510163394073
+    "regret_saved_mean": 18380.98327820692,
+    "regret_saved_sd": 5.5711578603823755
   },
   {
     "comparator": "ceac_ranked_natural",
     "dose": 3,
     "kind": "signalling_rewiring",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 314.7336212447221,
-    "regret_saved_sd": 8.467087897409384
+    "regret_saved_mean": 332.8403739318732,
+    "regret_saved_sd": 4.54541418157225
   },
   {
     "comparator": "oracle",
     "dose": 3,
     "kind": "signalling_rewiring",
     "ranked_wins_all_seeds": false,
-    "regret_saved_mean": -41.33385371376098,
-    "regret_saved_sd": 1.5609935503134051
+    "regret_saved_mean": -39.99078864534671,
+    "regret_saved_sd": 2.625183453845852
   },
   {
     "comparator": "idac",
     "dose": 3,
     "kind": "canalized_gi",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 21616.504249259597,
-    "regret_saved_sd": 575.7158198021096
+    "regret_saved_mean": 19319.64350421655,
+    "regret_saved_sd": 744.4651685349088
   },
   {
     "comparator": "ucb_q",
     "dose": 3,
     "kind": "canalized_gi",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 22942.436324537066,
-    "regret_saved_sd": 82.92838810358397
+    "regret_saved_mean": 20485.868883631352,
+    "regret_saved_sd": 267.54903085244
   },
   {
     "comparator": "pomd",
     "dose": 3,
     "kind": "canalized_gi",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 21231.164679665188,
-    "regret_saved_sd": 5.235558018482924
+    "regret_saved_mean": 18763.65536722995,
+    "regret_saved_sd": 4.743553756775297
   },
   {
     "comparator": "ids_null",
     "dose": 3,
     "kind": "canalized_gi",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 15148.388452013178,
-    "regret_saved_sd": 5.235558018484722
+    "regret_saved_mean": 15151.367963636012,
+    "regret_saved_sd": 4.743553756776223
   },
   {
     "comparator": "ids_product",
     "dose": 3,
     "kind": "canalized_gi",
-    "ranked_wins_all_seeds": false,
-    "regret_saved_mean": -7.3118176311362975,
-    "regret_saved_sd": 16.344331860126193
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 15153.63379467662,
+    "regret_saved_sd": 4.6665047537949995
   },
   {
     "comparator": "ids_action_tree",
     "dose": 3,
     "kind": "canalized_gi",
-    "ranked_wins_all_seeds": false,
-    "regret_saved_mean": -14.962443855621146,
-    "regret_saved_sd": 11.413953390171802
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 15153.826193637156,
+    "regret_saved_sd": 4.876966873501304
   },
   {
     "comparator": "ids_action_onpath",
     "dose": 3,
     "kind": "canalized_gi",
-    "ranked_wins_all_seeds": false,
-    "regret_saved_mean": -30.196460938345314,
-    "regret_saved_sd": 9.103138795337463
+    "ranked_wins_all_seeds": true,
+    "regret_saved_mean": 15151.81852134314,
+    "regret_saved_sd": 4.564299389455854
   },
   {
     "comparator": "ceac",
     "dose": 3,
     "kind": "canalized_gi",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 17701.352225112158,
-    "regret_saved_sd": 13.14373667405218
+    "regret_saved_mean": 20242.304494192227,
+    "regret_saved_sd": 15.695374282658888
   },
   {
     "comparator": "ceac_natural",
     "dose": 3,
     "kind": "canalized_gi",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 17702.172466004817,
-    "regret_saved_sd": 3.83178562804038
+    "regret_saved_mean": 20195.264669850487,
+    "regret_saved_sd": 8.590896833072804
   },
   {
     "comparator": "ceac_ranked_natural",
     "dose": 3,
     "kind": "canalized_gi",
     "ranked_wins_all_seeds": true,
-    "regret_saved_mean": 333.61764531425354,
-    "regret_saved_sd": 6.778845696594959
+    "regret_saved_mean": 352.9973855110023,
+    "regret_saved_sd": 11.694247327658815
   },
   {
     "comparator": "oracle",
     "dose": 3,
     "kind": "canalized_gi",
     "ranked_wins_all_seeds": false,
-    "regret_saved_mean": -40.134234336232446,
-    "regret_saved_sd": 5.235558018484419
+    "regret_saved_mean": -37.15472271339639,
+    "regret_saved_sd": 4.743553756775801
   }
 ]

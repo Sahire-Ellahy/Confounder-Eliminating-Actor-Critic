@@ -17,10 +17,15 @@ LABELS = {
     "ids_rare": "IDS: rare prior (0.001)", "ids_zero": "Bayesian IDS: misspecified prior",
 }
 STYLES = {
-    "ceac": ("#cf202f", "-", "o"), "ceac_actor": ("#8b3e2f", ":", "v"),
-    "oracle": ("#161616", "--", "*"), "ucb_q": ("#07854d", "-.", "x"),
-    "idac": ("#7c2fc5", (0, (5, 1, 1, 1)), "^"), "pomd": ("#ad5700", "--", "s"), "ids": ("#0058c7", "--", "D"),
-    "ids_rare": ("#bd319b", "-.", "s"), "ids_zero": ("#c90078", ":", "X"),
+    "ceac": ("#0047AB", "-", "o"),            # Canonical CEAC: Cobalt Blue
+    "ceac_actor": ("#3B82F6", ":", "v"),      # Actor-only CEAC ablation: Slate Cobalt
+    "oracle": ("#374151", ":", "*"),          # Oracle: Charcoal Grey
+    "idac": ("#15803D", "-", "D"),            # IDAC: Emerald / Forest Green
+    "pomd": ("#FF1493", "--", "h"),           # Optimistic POMD: Deep Hot Pink
+    "ucb_q": ("#C026D3", "-.", ">"),          # UCB Q-learning: Vivid Fuchsia-Magenta
+    "ids": ("#DC2626", "--", "^"),            # Bayesian IDS (full support): Scarlet Red
+    "ids_rare": ("#FB7185", "-.", "s"),       # Bayesian IDS (rare prior): Coral Red
+    "ids_zero": ("#7F1D1D", ":", "X"),        # Bayesian IDS (misspecified prior): Dark Wine Red
 }
 
 
@@ -134,7 +139,7 @@ def plot_seed_trace(axis, values, method, band):
     x = np.arange(1, values.shape[1]+1)
     color, style, marker = STYLES[method]
     return plot_summary(axis, x, stats, color=color, linestyle=style, marker=marker,
-                        label=LABELS[method], lw=2.6 if method == "ceac" else 1.9,
+                        label=LABELS[method], lw=3.1 if method == "ceac" else (2.4 if method.startswith("ceac") else 1.85),
                         marker_slot=tuple(STYLES).index(method), marker_slots=len(STYLES),
                         time_trace=True)
 

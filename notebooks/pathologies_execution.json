@@ -1,13 +1,13 @@
 {
-  "code_cells": 28,
+  "code_cells": 7,
   "evidence_manifests": {
-    "pathologies_epistasis": "bad980b54e6ac88c5e8ab8638e200ad6ee43e3ca615ad03cea4962ef88761c6c",
-    "pathologies_gi_ranked": "e011deb1d1bcfd0fe979c512d26c13bf719de956e696bb3f6d65d290fed6d008",
-    "pathologies_locks": "7a69fc691ba6c63c1065bf08d26753c1cfd198f9cb936259f5aebd7e354f8fd5",
-    "pathologies_pathdep": "0c5ce63bb5c2ec16c213a5f4ce9f5a07a1caf65145bfeae67027f06702ea702e"
+    "pathologies_epistasis": "2631b0d6fbd45b332249fb8f56d71ec4100360d28151164042b613710587533d",
+    "pathologies_gi_ranked": "e8ce5f3c6a811f6d2b862ba8ec079335fd9073a18547e65ccb70b4fb32a01a6f",
+    "pathologies_locks": "260875b08c361c8fa28f2686e18dfd7181aa1cf1b4e9f3250d2dee6b698e6ad0",
+    "pathologies_pathdep": "afcfa99db7f107e27f6d1fb5f4e6317c8c348db2b975b7d5eba1c65e5b7d028e"
   },
   "notebook": "notebooks/Pathological_Search_Suite.ipynb",
-  "notebook_sha256": "26525e0d4793fb7746be08f27d049f521f1575dec1b90e3ef9d921bf270e8633",
+  "notebook_sha256": "146a7101ed3f875abab66162e489e010f3c3214fa645aa8a84a0e0b5c0b70ddd",
   "packages": {
     "ipykernel": "7.4.0",
     "matplotlib": "3.11.2",
@@ -16,7 +16,7 @@
     "scipy": "1.17.1"
   },
   "python": "3.11.13",
-  "rendered_figures": 27,
+  "rendered_figures": 24,
   "schema": 1,
   "status": "complete",
   "training_launched": false

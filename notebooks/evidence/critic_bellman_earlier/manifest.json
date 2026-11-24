@@ -1,0 +1,27 @@
+{
+  "burden_cells": 120,
+  "files": {
+    "assessment.md": "df0c2d58d50c06226d55b20b7c1e50af3241ca6d71379d97ee039d0cea493704",
+    "grid_critic_audit.json.gz": "35f115130f219f204f550eef1b1ba20e49010b6b5ce217cee7116d32f1100e24",
+    "grid_critic_rho_scaling.pdf": "857116f5bbf9da308da1f0bbbad293d6b42fa57a464e2d4352fdf4d30bedccf8",
+    "grid_critic_rho_scaling.png": "1c2d2b9cdbd6e105895db99593358cc00101c4195200da68d3ba4ed1cc7ec175",
+    "grid_deepsea_frozenlake_critic_traces.pdf": "cbd258ac840fe26a1cbf2e0d9ac8eb7d6bd9db9898355ae68520f4fdb9d6155a",
+    "grid_deepsea_frozenlake_critic_traces.png": "501cd78e4812389702b56b4abeca257f697af8a615cba89cb721ead0107e117f",
+    "grid_deepsea_frozenlake_reward_traces.pdf": "7bcadc7b89bbe278e09bbb1714ee2f74f8bfe03f83241b7b4c43e7d243cddf7b",
+    "grid_deepsea_frozenlake_reward_traces.png": "26e77b689a58a8a2a5a731d8c90dead8e4301dd53ea1b63d7aa56af26fdfdf32",
+    "junction_burden_critic_audit.json.gz": "dd2ca0725d8d2a61571092db11fb67eb69e224a45e25f3ab00d7228ae8fd11e0",
+    "junction_burden_critic_scaling.pdf": "c19200501c16fd6007f3a3a6d5a6c9c2fba420d36e94374061fc7e602f776ca5",
+    "junction_burden_critic_scaling.png": "d8e615e8b34f9b431a469d437cd6addc95ff723f4968c507767b0176c06a1eb5",
+    "junction_burden_critic_traces.pdf": "e662bd239f89ff3e816ffb67de12257504c9e3bde5a3d9f3249e6b82f88eb44f",
+    "junction_burden_critic_traces.png": "b0b54441779c9eb68c9be5a0da31c1a6bbf10118a273faf1f1cdc533644aeadf",
+    "junction_burden_reward_traces.pdf": "0caf3c46513e8308b7ec2c3431c0dba8dba454dd2ef51000d106063bcd33582c",
+    "junction_burden_reward_traces.png": "3ef34088ebc28bb267dcab9736dfb4c31ef991fa4d97155c1aa0fccfe75b4411",
+    "junction_prior_critic_audit.json.gz": "8b9a6f5d0ed3e28d8f06d49aa643729442e42f67ed62e8f693467c892e050953",
+    "junction_prior_critic_traces.pdf": "a644edc73cd5ecede8b6c22c27b353a0332ed4de4d0a6020a92a926ce5f2d7a8",
+    "junction_prior_critic_traces.png": "88eae798d17fb06366899e701784f1a2acd0254d3420771cb55642ee4c426a21"
+  },
+  "grid_cells": 144,
+  "prior_cells": 45,
+  "schema": 1,
+  "training_launched": false
+}

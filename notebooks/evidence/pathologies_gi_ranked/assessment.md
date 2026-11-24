@@ -113,3 +113,36 @@ Verified **288** held-out sweep cells (`seeds = 0, 1, 2`, `65,536` episodes/cell
 | Multiplexed screen variant (synthetic pooled blocks) | CEAC · guarded natural | +4,413.7 ± 74.7 | True |
 | Multiplexed screen variant (synthetic pooled blocks) | CEAC · greedy + price-ranked (guarded natural) | +315.8 ± 11.2 | True |
 | Multiplexed screen variant (synthetic pooled blocks) | Oracle Graves–Lai | -36.5 ± 9.3 | False |
+
+## Held-Out Reward & Evidence Critic TD / Bellman Diagnostics
+
+Evaluated all **264** non-oracle `Task 1` sweep cells across log-spaced checkpoints `t ∈ {16 .. 65,536}` on independent held-out rollouts (`512` on-policy + `256` uniform-probe episodes per checkpoint; bit-exact cumulative-regret parity verified `< 1e-6` against `evidence.json.gz`).
+
+![Held-out critic Bellman trajectories](gi_critic_bellman_traces.png)
+
+![Held-out critic dose scaling](gi_critic_dose_scaling.png)
+
+| Environment | Algorithm | Reward Bellman RMSE (k=3, t=65,536) | Evidence Critic RMSE (k=0 → 3) | Active / Stage Critic RMSE (k=0 → 3) |
+|---|---|---:|---:|---:|
+| K562 GI Arrayed | IDAC · occupancy ratio | 0.0043 | 6.3818 → 6.8814 | 6.3818 → 6.8814 |
+| K562 GI Arrayed | UCB Q-learning | 0.1142 | 0.3063 → 0.3016 | 0.3063 → 0.3016 |
+| K562 GI Arrayed | Optimistic POMD | 0.9033 | 0.9017 → 0.9046 | 0.9017 → 0.9046 |
+| K562 GI Arrayed | IDS · no-interaction prior | 0.0609 | 22,542.0896 → 28,546.1863 | 0.3440 → 0.4356 |
+| K562 GI Arrayed | IDS · model-MI, uniform prior | 0.0335 | 40,876.4377 → 40,881.1767 | 0.0000 → 0.0052 |
+| K562 GI Arrayed | IDS · model-MI, empirical prior | 0.0380 | 40,699.8308 → 37,854.1364 | 0.0000 → 0.0000 |
+| K562 GI Arrayed | IDS · optimal-action MI (Russo–Van Roy) | 0.0288 | 40,755.2167 → 40,757.9319 | 0.0000 → 0.0047 |
+| K562 GI Arrayed | CEAC · reward + evidence critics | 0.0150 | 0.0027 → 0.0081 | 0.1841 → 0.2001 |
+| K562 GI Arrayed | CEAC · guarded natural | 0.0068 | 0.0023 → 0.0033 | 0.1837 → 0.2085 |
+| K562 GI Arrayed | CEAC · greedy disagreement + price-ranked replay | 0.0109 | 0.0000 → 0.0000 | 0.0000 → 0.0000 |
+| K562 GI Arrayed | CEAC · greedy + price-ranked (guarded natural) | 0.0101 | 0.0000 → 0.0000 | 0.0000 → 0.0000 |
+| K562 GI Multiplexed | IDAC · occupancy ratio | 0.0094 | 7.2064 → 7.0555 | 7.2064 → 7.0555 |
+| K562 GI Multiplexed | UCB Q-learning | 0.1116 | 0.2996 → 0.3024 | 0.2996 → 0.3024 |
+| K562 GI Multiplexed | Optimistic POMD | 0.7661 | 0.7670 → 0.7662 | 0.7670 → 0.7662 |
+| K562 GI Multiplexed | IDS · no-interaction prior | 0.0438 | 30,375.5222 → 23,672.8741 | 0.4635 → 0.3612 |
+| K562 GI Multiplexed | IDS · model-MI, uniform prior | 0.0256 | 40,919.7717 → 40,906.2746 | 0.0000 → 0.0071 |
+| K562 GI Multiplexed | IDS · model-MI, empirical prior | 0.0259 | 40,883.2785 → 40,287.8381 | 0.0000 → 0.0012 |
+| K562 GI Multiplexed | IDS · optimal-action MI (Russo–Van Roy) | 0.0307 | 40,873.1478 → 40,872.1052 | 0.0000 → 0.0064 |
+| K562 GI Multiplexed | CEAC · reward + evidence critics | 0.0270 | 0.0014 → 0.0038 | 0.1902 → 0.1910 |
+| K562 GI Multiplexed | CEAC · guarded natural | 0.0175 | 0.0034 → 0.0037 | 0.1902 → 0.1946 |
+| K562 GI Multiplexed | CEAC · greedy disagreement + price-ranked replay | 0.0224 | 0.0000 → 0.0000 | 0.0000 → 0.0000 |
+| K562 GI Multiplexed | CEAC · greedy + price-ranked (guarded natural) | 0.0094 | 0.0000 → 0.0000 | 0.0000 → 0.0000 |

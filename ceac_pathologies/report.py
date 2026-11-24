@@ -36,21 +36,21 @@ KINDS = {
     "gi_multiplexed": "Multiplexed screen variant (synthetic pooled blocks)",
 }
 
-DOSE_COLORS = ["#60A5FA", "#2563EB", "#1D4ED8", "#D62828", "#7B2CBF"]
+DOSE_COLORS = ["#94A3B8", "#64748B", "#475569", "#1E293B", "#0F172A"]
 
 METHOD_COLORS = {
-    "idac": "#16A34A",          # Primary Kelly Green
-    "ucb_q": "#7B2CBF",         # Primary Violet
-    "pomd": "#C026D3",          # Vibrant Magenta
-    "ids_decoy": "#8C1D18",     # Dark Brick Red
-    "ids_canonical": "#8C1D18", # Dark Brick Red
-    "ids_additive": "#8C1D18",  # Dark Brick Red
-    "ids_product": "#F77F00",   # Primary Vivid Orange
-    "ids_empirical": "#D99B00", # Primary Golden Yellow-Ochre
-    "ids_action": "#D62828",    # Primary Crimson Red
-    "ceac": "#0038A8",          # Bold Primary Royal Blue
-    "ceac_natural": "#1D70F2",  # Bold Primary Cobalt Blue
-    "oracle": "#222222",        # Charcoal Black
+    "idac": "#15803D",          # Emerald / Forest Green (IDAC)
+    "pomd": "#FF1493",          # Deep Hot Pink (Optimistic POMD)
+    "ucb_q": "#C026D3",         # Vivid Fuchsia-Magenta (UCB-Q)
+    "ids_decoy": "#7F1D1D",     # Dark Wine Red (misspecified/restricted IDS)
+    "ids_canonical": "#7F1D1D",
+    "ids_additive": "#7F1D1D",
+    "ids_product": "#DC2626",   # Vivid Scarlet Red (full-model MI IDS)
+    "ids_empirical": "#FB7185", # Coral / Rose Red (data-grounded MI IDS)
+    "ids_action": "#B91C1C",    # Ruby / Firebrick Red (optimal-action MI IDS)
+    "ceac": "#0047AB",          # Canonical CEAC = Cobalt Blue
+    "ceac_natural": "#1D4ED8",  # Canonical CEAC (guarded natural) = Royal Cobalt Blue
+    "oracle": "#374151",        # Charcoal Grey
 }
 
 METHOD_MARKERS = {
@@ -275,11 +275,15 @@ def _apply_style():
 
 
 def style_ceac_legend(leg):
-    """Emphasize all CEAC legend entries in boldface royal blue."""
+    """Emphasize canonical CEAC in bold cobalt blue and improved/ranked CEAC in bold periwinkle."""
     for txt in leg.get_texts():
-        if "CEAC" in txt.get_text():
+        label = txt.get_text()
+        if "CEAC" in label:
             txt.set_fontweight("bold")
-            txt.set_color("#002B7F")
+            if "greedy" in label.lower() or "ranked" in label.lower():
+                txt.set_color("#4C5CE8")
+            else:
+                txt.set_color("#0047AB")
     return leg
 
 
@@ -354,7 +358,7 @@ def draw_learning(bundle: dict, kind: str, task: int = 1, metric: str = "cumulat
 
 
 def draw_response(bundle: dict):
-    """Pathology dose on x: both final expected policy loss and cumulative regret (symlog)."""
+    """Render clean 1x2 pathology dose response (never >2 panels per figure)."""
     import matplotlib.pyplot as plt
     _apply_style()
     rows = endpoints(bundle)
@@ -363,53 +367,62 @@ def draw_response(bundle: dict):
     methods = [m for m in METHOD_ORDER if any(r["method"] == m for r in rows)]
     doses = sorted({r["dose"] for r in rows})
 
-    fig, axes = plt.subplots(len(kinds), 2, figsize=(12.8, 4.35 * len(kinds)), squeeze=False)
     xlab = {"locks": "Lock depth L (horizon H = L + 1)",
-            "epistasis": "Pleiotropic passenger modules k (M = 128 · 2^k, B = 4^k - 1)",
+            "epistasis": "Pleiotropic passenger modules k (M = 128 · 2^k, B = 4^k − 1)",
             "gi_screen": "Variables with unknown main effects k (M = 46 · 2^k)"}[protocol]
-    for row_idx, kind in enumerate(kinds):
-        for col_idx, (field_mean, field_sd, ylabel, use_symlog) in enumerate([
-            ("late_gap_mean", "late_gap_sd", "Final expected policy loss ↓", False),
-            ("regret_mean", "regret_sd", "Cumulative pseudo-regret (symlog) ↓", True),
-        ]):
-            ax = axes[row_idx, col_idx]
-            for method in methods:
-                group = sorted([r for r in rows if r["kind"] == kind and r["task"] == 1 and r["method"] == method], key=lambda r: r["dose"])
-                if not group:
-                    continue
-                x = np.array([r["dose"] for r in group], dtype=float)
-                y = np.array([r[field_mean] for r in group], dtype=float)
-                sd = np.array([r[field_sd] for r in group], dtype=float)
-                color = METHOD_COLORS[method]
-                is_ceac = method.startswith("ceac")
-                ax.fill_between(x, np.maximum(0.0, y - sd), y + sd, color=color, alpha=0.13 if is_ceac else 0.10, linewidth=0)
-                mk_kw = dict(markeredgecolor="white", markeredgewidth=0.6) if METHOD_MARKERS[method] != "x" else {}
-                ax.plot(
-                    x, y,
-                    label=LABELS[method],
-                    color=color,
-                    lw=3.0 if is_ceac else 1.65,
-                    marker=METHOD_MARKERS[method],
-                    markersize=9.5 if method == "ceac" else (8.0 if is_ceac else 6.2),
-                    linestyle="--" if method == "ids_product" else (":" if method == "oracle" else "-"),
-                    zorder=8 if is_ceac else 3,
-                    **mk_kw,
-                )
-            ax.set_title(f"{KINDS[kind]} · {'Final gap' if col_idx == 0 else 'Total learning cost'}", fontsize=11, pad=8)
-            ax.set_xlabel(xlab, fontsize=10, labelpad=6)
-            ax.set_ylabel(ylabel, fontsize=10)
-            ax.set_xticks(doses)
-            if use_symlog:
-                ax.set_yscale("symlog", linthresh=10.0)
-                ax.set_ylim(bottom=0.0)
-            else:
-                ax.set_ylim(-0.03, 1.00)
-            ax.grid(alpha=0.2)
-            ax.spines[["top", "right"]].set_visible(False)
-    bottom_reserve = 0.18 if len(kinds) == 1 else 0.11
-    fig.tight_layout(rect=(0.0, bottom_reserve, 1.0, 1.0))
+
+    if len(kinds) == 1:
+        panel_specs = [
+            (kinds[0], "late_gap_mean", "late_gap_sd", "Final expected policy loss ↓", False, "Final Policy Gap"),
+            (kinds[0], "regret_mean", "regret_sd", "Cumulative pseudo-regret (symlog) ↓", True, "Cumulative Regret"),
+        ]
+    else:
+        panel_specs = [
+            (k, "regret_mean", "regret_sd", "Cumulative pseudo-regret (symlog) ↓", True, "Cumulative Regret vs. Depth")
+            for k in kinds[:2]
+        ]
+
+    fig, axes = plt.subplots(1, len(panel_specs), figsize=(13.2, 4.9), squeeze=False)
+    for col_idx, (kind, field_mean, field_sd, ylabel, use_symlog, sfx) in enumerate(panel_specs):
+        ax = axes[0, col_idx]
+        for method in methods:
+            group = sorted([r for r in rows if r["kind"] == kind and r["task"] == 1 and r["method"] == method], key=lambda r: r["dose"])
+            if not group:
+                continue
+            x = np.array([r["dose"] for r in group], dtype=float)
+            y = np.array([r[field_mean] for r in group], dtype=float)
+            sd = np.array([r[field_sd] for r in group], dtype=float)
+            color = METHOD_COLORS[method]
+            is_ceac = method.startswith("ceac")
+            ax.fill_between(x, np.maximum(0.0, y - sd), y + sd, color=color, alpha=0.13 if is_ceac else 0.09, linewidth=0)
+            mk_kw = dict(markeredgecolor="white", markeredgewidth=0.6) if METHOD_MARKERS[method] != "x" else {}
+            ls = "--" if method in {"ids_product", "ceac_natural"} else (":" if method in {"oracle", "ids_decoy", "ids_canonical", "ids_additive"} else ("-." if method == "ucb_q" else "-"))
+            ax.plot(
+                x, y,
+                label=LABELS[method],
+                color=color,
+                lw=3.1 if method == "ceac" else (2.7 if is_ceac else 1.7),
+                marker=METHOD_MARKERS[method],
+                markersize=8.8 if method == "ceac" else (7.6 if is_ceac else 6.0),
+                linestyle=ls,
+                zorder=9 if is_ceac else 4,
+                **mk_kw,
+            )
+        ax.set_title(f"{KINDS[kind]} · {sfx}", fontsize=10.8, pad=8)
+        ax.set_xlabel(xlab, fontsize=9.8, labelpad=5)
+        if col_idx == 0 or len(kinds) == 1:
+            ax.set_ylabel(ylabel, fontsize=9.8)
+        ax.set_xticks(doses)
+        if use_symlog:
+            ax.set_yscale("symlog", linthresh=10.0)
+            ax.set_ylim(bottom=0.0)
+        else:
+            ax.set_ylim(-0.03, 1.00)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
+    fig.tight_layout(rect=(0.0, 0.21, 1.0, 0.98))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, bottom_reserve - 0.02), ncol=3, frameon=False, fontsize=9.5)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.19), ncol=3, frameon=False, fontsize=9.0)
     style_ceac_legend(leg)
     return fig
 
@@ -604,90 +617,147 @@ def _windowed_event_rate(trace: list[dict], keys: tuple[str, ...]) -> tuple[np.n
     return xs, rates
 
 
-def draw_epistasis_overlaid_performance(bundle: dict, task: int = 1):
-    """Render 2x2 overlaid performance time traces (k=0 vs k=3) with distinct markers and bold blue CEAC."""
+def draw_locks_overlaid_performance(bundle: dict, dose: int = 4, task: int = 1, metric: str = "cumulative_regret"):
+    """Render clean 1x2 overlaid time traces across Combination Lock & Bidirectional Lock at depth L."""
     import matplotlib.pyplot as plt
     _apply_style()
 
-    runs_all = [r for r in bundle["runs"] if r["kind"] == "epistatic_signalling" and r["task"] == task]
+    runs_all = [r for r in bundle["runs"] if r["task"] == task and r["dose"] == dose]
     methods = [m for m in METHOD_ORDER if any(r["method"] == m for r in runs_all)]
-    doses = sorted({r["dose"] for r in runs_all})
-    d_pair = [doses[0], doses[-1]]
+    kinds = ["combination_lock", "bidirectional_lock"]
     xticks = [0.512, 1.0, 2.0, 5.0, 10.0, 25.0, 65.536]
     xticklabels = ["0.5k", "1k", "2k", "5k", "10k", "25k", "65k"]
 
-    fig, axes = plt.subplots(2, 2, figsize=(13.4, 8.4), sharex=False)
-    for c_idx, dose in enumerate(d_pair):
-        n_mod = 128 * (2 ** dose)
-        n_pleio = (4 ** dose) - 1
-        col_lbl = f"Baseline (k = {dose}, M = {n_mod})" if dose == 0 else f"Pleiotropic Confounding (k = {dose}, M = {n_mod:,}, {n_pleio} off-pathway)"
-        for r_idx, (metric, ylab, symlog) in enumerate([
-            ("window_gap", "Rolling 256-episode policy gap ↓", False),
-            ("cumulative_regret", "Cumulative expected regret (symlog) ↓", True),
-        ]):
-            ax = axes[r_idx, c_idx]
-            for m_idx, method in enumerate(methods):
-                cells = sorted([r for r in runs_all if r["dose"] == dose and r["method"] == method], key=lambda r: r["seed"])
-                if not cells:
-                    continue
-                pts_list = [r["trace"][1:] if len(r["trace"]) > 1 and r["trace"][0]["episode"] == 1 else r["trace"] for r in cells]
-                xs = np.array([t["episode"] for t in pts_list[0]], dtype=float) / 1000.0
-                vals = np.array([[t[metric] for t in pts] for pts in pts_list], dtype=float)
-                mean = vals.mean(axis=0)
-                sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
-                color = METHOD_COLORS[method]
-                is_ceac = method.startswith("ceac")
-                ls = "--" if method == "ids_product" else (":" if method == "oracle" else "-")
-                lw = 3.0 if is_ceac else 1.6
-                ms = 8.6 if method == "ceac" else (7.4 if is_ceac else 5.6)
-                zord = 9 if is_ceac else (5 if method == "ids_action" else 3)
-                mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if METHOD_MARKERS[method] != "x" else {}
-                ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=color, alpha=0.13 if is_ceac else 0.09, linewidth=0)
-                ax.plot(
-                    xs, mean, label=LABELS[method], color=color, lw=lw, linestyle=ls,
-                    marker=METHOD_MARKERS[method], markersize=ms, markevery=log_markevery(len(xs), m_idx),
-                    zorder=zord, **mk_kw,
-                )
-            ax.set_xscale("log")
-            ax.set_xlim(0.50, 67.0)
-            ax.set_xticks(xticks)
-            ax.set_xticklabels(xticklabels)
-            ax.minorticks_off()
-            if symlog:
-                ax.set_yscale("symlog", linthresh=15.0)
-                ax.set_ylim(bottom=0.0)
-            else:
-                ax.set_ylim(-0.03, 1.03)
-            metric_lbl = "Expected Policy Gap" if metric == "window_gap" else "Cumulative Regret"
-            ax.set_title(f"{col_lbl} · {metric_lbl}", fontsize=10.5, pad=7)
-            ax.set_xlabel("Training episodes (log scale)", fontsize=9.6, labelpad=4)
-            if c_idx == 0:
-                ax.set_ylabel(ylab, fontsize=9.8)
-            ax.grid(alpha=0.2)
-            ax.spines[["top", "right"]].set_visible(False)
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.0), squeeze=False)
+    symlog = metric == "cumulative_regret"
+    ylab = "Cumulative expected regret (symlog) ↓" if symlog else "Rolling 256-episode policy gap ↓"
+    sfx = "Cumulative Regret" if symlog else "Expected Policy Gap"
 
-    fig.suptitle("Epistatic Signalling / Protein Activation · Overlaid Performance Time Traces (Task 1)", fontsize=13.0, y=0.988)
-    fig.tight_layout(rect=(0.0, 0.135, 1.0, 0.948))
+    for c_idx, kind in enumerate(kinds):
+        ax = axes[0, c_idx]
+        for m_idx, method in enumerate(methods):
+            cells = sorted([r for r in runs_all if r["kind"] == kind and r["method"] == method], key=lambda r: r["seed"])
+            if not cells:
+                continue
+            pts_list = [r["trace"][1:] if len(r["trace"]) > 1 and r["trace"][0]["episode"] == 1 else r["trace"] for r in cells]
+            xs = np.array([t["episode"] for t in pts_list[0]], dtype=float) / 1000.0
+            vals = np.array([[t[metric] for t in pts] for pts in pts_list], dtype=float)
+            mean = vals.mean(axis=0)
+            sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
+            color = METHOD_COLORS[method]
+            is_ceac = method.startswith("ceac")
+            ls = "--" if method in {"ids_product", "ceac_natural"} else (":" if method in {"oracle", "ids_decoy"} else ("-." if method == "ucb_q" else "-"))
+            lw = 3.2 if method == "ceac" else (2.7 if is_ceac else 1.75)
+            ms = 8.4 if method == "ceac" else (7.4 if is_ceac else 5.8)
+            zord = 10 if method == "ceac" else (8 if is_ceac else 4)
+            mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if METHOD_MARKERS[method] != "x" else {}
+            ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=color, alpha=0.13 if is_ceac else 0.08, linewidth=0)
+            ax.plot(
+                xs, mean, label=LABELS[method], color=color, lw=lw, linestyle=ls,
+                marker=METHOD_MARKERS[method], markersize=ms, markevery=log_markevery(len(xs), m_idx),
+                zorder=zord, **mk_kw,
+            )
+        ax.set_xscale("log")
+        ax.set_xlim(0.50, 67.0)
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(xticklabels)
+        ax.minorticks_off()
+        if symlog:
+            ax.set_yscale("symlog", linthresh=15.0)
+            ax.set_ylim(bottom=0.0)
+        else:
+            ax.set_ylim(-0.03, 1.03)
+        ax.set_title(f"{KINDS[kind]} (L = {dose}) · {sfx}", fontsize=10.8, pad=8)
+        ax.set_xlabel("Training episodes (log scale)", fontsize=9.6, labelpad=4)
+        if c_idx == 0:
+            ax.set_ylabel(ylab, fontsize=9.8)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
+
+    fig.suptitle(f"Sequential & Bidirectional Combination Locks · Overlaid {sfx} Time Traces (Depth L = {dose}, Task 1)", fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0.0, 0.21, 1.0, 0.925))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.115), ncol=3, frameon=False, fontsize=9.2)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.19), ncol=3, frameon=False, fontsize=9.0)
+    style_ceac_legend(leg)
+    return fig
+
+
+def draw_epistasis_overlaid_performance(bundle: dict, task: int = 1, dose: int = 3):
+    """Render clean 1x2 overlaid performance time traces (Policy Gap | Cumulative Regret) at pleiotropy k=3."""
+    import matplotlib.pyplot as plt
+    _apply_style()
+
+    runs_all = [r for r in bundle["runs"] if r["kind"] == "epistatic_signalling" and r["task"] == task and r["dose"] == dose]
+    methods = [m for m in METHOD_ORDER if any(r["method"] == m for r in runs_all)]
+    xticks = [0.512, 1.0, 2.0, 5.0, 10.0, 25.0, 65.536]
+    xticklabels = ["0.5k", "1k", "2k", "5k", "10k", "25k", "65k"]
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.0), sharex=False, squeeze=False)
+    for c_idx, (metric, title_sfx, ylab, symlog) in enumerate([
+        ("window_gap", "Overlaid Expected Policy Gap ↓", "Rolling 256-episode policy gap ↓", False),
+        ("cumulative_regret", "Overlaid Cumulative Regret ↓", "Cumulative expected regret (symlog) ↓", True),
+    ]):
+        ax = axes[0, c_idx]
+        for m_idx, method in enumerate(methods):
+            cells = sorted([r for r in runs_all if r["method"] == method], key=lambda r: r["seed"])
+            if not cells:
+                continue
+            pts_list = [r["trace"][1:] if len(r["trace"]) > 1 and r["trace"][0]["episode"] == 1 else r["trace"] for r in cells]
+            xs = np.array([t["episode"] for t in pts_list[0]], dtype=float) / 1000.0
+            vals = np.array([[t[metric] for t in pts] for pts in pts_list], dtype=float)
+            mean = vals.mean(axis=0)
+            sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
+            color = METHOD_COLORS[method]
+            is_ceac = method.startswith("ceac")
+            ls = "--" if method in {"ids_product", "ceac_natural"} else (":" if method in {"oracle", "ids_canonical"} else ("-." if method == "ucb_q" else "-"))
+            lw = 3.2 if method == "ceac" else (2.7 if is_ceac else 1.75)
+            ms = 8.4 if method == "ceac" else (7.4 if is_ceac else 5.8)
+            zord = 10 if method == "ceac" else (8 if is_ceac else (5 if method == "ids_action" else 4))
+            mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if METHOD_MARKERS[method] != "x" else {}
+            ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=color, alpha=0.13 if is_ceac else 0.08, linewidth=0)
+            ax.plot(
+                xs, mean, label=LABELS[method], color=color, lw=lw, linestyle=ls,
+                marker=METHOD_MARKERS[method], markersize=ms, markevery=log_markevery(len(xs), m_idx),
+                zorder=zord, **mk_kw,
+            )
+        ax.set_xscale("log")
+        ax.set_xlim(0.50, 67.0)
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(xticklabels)
+        ax.minorticks_off()
+        if symlog:
+            ax.set_yscale("symlog", linthresh=15.0)
+            ax.set_ylim(bottom=0.0)
+        else:
+            ax.set_ylim(-0.03, 1.03)
+        ax.set_title(title_sfx, fontsize=10.8, pad=8)
+        ax.set_xlabel("Training episodes (log scale)", fontsize=9.6, labelpad=4)
+        ax.set_ylabel(ylab, fontsize=9.8)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
+
+    n_mod = 128 * (2 ** dose)
+    n_pleio = (4 ** dose) - 1
+    fig.suptitle(f"Epistatic Signalling Activation (k = {dose}, M = {n_mod:,}, {n_pleio} Off-Pathway Arms) · Overlaid Time Traces", fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0.0, 0.21, 1.0, 0.925))
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.19), ncol=3, frameon=False, fontsize=9.0)
     style_ceac_legend(leg)
     return fig
 
 
 def draw_epistasis_discovery_traces(bundle: dict, dose: int = 3, task: int = 1):
-    """Render 4-panel time-trace view of performance gap and discovery mechanics on epistasis."""
+    """Render clean 1x2 overlaid discovery time traces (Causal Synergy Lock-On | Confounder & Pleiotropic Trap)."""
     import matplotlib.pyplot as plt
     _apply_style()
 
     runs = [r for r in bundle["runs"] if r["kind"] == "epistatic_signalling" and r["task"] == task and r["dose"] == dose]
-    methods = [m for m in METHOD_ORDER if any(r["method"] == m for r in runs)]
+    methods = [m for m in METHOD_ORDER if m != "oracle" and any(r["method"] == m for r in runs)]
 
-    fig, axes = plt.subplots(2, 2, figsize=(13.4, 8.4))
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.0), squeeze=False)
     panels = [
-        ("gap", "Policy Suboptimality Gap ↓", "Rolling 256-episode policy gap ↓", (-0.03, 1.03)),
         (("synergy",), "Causal Responder Lock-On Rate ↑ (K1 ∧ K2 Synergy)", "Episodes selecting causal synergy (%)", (-3.0, 105.0)),
-        (("passenger_omics",), "Non-Causal Passenger-Omics Distraction ↓", "Episodes profiling passenger omics (%)", (-3.0, 105.0)),
-        (("pleiotropic",), "Off-Pathway Pleiotropic State Capture ↓", "Episodes entering off-pathway arms (%)", (-3.0, 105.0)),
+        (("passenger_omics", "pleiotropic"), "Confounder & Off-Pathway Trap Rate ↓", "Passenger-omics + off-pathway episodes (%)", (-3.0, 105.0)),
     ]
     xticks = [0.512, 1.0, 2.0, 5.0, 10.0, 25.0, 65.536]
     xticklabels = ["0.5k", "1k", "2k", "5k", "10k", "25k", "65k"]
@@ -697,24 +767,19 @@ def draw_epistasis_discovery_traces(bundle: dict, dose: int = 3, task: int = 1):
             cells = sorted([r for r in runs if r["method"] == method], key=lambda r: r["seed"])
             if not cells:
                 continue
-            if spec == "gap":
-                pts_list = [r["trace"][1:] if len(r["trace"]) > 1 and r["trace"][0]["episode"] == 1 else r["trace"] for r in cells]
-                xs = np.array([t["episode"] for t in pts_list[0]], dtype=float) / 1000.0
-                vals = np.array([[t["window_gap"] for t in pts] for pts in pts_list], dtype=float)
-            else:
-                series = [_windowed_event_rate(r["trace"], spec) for r in cells]
-                xs = series[0][0]
-                vals = np.array([s[1] for s in series], dtype=float)
+            series = [_windowed_event_rate(r["trace"], spec) for r in cells]
+            xs = series[0][0]
+            vals = np.array([s[1] for s in series], dtype=float)
             mean = vals.mean(axis=0)
             sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
             color = METHOD_COLORS[method]
             is_ceac = method.startswith("ceac")
-            ls = "--" if method == "ids_product" else (":" if method == "oracle" else "-")
-            lw = 3.0 if is_ceac else 1.6
-            ms = 8.6 if method == "ceac" else (7.4 if is_ceac else 5.6)
-            zord = 9 if is_ceac else (5 if method == "ids_action" else 3)
-            mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if METHOD_MARKERS[method] != "x" else {}
-            ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=color, alpha=0.13 if is_ceac else 0.09, linewidth=0)
+            ls = "--" if method in {"ids_product", "ceac_natural"} else (":" if method == "ids_canonical" else ("-." if method == "ucb_q" else "-"))
+            lw = 3.2 if method == "ceac" else (2.7 if is_ceac else 1.75)
+            ms = 8.4 if method == "ceac" else (7.4 if is_ceac else 5.8)
+            zord = 10 if method == "ceac" else (8 if is_ceac else (5 if method == "ids_action" else 4))
+            mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55)
+            ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=color, alpha=0.13 if is_ceac else 0.08, linewidth=0)
             ax.plot(
                 xs, mean, label=LABELS[method], color=color, lw=lw, linestyle=ls,
                 marker=METHOD_MARKERS[method], markersize=ms, markevery=log_markevery(len(xs), m_idx),
@@ -726,8 +791,8 @@ def draw_epistasis_discovery_traces(bundle: dict, dose: int = 3, task: int = 1):
         ax.set_xticklabels(xticklabels)
         ax.minorticks_off()
         ax.set_ylim(*ylim)
-        ax.set_title(title, fontsize=11, pad=8)
-        ax.set_xlabel("Training episodes (log scale)", fontsize=9.8, labelpad=5)
+        ax.set_title(title, fontsize=10.8, pad=8)
+        ax.set_xlabel("Training episodes (log scale)", fontsize=9.6, labelpad=4)
         ax.set_ylabel(ylab, fontsize=9.8)
         ax.grid(alpha=0.2)
         ax.spines[["top", "right"]].set_visible(False)
@@ -735,13 +800,13 @@ def draw_epistasis_discovery_traces(bundle: dict, dose: int = 3, task: int = 1):
     n_mod = 128 * (2 ** dose)
     n_pleio = (4 ** dose) - 1
     fig.suptitle(
-        f"Epistatic Signalling / Protein Activation · Overlaid Discovery & Performance Traces (k = {dose}, M = {n_mod:,}, {n_pleio} off-pathway arms)",
-        fontsize=12.8,
+        f"Epistatic Signalling Activation · Overlaid Discovery & Distraction Time Traces (k = {dose}, M = {n_mod:,}, {n_pleio} Off-Pathway Arms)",
+        fontsize=12.2,
         y=0.985,
     )
-    fig.tight_layout(rect=(0.0, 0.135, 1.0, 0.945))
+    fig.tight_layout(rect=(0.0, 0.21, 1.0, 0.925))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.115), ncol=3, frameon=False, fontsize=9.2)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.19), ncol=3, frameon=False, fontsize=9.0)
     style_ceac_legend(leg)
     return fig
 

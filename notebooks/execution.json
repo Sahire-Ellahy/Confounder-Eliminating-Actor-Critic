@@ -1,16 +1,18 @@
 {
   "actor_stability_manifest_sha256": "97ba016ce4a5596eb7c2fe34ebbfd93917783ee6634b79b9593e04f94306625e",
-  "code_cells": 6,
+  "code_cells": 7,
   "evidence_manifest_sha256": "e402d8639c7ec9662b55b96ab9981ae4f90578ce2a3962166159068cbc6ce5b8",
   "explanatory_map_hashes": {
-    "assets/junctions.png": "8a658d5bf3c37398b17b745e9af1b385a8f39da428a2c16a83e6e0fa2fa75abe"
+    "assets/junctions.png": "7904839e645d42dcb4ecf7f61382a638527b7940e4aeb5dfcd6306449fc88926"
   },
   "hardness_evidence_manifests": {
-    "hardness_burden": "5e725e20e8eb8bc68479d270481530a693f5738dab9cdda3cdfb8d6104dea0d9",
-    "hardness_prior": "f70ef390238572b636651cf6f120102ebbc21dfc8fee0fdc48e6971831544119",
-    "mechanisms": "42da881778c0bf083e2946350f44ca5aed8b55a211e71705a28be81d0d22aae7"
+    "critic_bellman_earlier": "164a4359e19f00608d028d7f3a64cacdf78b13503389e0e9fc3a2adc0368a402",
+    "hardness_burden": "f6fe39e07fd03f82ca9a084355848dc31813dc1445a30b81656695ffc78aad51",
+    "hardness_prior": "fc97413c9e3c94de00814efba2e063bd0a2fcef1e80cb8b1432b8e11cd7d5274",
+    "mechanisms": "58518867d433f3d0794cb40c4fcfe7da0db771bda9b578a05e5095015dff58a4",
+    "pathdep_undertow_falsebeacon": "befd7605b34739d5bf045b077425399a5fcdd4fa078df7922782989fb9011b92"
   },
-  "notebook_sha256": "9f3c0e117a64bdbdb238fc60b9cc533de022bdf59ee7699deea78b19b4c8fbea",
+  "notebook_sha256": "fe63aeef5d3d430d87989a4a32589c155ac56b63283e334045ab2d3212ab9ecf",
   "packages": {
     "ipykernel": "7.4.0",
     "matplotlib": "3.11.2",
@@ -19,7 +21,7 @@
     "scipy": "1.17.1"
   },
   "python": "3.11.13",
-  "rendered_figures": 5,
+  "rendered_figures": 15,
   "schema": 1,
   "status": "complete",
   "training_launched": false

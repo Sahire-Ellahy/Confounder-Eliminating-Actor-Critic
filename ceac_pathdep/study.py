@@ -15,6 +15,7 @@ from dataclasses import asdict
 import gzip
 import hashlib
 import json
+import multiprocessing as mp
 from pathlib import Path
 import time
 import numpy as np
@@ -46,7 +47,7 @@ from .environments import (
     relabel_canalized_gi,
     relabel_signalling,
 )
-from .learners import MultiStepActionIDS, PathDepGreedyCEAC
+from .learners import FastPathDepBayesianIDS, MultiStepActionIDS, PathDepGreedyCEAC, _base_policy_occ, make_truth_return_vec
 
 
 PATHDEP_KINDS = {
@@ -70,18 +71,18 @@ PATHDEP_LABELS = {
 }
 
 PATHDEP_COLORS = {
-    "idac": "#16A34A",                # Primary Kelly Green
-    "ucb_q": "#7B2CBF",               # Primary Violet
-    "pomd": "#C026D3",                # Vibrant Magenta
-    "ids_null": "#8C1D18",            # Dark Brick Red
-    "ids_product": "#F77F00",         # Primary Vivid Orange
-    "ids_action_tree": "#D99B00",     # Primary Golden Yellow-Ochre
-    "ids_action_onpath": "#D62828",   # Primary Crimson Red
-    "ceac": "#2563EB",                # Bold Primary Blue (uniform-bank CEAC)
-    "ceac_natural": "#60A5FA",        # Bold Sky-Cobalt Blue (uniform natural)
-    "ceac_ranked": "#0038A8",         # Bold Deep Royal Blue (ranked CEAC)
-    "ceac_ranked_natural": "#0077FF", # Bold Vivid Azure Blue (ranked natural)
-    "oracle": "#222222",              # Charcoal Black
+    "idac": "#15803D",                # Emerald / Forest Green (IDAC)
+    "pomd": "#FF1493",                # Deep Hot Pink (Optimistic POMD)
+    "ucb_q": "#C026D3",               # Vivid Fuchsia-Magenta (UCB-Q)
+    "ids_null": "#7F1D1D",            # Dark Wine Red (restricted/null IDS)
+    "ids_product": "#DC2626",         # Vivid Scarlet Red (full-model MI IDS)
+    "ids_action_tree": "#FB7185",     # Coral / Rose Red (optimal-policy tree MI IDS)
+    "ids_action_onpath": "#B91C1C",   # Ruby / Firebrick Red (quotiented on-path MI IDS)
+    "ceac": "#0047AB",                # Canonical CEAC = Cobalt Blue
+    "ceac_natural": "#1D4ED8",        # Canonical CEAC (guarded natural) = Royal Cobalt Blue
+    "ceac_ranked": "#6C7CFA",         # Improved / Ranked CEAC = Periwinkle
+    "ceac_ranked_natural": "#96A2FF", # Improved / Ranked CEAC (natural) = Lavender Periwinkle
+    "oracle": "#374151",              # Charcoal Grey
 }
 
 PATHDEP_MARKERS = {
@@ -229,9 +230,9 @@ def construct_pathdep_learner(kind: str, model, method: str, rng, episodes: int,
         return LaiGravesOracle(model, truth, CEACConfig(mass_bound=64.0, normalization=64.0))
     if method == "ids_null":
         t_name = "canonical" if kind == "signalling_rewiring" else "additive"
-        return BayesianIDS(model, rng, model.prior(t_name))
+        return FastPathDepBayesianIDS(model, rng, model.prior(t_name))
     if method == "ids_product":
-        return BayesianIDS(model, rng, model.prior("reference"))
+        return FastPathDepBayesianIDS(model, rng, model.prior("reference"))
     if method == "ids_action_tree":
         return MultiStepActionIDS(model, rng, model.prior("reference"), target="policy_tree")
     if method == "ids_action_onpath":
@@ -315,12 +316,13 @@ def run_pathdep_cell(
     priced_updates = 0
     last_policy = None
     expected = None
+    truth_r_vec = make_truth_return_vec(model, truth)
 
     with gzip.open(output / "trace.jsonl.gz", "wt") as target:
         for t in range(episodes):
             policy, behavior, prices = learner.select(t)
             if policy.identity != last_policy:
-                expected = float(model.returns(policy)[truth])
+                expected = float(truth_r_vec @ _base_policy_occ(model, policy))
                 last_policy = policy.identity
             gap = max(0.0, float(model.optimal_returns[truth] - expected))
             observation, _ = env.reset()
@@ -345,14 +347,21 @@ def run_pathdep_cell(
 
             # Evict raw Episode lists every 128 episodes to keep worker RSS < 45 MB.
             if (t + 1) % 128 == 0 and hasattr(learner, "replay") and hasattr(learner.replay, "strata"):
-                for bucket in learner.replay.strata.values():
-                    bucket.clear()
                 if hasattr(learner.replay, "evidence") and hasattr(learner.replay.evidence, "strata"):
                     learner.replay.evidence.strata.clear()
                 if method in {"ceac", "ceac_natural"} and hasattr(learner.replay, "statistics"):
                     keep = set(learner.bank._ids) | set(learner.candidates) | set(learner.frozen)
+                    learner.replay.strata.clear()
                     for pid in [k_id for k_id in learner.replay.statistics if k_id not in keep]:
                         del learner.replay.statistics[pid]
+                elif method in {"ceac_ranked", "ceac_ranked_natural"} and hasattr(learner.replay, "statistics"):
+                    keep = set(learner.bank._ids) | set(learner.replay.policies_by_id)
+                    learner.replay.strata.clear()
+                    for pid in [k_id for k_id in learner.replay.statistics if k_id not in keep]:
+                        del learner.replay.statistics[pid]
+                else:
+                    for bucket in learner.replay.strata.values():
+                        bucket.clear()
 
             cumulative += gap
             window.append(gap)
@@ -482,14 +491,14 @@ def draw_pathdep_architecture():
             "Signalling Pathway Rewiring (H = 3, EGFR/MEK Priming)",
             "basal\ncell",
             "Step 1 Priming (-0.015, 0 KL) → Step 2 Rewired Bypass Co-Target (0.92 vs 0.10)\nUnprimed / reversed-order co-target fails (0.25, intact feedback)",
-            "k Echoed Peripheral mRNA Reporters (0.49998; I(C*_onpath; Z) > 0\non peripheral clades, ZERO KL between Null & primary responder)",
+            "6k Echoed Peripheral mRNA Reporters (0.49999; I(C*_onpath; Z) > 0\non peripheral clades, ZERO KL between Null & primary responder)",
             "k Lineage Assays + (3^k - 1) Off-Path Stress States (local rescue ξ_b\nsplits optimal policy tree Π* by 2^k, zero on-path return change)",
         ),
         (
             "Canalized Genetic Risk Screen (H = 3, K562 PPP2R1A Hub)",
             "intact\nhub",
             "Step 1 PPP2R1A De-Canalization (-0.015, 0 KL) → Step 2 Modifier Hit\nfrom Horlbeck 2018 K562 GI (FDPS = -5.24 pays ≈0.96 vs neutral modifiers)",
-            "k Echoed Peripheral eQTL Reporters (0.49998; traps quotiented\non-path IDS via positive scalar MI on peripheral K562 modifiers)",
+            "6k Echoed Peripheral eQTL Reporters (0.49999; traps quotiented\non-path IDS via positive scalar MI on peripheral K562 modifiers)",
             "Intact-Hub Knockdowns (buffered 0.4999; k reveal ξ) + (3^k - 1)\nOff-Path Complexes (traps Russo–Van Roy policy-tree IDS & model-free RL)",
         ),
     ]
@@ -511,7 +520,132 @@ def draw_pathdep_architecture():
     return fig
 
 
+def draw_single_pathdep_scaling(summary_rows: list[dict], kind: str):
+    """Single-environment 1x2 scaling across k = 0 -> 3: Final Policy Gap (left) & Linear Cumulative Regret (right)."""
+    import matplotlib.pyplot as plt
+
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    sub = [r for r in summary_rows if r["kind"] == kind and r["task"] == 1]
+    doses = sorted({r["dose"] for r in sub})
+    methods = [m for m in PATHDEP_ORDER if any(r["method"] == m for r in sub)]
+    short_title = "Signalling Rewiring (H = 3)" if kind == "signalling_rewiring" else "Canalized K562 Genetic Risk (H = 3)"
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.6, 5.1), squeeze=False)
+    for c_i, (field, sd_f, ylab, title_sfx) in enumerate([
+        ("late_gap_mean", "late_gap_sd", "Final expected policy loss ↓", "Final Policy Gap vs. k ↓"),
+        ("regret_mean", "regret_sd", "Cumulative expected regret (linear) ↓", "Cumulative Regret vs. k (Linear Scale) ↓"),
+    ]):
+        ax = axes[0, c_i]
+        for m in methods:
+            grp = sorted([r for r in sub if r["method"] == m], key=lambda x: x["dose"])
+            if not grp:
+                continue
+            xs = np.array([x["dose"] for x in grp], dtype=float)
+            ys = np.array([x[field] for x in grp], dtype=float)
+            sds = np.array([x[sd_f] for x in grp], dtype=float)
+            col = PATHDEP_COLORS[m]
+            is_ceac = m.startswith("ceac")
+            is_ranked = m.startswith("ceac_ranked")
+            is_opt_ids = "ids_action" in m
+            ls = (
+                "--" if m in {"ceac", "ceac_ranked_natural", "ids_product"}
+                else (":" if m in {"oracle", "ids_null"} else ("-." if m in {"ucb_q", "ids_action_tree"} else "-"))
+            )
+            lw = 3.35 if is_ranked else (2.75 if is_ceac else (2.35 if is_opt_ids else 1.7))
+            ms = 8.4 if is_ranked else (7.6 if is_ceac else (6.8 if is_opt_ids else 5.6))
+            zord = 12 if is_ranked else (9 if is_opt_ids else (7 if is_ceac else 4))
+            mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if PATHDEP_MARKERS[m] != "x" else {}
+            ax.fill_between(xs, np.maximum(0.0, ys - sds), ys + sds, color=col, alpha=0.13 if (is_ranked or is_opt_ids) else 0.07, linewidth=0)
+            ax.plot(xs, ys, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls, marker=PATHDEP_MARKERS[m], markersize=ms, zorder=zord, **mk_kw)
+        ax.set_xticks(doses)
+        if c_i == 0:
+            ax.set_ylim(-0.025, 0.80)
+        else:
+            ax.set_ylim(bottom=0.0)
+        ax.set_title(f"{short_title} · {title_sfx}", fontsize=10.6, pad=8)
+        ax.set_xlabel("Path-dependent confounding modules k", fontsize=9.6)
+        ax.set_ylabel(ylab, fontsize=9.6)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
+
+    fig.suptitle(f"{short_title} · Path-Dependent Confounding Breaks Optimal-Action IDS Across k = 0 → 3", fontsize=12.3, y=0.985)
+    fig.tight_layout(rect=(0.0, 0.24, 1.0, 0.925))
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.22), ncol=3, frameon=False, fontsize=8.8)
+    style_ceac_legend(leg)
+    return fig
+
+
+def draw_single_pathdep_traces(bundle: dict, kind: str, dose: int = 3):
+    """Single-environment 1x2 overlaid time traces at k=3: Policy Gap (left) & Linear Cumulative Regret (right)."""
+    import matplotlib.pyplot as plt
+
+    plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
+    traces = [t for t in bundle["traces"] if t["kind"] == kind and t["task"] == 1 and t["dose"] == dose]
+    methods = [m for m in PATHDEP_ORDER if any(t["method"] == m for t in traces)]
+    short_kind = "Signalling Rewiring (H = 3)" if kind == "signalling_rewiring" else "Canalized K562 Genetic Risk (H = 3)"
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.6, 5.1), squeeze=False)
+    for c_idx, (metric, ylab, title_sfx, log_x) in enumerate([
+        ("window_gap", "Rolling 256-episode policy gap ↓", f"Overlaid Policy Gap (k = {dose}) ↓", True),
+        ("cumulative_regret", "Cumulative expected regret (linear) ↓", f"Overlaid Linear Regret (k = {dose}) ↓", False),
+    ]):
+        ax = axes[0, c_idx]
+        for m_idx, m in enumerate(methods):
+            cells = sorted([t for t in traces if t["method"] == m], key=lambda x: x["seed"])
+            if not cells:
+                continue
+            start = 1 if len(cells[0]["episode"]) > 1 and cells[0]["episode"][0] == 1 else 0
+            xs = np.array(cells[0]["episode"][start:], dtype=float) / 1000.0
+            vals = np.array([c[metric][start:] for c in cells], dtype=float)
+            mean = vals.mean(axis=0)
+            sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
+            col = PATHDEP_COLORS[m]
+            is_ceac = m.startswith("ceac")
+            is_ranked = m.startswith("ceac_ranked")
+            is_opt_ids = "ids_action" in m
+            ls = (
+                "--" if m in {"ceac", "ceac_ranked_natural", "ids_product"}
+                else (":" if m in {"oracle", "ids_null"} else ("-." if m in {"ucb_q", "ids_action_tree"} else "-"))
+            )
+            lw = 3.35 if is_ranked else (2.75 if is_ceac else (2.35 if is_opt_ids else 1.7))
+            ms = 8.2 if is_ranked else (7.4 if is_ceac else (6.6 if is_opt_ids else 5.5))
+            zord = 12 if is_ranked else (9 if is_opt_ids else (7 if is_ceac else 4))
+            if log_x:
+                mk_idx = log_markevery(len(xs), m_idx)
+            else:
+                step_mk = max(1, len(xs) // 8)
+                mk_idx = list(range((m_idx * 2) % step_mk, len(xs), step_mk)) or [0]
+            mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if PATHDEP_MARKERS[m] != "x" else {}
+            ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=col, alpha=0.13 if (is_ranked or is_opt_ids) else 0.07, linewidth=0)
+            ax.plot(xs, mean, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls, marker=PATHDEP_MARKERS[m], markersize=ms, markevery=mk_idx, zorder=zord, **mk_kw)
+        if log_x:
+            ax.set_xscale("log")
+            ax.set_xlim(0.24, 34.0)
+            ax.set_xticks([0.256, 0.5, 1.0, 2.0, 5.0, 12.0, 32.768])
+            ax.set_xticklabels(["0.25k", "0.5k", "1k", "2k", "5k", "12k", "33k"])
+            ax.minorticks_off()
+            ax.set_ylim(-0.025, 0.80)
+            ax.set_xlabel("Training episodes (log scale)", fontsize=9.6)
+        else:
+            ax.set_xlim(0.0, 33.0)
+            ax.set_ylim(bottom=0.0)
+            ax.set_xlabel("Training episodes (thousands)", fontsize=9.6)
+        ax.set_title(f"{short_kind} · {title_sfx}", fontsize=10.6, pad=8)
+        ax.set_ylabel(ylab, fontsize=9.6)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
+
+    fig.suptitle(f"{short_kind} (k = {dose}, Task 1) · Overlaid Policy Gap & Linear Regret Time Traces", fontsize=12.3, y=0.985)
+    fig.tight_layout(rect=(0.0, 0.24, 1.0, 0.925))
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.22), ncol=3, frameon=False, fontsize=8.8)
+    style_ceac_legend(leg)
+    return fig
+
+
 def draw_pathdep_dose_response(summary_rows: list[dict]):
+    """Render clean 1x2 linear cumulative-regret scaling across path-dependent confounding k = 0 -> 3."""
     import matplotlib.pyplot as plt
 
     plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
@@ -519,60 +653,59 @@ def draw_pathdep_dose_response(summary_rows: list[dict]):
     doses = sorted({r["dose"] for r in summary_rows})
     methods = [m for m in PATHDEP_ORDER if any(r["method"] == m for r in summary_rows)]
 
-    fig, axes = plt.subplots(2, 2, figsize=(13.4, 8.8), squeeze=False)
-    for r_i, kind in enumerate(kinds):
+    fig, axes = plt.subplots(1, 2, figsize=(13.6, 5.1), squeeze=False)
+    for c_i, kind in enumerate(kinds):
         xlab = (
-            "Path-dependent confounding modules k (M = (9+k)·2^k, 3^k−1 stress states)"
+            "Path-dependent confounding modules k (6k echo clades, 3^k − 1 stress states)"
             if kind == "signalling_rewiring"
-            else "Path-dependent confounding modules k (M = (11+k)·2^k, 3^k−1 off-path states)"
+            else "Path-dependent confounding modules k (6k echo eQTLs, 3^k − 1 off-path states)"
         )
-        for c_i, (field, sd_f, ylab, symlog) in enumerate([
-            ("late_gap_mean", "late_gap_sd", "Final expected policy loss ↓", False),
-            ("regret_mean", "regret_sd", "Cumulative pseudo-regret (symlog) ↓", True),
-        ]):
-            ax = axes[r_i, c_i]
-            for m in methods:
-                grp = sorted([r for r in summary_rows if r["kind"] == kind and r["task"] == 1 and r["method"] == m], key=lambda x: x["dose"])
-                if not grp:
-                    continue
-                xs = np.array([x["dose"] for x in grp], dtype=float)
-                ys = np.array([x[field] for x in grp], dtype=float)
-                sds = np.array([x[sd_f] for x in grp], dtype=float)
-                col = PATHDEP_COLORS[m]
-                is_ceac = m.startswith("ceac")
-                is_ranked = m.startswith("ceac_ranked")
-                ls = "--" if m in {"ceac", "ceac_natural", "ids_product"} else (":" if m == "oracle" else "-")
-                lw = 3.2 if is_ranked else (2.5 if is_ceac else 1.65)
-                ms = 7.8 if is_ranked else (7.5 if m == "ceac" else (6.8 if is_ceac else 5.8))
-                mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if PATHDEP_MARKERS[m] != "x" else {}
-                ax.fill_between(xs, np.maximum(0.0, ys - sds), ys + sds, color=col, alpha=0.13 if is_ceac else 0.09, linewidth=0)
-                ax.plot(
-                    xs, ys, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
-                    marker=PATHDEP_MARKERS[m], markersize=ms, zorder=10 if is_ranked else (8 if is_ceac else 4),
-                    **mk_kw,
-                )
-            short_title = "Signalling Rewiring (H=3)" if kind == "signalling_rewiring" else "Canalized K562 Genetic Risk (H=3)"
-            ax.set_title(f"{short_title} · {'Final Policy Gap' if c_i == 0 else 'Cumulative Regret'}", fontsize=11, pad=8)
-            ax.set_xlabel(xlab, fontsize=9.6, labelpad=5)
-            ax.set_ylabel(ylab, fontsize=9.8)
-            ax.set_xticks(doses)
-            if symlog:
-                ax.set_yscale("symlog", linthresh=10.0)
-                ax.set_ylim(bottom=0.0)
-            else:
-                ax.set_ylim(-0.03, 1.00)
-            ax.grid(alpha=0.2)
-            ax.spines[["top", "right"]].set_visible(False)
+        ax = axes[0, c_i]
+        for m in methods:
+            grp = sorted([r for r in summary_rows if r["kind"] == kind and r["task"] == 1 and r["method"] == m], key=lambda x: x["dose"])
+            if not grp:
+                continue
+            xs = np.array([x["dose"] for x in grp], dtype=float)
+            ys = np.array([x["regret_mean"] for x in grp], dtype=float)
+            sds = np.array([x["regret_sd"] for x in grp], dtype=float)
+            col = PATHDEP_COLORS[m]
+            is_ceac = m.startswith("ceac")
+            is_ranked = m.startswith("ceac_ranked")
+            is_opt_ids = "ids_action" in m
+            ls = (
+                "--" if m in {"ceac", "ceac_ranked_natural", "ids_product"}
+                else (":" if m in {"oracle", "ids_null"} else ("-." if m in {"ucb_q", "ids_action_tree"} else "-"))
+            )
+            lw = 3.35 if is_ranked else (2.75 if is_ceac else (2.35 if is_opt_ids else 1.7))
+            ms = 8.4 if is_ranked else (7.6 if is_ceac else (6.8 if is_opt_ids else 5.6))
+            zord = 12 if is_ranked else (9 if is_opt_ids else (7 if is_ceac else 4))
+            mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if PATHDEP_MARKERS[m] != "x" else {}
+            ax.fill_between(xs, np.maximum(0.0, ys - sds), ys + sds, color=col, alpha=0.13 if (is_ranked or is_opt_ids) else 0.07, linewidth=0)
+            ax.plot(
+                xs, ys, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
+                marker=PATHDEP_MARKERS[m], markersize=ms, zorder=zord,
+                **mk_kw,
+            )
+        short_title = "Signalling Rewiring (H=3)" if kind == "signalling_rewiring" else "Canalized K562 Genetic Risk (H=3)"
+        ax.set_title(f"{short_title} · Cumulative Regret vs. k (Linear)", fontsize=10.8, pad=8)
+        ax.set_xlabel(xlab, fontsize=9.4, labelpad=5)
+        if c_i == 0:
+            ax.set_ylabel("Cumulative expected regret (linear) ↓", fontsize=9.8)
+        ax.set_xticks(doses)
+        ax.set_ylim(bottom=0.0)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
 
-    fig.tight_layout(rect=(0.0, 0.145, 1.0, 1.0))
+    fig.suptitle("Path-Dependent Signalling & Canalized K562 Genetic Risk · Scaling Across Confounding k = 0 → 3", fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0.0, 0.24, 1.0, 0.925))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.12), ncol=3, frameon=False, fontsize=8.8)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.22), ncol=3, frameon=False, fontsize=8.8)
     style_ceac_legend(leg)
     return fig
 
 
-def draw_pathdep_overlaid_performance(bundle: dict, dose: int = 3):
-    """Render 2x2 overlaid performance time traces (Signalling Rewiring vs Canalized K562 GI) at k=3."""
+def draw_pathdep_overlaid_performance(bundle: dict, dose: int = 3, metric: str = "cumulative_regret"):
+    """Render clean 1x2 overlaid performance time traces (Signalling Rewiring vs Canalized K562 GI) at k=3."""
     import matplotlib.pyplot as plt
 
     plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
@@ -582,123 +715,129 @@ def draw_pathdep_overlaid_performance(bundle: dict, dose: int = 3):
     xticks = [0.256, 0.5, 1.0, 2.0, 5.0, 12.0, 32.768]
     xticklabels = ["0.25k", "0.5k", "1k", "2k", "5k", "12k", "33k"]
 
-    fig, axes = plt.subplots(2, 2, figsize=(13.6, 8.6), sharex=False)
+    is_reg = metric == "cumulative_regret"
+    ylab = "Cumulative expected regret (linear) ↓" if is_reg else "Rolling 256-episode policy gap ↓"
+    metric_lbl = "Linear Cumulative Regret" if is_reg else "Expected Policy Gap"
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.6, 5.1), sharex=False, squeeze=False)
     for c_idx, kind in enumerate(kinds):
         short_kind = "Signalling Rewiring (H=3)" if kind == "signalling_rewiring" else "Canalized K562 Genetic Risk (H=3)"
-        for r_idx, (metric, ylab, symlog) in enumerate([
-            ("window_gap", "Rolling 256-episode policy gap ↓", False),
-            ("cumulative_regret", "Cumulative expected regret (symlog) ↓", True),
-        ]):
-            ax = axes[r_idx, c_idx]
-            for m_idx, m in enumerate(methods):
-                cells = sorted([t for t in traces if t["kind"] == kind and t["method"] == m], key=lambda x: x["seed"])
-                if not cells:
-                    continue
-                start = 1 if len(cells[0]["episode"]) > 1 and cells[0]["episode"][0] == 1 else 0
-                xs = np.array(cells[0]["episode"][start:], dtype=float) / 1000.0
-                vals = np.array([c[metric][start:] for c in cells], dtype=float)
-                mean = vals.mean(axis=0)
-                sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
-                col = PATHDEP_COLORS[m]
-                is_ceac = m.startswith("ceac")
-                is_ranked = m.startswith("ceac_ranked")
-                ls = "--" if m in {"ceac", "ceac_natural", "ids_product"} else (":" if m == "oracle" else "-")
-                lw = 3.2 if is_ranked else (2.5 if is_ceac else 1.6)
-                ms = 7.6 if is_ranked else (7.4 if m == "ceac" else (6.6 if is_ceac else 5.5))
-                zord = 10 if is_ranked else (8 if is_ceac else (5 if "ids_action" in m else 3))
-                mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if PATHDEP_MARKERS[m] != "x" else {}
-                ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=col, alpha=0.13 if is_ceac else 0.08, linewidth=0)
-                ax.plot(
-                    xs, mean, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
-                    marker=PATHDEP_MARKERS[m], markersize=ms, markevery=log_markevery(len(xs), m_idx),
-                    zorder=zord, **mk_kw,
-                )
+        ax = axes[0, c_idx]
+        for m_idx, m in enumerate(methods):
+            cells = sorted([t for t in traces if t["kind"] == kind and t["method"] == m], key=lambda x: x["seed"])
+            if not cells:
+                continue
+            start = 1 if len(cells[0]["episode"]) > 1 and cells[0]["episode"][0] == 1 else 0
+            xs = np.array(cells[0]["episode"][start:], dtype=float) / 1000.0
+            vals = np.array([c[metric][start:] for c in cells], dtype=float)
+            mean = vals.mean(axis=0)
+            sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
+            col = PATHDEP_COLORS[m]
+            is_ceac = m.startswith("ceac")
+            is_ranked = m.startswith("ceac_ranked")
+            is_opt_ids = "ids_action" in m
+            ls = (
+                "--" if m in {"ceac", "ceac_ranked_natural", "ids_product"}
+                else (":" if m in {"oracle", "ids_null"} else ("-." if m in {"ucb_q", "ids_action_tree"} else "-"))
+            )
+            lw = 3.35 if is_ranked else (2.75 if is_ceac else (2.35 if is_opt_ids else 1.7))
+            ms = 8.2 if is_ranked else (7.4 if is_ceac else (6.6 if is_opt_ids else 5.5))
+            zord = 12 if is_ranked else (9 if is_opt_ids else (7 if is_ceac else 4))
+            if is_reg:
+                step_mk = max(1, len(xs) // 8)
+                mk_idx = list(range((m_idx * 2) % step_mk, len(xs), step_mk)) or [0]
+            else:
+                mk_idx = log_markevery(len(xs), m_idx)
+            mk_kw = dict(markeredgecolor="white", markeredgewidth=0.55) if PATHDEP_MARKERS[m] != "x" else {}
+            ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=col, alpha=0.13 if (is_ranked or is_opt_ids) else 0.07, linewidth=0)
+            ax.plot(
+                xs, mean, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
+                marker=PATHDEP_MARKERS[m], markersize=ms, markevery=mk_idx,
+                zorder=zord, **mk_kw,
+            )
+        if is_reg:
+            ax.set_xlim(0.0, 33.0)
+            ax.set_ylim(bottom=0.0)
+            ax.set_xlabel("Training episodes (thousands)", fontsize=9.6, labelpad=4)
+        else:
             ax.set_xscale("log")
             ax.set_xlim(0.24, 34.0)
             ax.set_xticks(xticks)
             ax.set_xticklabels(xticklabels)
             ax.minorticks_off()
-            if symlog:
-                ax.set_yscale("symlog", linthresh=10.0)
-                ax.set_ylim(bottom=0.0)
-            else:
-                ax.set_ylim(-0.03, 1.03)
-            metric_lbl = "Expected Policy Gap" if metric == "window_gap" else "Cumulative Regret"
-            ax.set_title(f"{short_kind} · {metric_lbl}", fontsize=10.6, pad=7)
+            ax.set_ylim(-0.03, 0.80)
             ax.set_xlabel("Training episodes (log scale)", fontsize=9.6, labelpad=4)
-            if c_idx == 0:
-                ax.set_ylabel(ylab, fontsize=9.8)
-            ax.grid(alpha=0.2)
-            ax.spines[["top", "right"]].set_visible(False)
+        ax.set_title(f"{short_kind} · {metric_lbl}", fontsize=10.6, pad=8)
+        if c_idx == 0:
+            ax.set_ylabel(ylab, fontsize=9.8)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
 
-    fig.suptitle(f"Path-Dependent Signalling & Genetic Risk · Overlaid Performance Time Traces (k = {dose}, Task 1)", fontsize=13.0, y=0.988)
-    fig.tight_layout(rect=(0.0, 0.145, 1.0, 0.948))
+    fig.suptitle(f"Path-Dependent Signalling & Genetic Risk · Overlaid {metric_lbl} Time Traces (k = {dose}, Task 1)", fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0.0, 0.24, 1.0, 0.925))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.125), ncol=3, frameon=False, fontsize=8.7)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.22), ncol=3, frameon=False, fontsize=8.8)
     style_ceac_legend(leg)
     return fig
 
 
 def draw_pathdep_discovery_traces(bundle: dict, dose: int = 3):
-    """Render 3x2 visual discovery-effectiveness & IDS-trap separation trajectories at k=3."""
+    """Render clean 1x2 overlaid optimal-path lock-on time traces (Signalling Rewiring vs Canalized K562 GI) at k=3."""
     import matplotlib.pyplot as plt
 
     plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
     traces = [t for t in bundle["traces"] if t["task"] == 1 and t["dose"] == dose]
     methods = [m for m in PATHDEP_ORDER if m != "oracle" and any(t["method"] == m for t in traces)]
     kinds = ["signalling_rewiring", "canalized_gi"]
-    row_specs = [
-        (("active_hit",), "Primed / De-Canalized Optimal Co-Target Lock-On ↑", "Optimal path selection (%)"),
-        (("echo_reporter",), "Peripheral Clade Echo Trap (Traps Quotiented I(C*_onpath; Z)) ↓", "Echoed peripheral reporter (%)"),
-        (("passenger_omics",), "Counterfactual Off-Path Modifier Trap (Traps I(Π*; Z)) ↓", "Off-path modifier profiling (%)"),
-    ]
     xticks = [0.256, 0.5, 1.0, 2.0, 5.0, 12.0, 32.768]
     xticklabels = ["0.25k", "0.5k", "1k", "2k", "5k", "12k", "33k"]
 
-    fig, axes = plt.subplots(3, 2, figsize=(13.6, 10.8), sharex=False, sharey=True)
-    for r_idx, (keys, row_title, ylab) in enumerate(row_specs):
-        for c_idx, kind in enumerate(kinds):
-            ax = axes[r_idx, c_idx]
-            for m_idx, m in enumerate(methods):
-                cells = sorted([t for t in traces if t["kind"] == kind and t["method"] == m], key=lambda x: x["seed"])
-                if not cells:
-                    continue
-                series = [_window_rate(c, keys) for c in cells]
-                xs = series[0][0]
-                vals = np.array([s[1] for s in series], dtype=float)
-                mean = vals.mean(axis=0)
-                sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
-                col = PATHDEP_COLORS[m]
-                is_ceac = m.startswith("ceac")
-                is_ranked = m.startswith("ceac_ranked")
-                ls = "--" if m in {"ceac", "ceac_natural", "ids_product"} else "-"
-                lw = 3.2 if is_ranked else (2.5 if is_ceac else 1.6)
-                ms = 7.6 if is_ranked else (7.4 if m == "ceac" else (6.6 if is_ceac else 5.5))
-                zord = 10 if is_ranked else (8 if is_ceac else (5 if "ids_action" in m else 3))
-                ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=col, alpha=0.13 if is_ceac else 0.08, linewidth=0)
-                ax.plot(
-                    xs, mean, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
-                    marker=PATHDEP_MARKERS[m], markersize=ms, markevery=log_markevery(len(xs), m_idx),
-                    markeredgecolor="white", markeredgewidth=0.55, zorder=zord,
-                )
-            ax.set_xscale("log")
-            ax.set_xlim(0.24, 34.0)
-            ax.set_xticks(xticks)
-            ax.set_xticklabels(xticklabels)
-            ax.minorticks_off()
-            ax.set_ylim(-3.0, 105.0)
-            short_kind = "Signalling Rewiring" if kind == "signalling_rewiring" else "Canalized K562 GI"
-            ax.set_title(f"{short_kind} · {row_title}", fontsize=9.8, pad=7)
-            ax.set_xlabel("Training episodes (log scale)", fontsize=9.4, labelpad=4)
-            if c_idx == 0:
-                ax.set_ylabel(ylab, fontsize=9.6)
-            ax.grid(alpha=0.2)
-            ax.spines[["top", "right"]].set_visible(False)
+    fig, axes = plt.subplots(1, 2, figsize=(13.6, 5.1), sharex=False, sharey=True, squeeze=False)
+    for c_idx, kind in enumerate(kinds):
+        ax = axes[0, c_idx]
+        for m_idx, m in enumerate(methods):
+            cells = sorted([t for t in traces if t["kind"] == kind and t["method"] == m], key=lambda x: x["seed"])
+            if not cells:
+                continue
+            series = [_window_rate(c, ("active_hit",)) for c in cells]
+            xs = series[0][0]
+            vals = np.array([s[1] for s in series], dtype=float)
+            mean = vals.mean(axis=0)
+            sd = vals.std(axis=0, ddof=1) if len(cells) > 1 else np.zeros_like(mean)
+            col = PATHDEP_COLORS[m]
+            is_ceac = m.startswith("ceac")
+            is_ranked = m.startswith("ceac_ranked")
+            ls = (
+                "--" if m in {"ceac", "ceac_ranked_natural", "ids_product"}
+                else (":" if m == "ids_null" else ("-." if m in {"ucb_q", "ids_action_tree"} else "-"))
+            )
+            lw = 3.25 if is_ranked else (2.75 if is_ceac else 1.75)
+            ms = 8.0 if is_ranked else (7.6 if is_ceac else 5.8)
+            zord = 11 if is_ranked else (9 if is_ceac else (5 if "ids_action" in m else 4))
+            ax.fill_between(xs, np.maximum(0.0, mean - sd), mean + sd, color=col, alpha=0.13 if is_ceac else 0.08, linewidth=0)
+            ax.plot(
+                xs, mean, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
+                marker=PATHDEP_MARKERS[m], markersize=ms, markevery=log_markevery(len(xs), m_idx),
+                markeredgecolor="white", markeredgewidth=0.55, zorder=zord,
+            )
+        ax.set_xscale("log")
+        ax.set_xlim(0.24, 34.0)
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(xticklabels)
+        ax.minorticks_off()
+        ax.set_ylim(-3.0, 105.0)
+        short_kind = "Signalling Rewiring · Primed Co-Target Lock-On ↑" if kind == "signalling_rewiring" else "Canalized K562 GI · Hub-Decanalized Pair Lock-On ↑"
+        ax.set_title(short_kind, fontsize=10.4, pad=8)
+        ax.set_xlabel("Training episodes (log scale)", fontsize=9.5, labelpad=4)
+        if c_idx == 0:
+            ax.set_ylabel("Optimal path selection (%)", fontsize=9.6)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
 
-    fig.suptitle(f"Path-Dependent Signalling & K562 Genetic Risk · Overlaid Discovery Process Traces (k = {dose})", fontsize=13.0, y=0.99)
-    fig.tight_layout(rect=(0.0, 0.125, 1.0, 0.958))
+    fig.suptitle(f"Path-Dependent Signalling & K562 Genetic Risk · Overlaid Discovery Time Traces (k = {dose}, Task 1)", fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0.0, 0.24, 1.0, 0.925))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.105), ncol=3, frameon=False, fontsize=8.7)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.22), ncol=3, frameon=False, fontsize=8.8)
     style_ceac_legend(leg)
     return fig
 
@@ -897,10 +1036,10 @@ def main():
                     folder = cal_dir / "cells" / kind / "dose_0" / f"task_{task}" / f"{m}_s{seed}"
                     cal_jobs.append((kind, m, seed, task, 0, args.episodes, str(folder)))
 
+    ctx = mp.get_context("spawn")
     cal_results = []
-    with ProcessPoolExecutor(max_workers=args.workers, max_tasks_per_child=1) as pool:
-        for fut in as_completed([pool.submit(_exec_pathdep_job, j) for j in cal_jobs]):
-            row = fut.result()
+    with ctx.Pool(processes=args.workers, maxtasksperchild=1) as pool:
+        for row in pool.imap_unordered(_exec_pathdep_job, cal_jobs, chunksize=1):
             cal_results.append(row)
             print("CAL:", json.dumps({k: row[k] for k in ("kind", "task", "method", "seed", "late_gap", "cumulative_regret", "bank_policies")}), flush=True)
     cal_results.sort(key=lambda r: (r["kind"], r["task"], r["method"], r["seed"]))
@@ -915,9 +1054,8 @@ def main():
                     sweep_jobs.append((kind, m, seed, 1, dose, args.episodes, str(folder)))
 
     sweep_results = []
-    with ProcessPoolExecutor(max_workers=args.workers, max_tasks_per_child=1) as pool:
-        for fut in as_completed([pool.submit(_exec_pathdep_job, j) for j in sweep_jobs]):
-            row = fut.result()
+    with ctx.Pool(processes=args.workers, maxtasksperchild=1) as pool:
+        for row in pool.imap_unordered(_exec_pathdep_job, sweep_jobs, chunksize=1):
             sweep_results.append(row)
             print("SWEEP:", json.dumps({k: row[k] for k in ("kind", "dose", "method", "seed", "late_gap", "cumulative_regret", "bank_policies")}), flush=True)
     sweep_results.sort(key=lambda r: (r["kind"], r["dose"], r["method"], r["seed"]))

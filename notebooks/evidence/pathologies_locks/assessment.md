@@ -128,3 +128,28 @@ Verified **192** completed cells (3 held-out seeds per condition, 65,536 episode
 | Combination Lock | 1 | UCB Q-learning | 2 | 0.0916 ± 0.0093 | 16,593.2 ± 49.7 |
 | Combination Lock | 1 | UCB Q-learning | 3 | 0.3563 ± 0.0251 | 33,801.9 ± 102.6 |
 | Combination Lock | 1 | UCB Q-learning | 4 | 0.5708 ± 0.0166 | 43,532.3 ± 266.0 |
+
+## Held-Out Reward & Evidence Critic TD / Bellman Diagnostics
+
+Evaluated all **168** non-oracle `Task 1` sweep cells across log-spaced checkpoints `t ∈ {16 .. 65,536}` on independent held-out rollouts (`512` on-policy + `256` uniform-probe episodes per checkpoint; bit-exact cumulative-regret parity verified `< 1e-6` against `evidence.json.gz`).
+
+![Held-out critic Bellman trajectories](locks_critic_bellman_traces.png)
+
+![Held-out critic dose scaling](locks_critic_dose_scaling.png)
+
+| Environment | Algorithm | Reward Bellman RMSE (L=4, t=65,536) | Evidence Critic RMSE (L=1 → 4) | Active / Stage Critic RMSE (L=1 → 4) |
+|---|---|---:|---:|---:|
+| Sequential Lock | IDAC · occupancy ratio | 0.0099 | 7.0053 → 3.0554 | 7.0053 → 3.0554 |
+| Sequential Lock | UCB Q-learning | 0.5441 | 0.1753 → 0.4648 | 0.1753 → 0.4648 |
+| Sequential Lock | Optimistic POMD | 1.0193 | 0.3278 → 2.3685 | 0.3278 → 2.3685 |
+| Sequential Lock | IDS · decoy-lock prior | 0.0117 | 49,728.1454 → 3,758.9542 | 0.7588 → 0.0574 |
+| Sequential Lock | IDS · model-MI, uniform prior | 0.0034 | 57,599.5099 → 57,453.9727 | 0.0000 → 0.0000 |
+| Sequential Lock | CEAC · reward + evidence critics | 0.0274 | 0.0090 → 0.0034 | 0.1667 → 0.2121 |
+| Sequential Lock | CEAC · guarded natural | 0.0155 | 0.0103 → 0.0052 | 0.1714 → 0.2112 |
+| Bidirectional ('Diabolical') Lock | IDAC · occupancy ratio | 0.0614 | 6.5654 → 2.3111 | 6.5654 → 2.3111 |
+| Bidirectional ('Diabolical') Lock | UCB Q-learning | 0.6428 | 0.1820 → 0.6221 | 0.1820 → 0.6221 |
+| Bidirectional ('Diabolical') Lock | Optimistic POMD | 1.0198 | 0.3326 → 3.0173 | 0.3326 → 3.0173 |
+| Bidirectional ('Diabolical') Lock | IDS · decoy-lock prior | 0.0089 | 50,093.5396 → 3,895.3751 | 0.7644 → 0.0594 |
+| Bidirectional ('Diabolical') Lock | IDS · model-MI, uniform prior | 0.0044 | 57,682.2720 → 57,683.7368 | 0.0000 → 0.0000 |
+| Bidirectional ('Diabolical') Lock | CEAC · reward + evidence critics | 0.0447 | 0.0046 → 0.0052 | 0.1607 → 0.2015 |
+| Bidirectional ('Diabolical') Lock | CEAC · guarded natural | 0.0178 | 0.0111 → 0.0084 | 0.1611 → 0.1975 |

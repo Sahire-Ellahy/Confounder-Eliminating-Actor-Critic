@@ -64,8 +64,12 @@ def main():
                      packages={name: importlib.metadata.version(name) for name in ("numpy", "scipy", "matplotlib", "nbclient", "ipykernel")},
                      training_launched=False, explanatory_map_hashes=maps)
         if hardness:
-            audit['hardness_evidence_manifests']={name:hashlib.sha256((ROOT/'notebooks/evidence'/name/'manifest.json').read_bytes()).hexdigest()
-                for name in (('hardness_burden','hardness_prior','mechanisms') if notebook.metadata.get('mechanism_report_schema')==1 else ('hardness_burden','hardness_prior'))}
+            names = ['hardness_burden','hardness_prior'] + (['mechanisms'] if notebook.metadata.get('mechanism_report_schema')==1 else [])
+            if (ROOT/'notebooks/evidence/critic_bellman_earlier/manifest.json').exists():
+                names.append('critic_bellman_earlier')
+            if (ROOT/'notebooks/evidence/pathdep_undertow_falsebeacon/manifest.json').exists():
+                names.append('pathdep_undertow_falsebeacon')
+            audit['hardness_evidence_manifests']={name:hashlib.sha256((ROOT/'notebooks/evidence'/name/'manifest.json').read_bytes()).hexdigest() for name in names}
         if notebook.metadata.get('actor_stability_schema')==2:
             audit['actor_stability_manifest_sha256']=hashlib.sha256((ROOT/'notebooks/evidence/actor_stability/manifest.json').read_bytes()).hexdigest()
         (ROOT / "notebooks/execution.json").write_text(json.dumps(audit, indent=2, sort_keys=True)+"\n")

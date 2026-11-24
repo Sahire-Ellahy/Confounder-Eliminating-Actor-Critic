@@ -15,19 +15,178 @@ from ceac_pathologies.agent import (
 from ceac_ranked.agent import GreedyPricedCEAC, PriceRankedReplay, RankedCEACConfig
 
 
-class MultiStepActionIDS(BayesianIDS):
-    """Multi-step IDS targeting optimal-action information across DAG horizons H >= 2.
+from ceac_critic_diagnostics.run_pathologies_audit import _group_laws_by_k, fast_best_pair
 
-    Supports two explicit definitions of the optimal-action random variable A*:
-    - `target="policy_tree"`: Standard Russo & Van Roy MDP optimal-policy class
-      Pi*(m) = argmax_pi V_m^pi (grouped by full state-contingent `policy.identity`).
-      Exposes the counterfactual off-path optimal-action pathology when off-path
-      states carry distinct local rescue rules.
-    - `target="onpath_class"`: Quotiented on-path return-equivalence class
-      `model.decision_classes()` (models with mutually zero on-path optimal-return
-      suboptimality are merged). Exposes the stagewise Markovian mixture inflation
-      and scalar peripheral-entropy pathology relative to CEAC's pairwise KL critic.
-    """
+
+def _base_policy_occ(model, policy) -> np.ndarray:
+    """Exact base-model (m=0) state-action occupancy vector for linear `evaluate_stage`."""
+    occ = np.zeros(model.n, dtype=float)
+    occ[model.initial] = 1.0
+    probs = policy.probabilities
+    for t in range(len(model.levels) - 1):
+        sts = model.levels[t]
+        if not len(sts):
+            continue
+        if getattr(model, "_shared_nonterm", False):
+            occ += occ[sts] @ np.einsum("sa,san->sn", probs[sts], model._nonterm_op[sts])
+        else:
+            occ += occ[sts] @ np.einsum("sa,san->sn", probs[sts], model._nonterm_op[0, sts])
+    return (occ[:, None] * probs).ravel()
+
+
+def _fast_reward_2d(model) -> np.ndarray:
+    """Exact `(M, S*A)` density-weighted reward matrix (`reward_2d @ occ == model.returns(p)`)."""
+    return (model.density[:, :, None] * model.reward).reshape(model.num_models, -1)
+
+
+def make_truth_return_vec(model, truth: int) -> np.ndarray:
+    """Exact `(S*A,)` density-weighted reward vector for `truth` (`vec @ occ == model.returns(p)[truth]`)."""
+    return (model.density[truth, :, None] * model.reward[truth]).ravel()
+
+
+def _deduplicate_onpath_bank(model, bank: PolicyBank, reward_2d: np.ndarray):
+    """Deduplicate policies with identical model returns and base-model state-action occupancy."""
+    seen = set()
+    unique = []
+    rets = []
+    occs = []
+    for p in bank.policies:
+        occ = _base_policy_occ(model, p)
+        ret = reward_2d @ occ
+        sig = (tuple(np.round(ret, 11)), tuple(np.round(occ, 12)))
+        if sig not in seen:
+            seen.add(sig)
+            unique.append(p)
+            rets.append(ret)
+            occs.append(occ)
+    bank.policies = unique
+    bank._ids = {p.identity: idx for idx, p in enumerate(unique)}
+    bank_returns = np.column_stack(rets) if rets else np.zeros((model.num_models, 0), dtype=float)
+    bank_occ = np.vstack(occs) if occs else np.zeros((0, model.n * model.actions), dtype=float)
+    return seen, bank_returns, bank_occ
+
+
+class FastPathDepBayesianIDS(BayesianIDS):
+    """Vectorized BayesianIDS with incremental `(M, B)` returns, `(B, S*A)` occupancies, and fast pair search."""
+
+    def __init__(self, model, rng, prior=0.5):
+        super().__init__(model, rng, prior)
+        self._reward_2d = _fast_reward_2d(model)
+        self._seen_sigs, self._bank_returns, self._bank_occ = _deduplicate_onpath_bank(
+            model, self.bank, self._reward_2d
+        )
+        self._mi_groups = _group_laws_by_k(model, model._informative_pairs)
+        self._bank_len = len(self.bank.policies)
+        self._zero_prices = np.zeros((model.num_models, model.num_models), dtype=float)
+        self._zero_prices.flags.writeable = False
+
+    def _sync_bank_caches(self):
+        cur_len = len(self.bank.policies)
+        if self._bank_len < cur_len:
+            new_pols = self.bank.policies[self._bank_len:]
+            new_occs = np.vstack([_base_policy_occ(self.model, p) for p in new_pols])
+            new_rets = self._reward_2d @ new_occs.T
+            self._bank_occ = np.vstack([self._bank_occ, new_occs])
+            self._bank_returns = np.hstack([self._bank_returns, new_rets])
+            self._bank_len = cur_len
+
+    def _fast_mi_stage(self, posterior: np.ndarray) -> np.ndarray:
+        stage = np.zeros(self.model.mask.shape, dtype=float)
+        masses = posterior[:, None] * self.model.density
+        for ss, aa, probs_grp in self._mi_groups:
+            w_mat = masses[:, ss].T
+            totals = w_mat.sum(axis=1)
+            pos = totals > 0.0
+            if not np.any(pos):
+                continue
+            belief = np.where(pos[:, None], w_mat / np.maximum(totals[:, None], 1e-300), 0.0)
+            mix = np.einsum("pm,pmk->pk", belief, probs_grp)
+            kls = kl_div(probs_grp, mix[:, None, :]).sum(axis=2)
+            vals = np.maximum(0.0, np.einsum("pm,pm->p", w_mat, kls))
+            stage[ss[pos], aa[pos]] = vals[pos]
+        return stage
+
+    def distribution(self):
+        posterior = self.posterior
+        key = tuple(self.log_weights)
+        if self._cache is not None and self._cache[0] == key:
+            return self._cache[1]
+        self._sync_bank_caches()
+        regret = posterior @ np.maximum(0.0, self.model.optimal_returns[:, None] - self._bank_returns)
+        if regret.min() <= self.regret_tolerance:
+            distribution = np.zeros(len(regret))
+            distribution[int(np.argmin(regret))] = 1.0
+            self.record = {
+                "regret": float(distribution @ regret),
+                "information": 0.0,
+                "ratio": 0.0,
+                "column_residual": 0.0,
+                "policy_count": len(self.bank.policies),
+                "prior_support": self.initial_support.tolist(),
+                "expected_regret_tolerance": self.regret_tolerance,
+                "posterior_underflow_entries": self.posterior_underflow_entries,
+                "solver_status": "expected_regret_below_tolerance",
+            }
+            self._cache = (key, distribution)
+            return distribution
+        stage_mi = self._fast_mi_stage(posterior)
+        stage_flat = stage_mi.ravel()
+        stage_return = np.einsum("m,ms,msa->sa", posterior, self.model.density, self.model.reward)
+        for _ in range(128):
+            self._sync_bank_caches()
+            regret = posterior @ np.maximum(0.0, self.model.optimal_returns[:, None] - self._bank_returns)
+            information = np.maximum(0.0, self._bank_occ @ stage_flat)
+            if regret.min() <= self.regret_tolerance:
+                distribution = np.zeros(len(regret))
+                distribution[int(np.argmin(regret))] = 1.0
+                d, g, residual = float(distribution @ regret), float(distribution @ information), 0.0
+                break
+            distribution = fast_best_pair(regret, information)
+            d, g = float(distribution @ regret), float(distribution @ information)
+            if d == 0.0:
+                residual = 0.0
+                break
+            price = d / (2.0 * g)
+            proposal, _ = self.model.response_stage(stage_return + price * stage_mi, "ids-separator")
+            prop_occ = _base_policy_occ(self.model, proposal)
+            new_returns = self._reward_2d @ prop_occ
+            new_d = float(posterior @ np.maximum(0.0, self.model.optimal_returns - new_returns))
+            new_g = max(0.0, float(prop_occ @ stage_flat))
+            residual = max(0.0, d - new_d + price * (new_g - g))
+            if residual <= 1e-7 * d:
+                break
+            sig = (tuple(np.round(new_returns, 11)), tuple(np.round(prop_occ, 12)))
+            if sig in self._seen_sigs or not self.bank.add(proposal):
+                break
+            self._seen_sigs.add(sig)
+            self._bank_occ = np.vstack([self._bank_occ, prop_occ[None, :]])
+            self._bank_returns = np.hstack([self._bank_returns, new_returns[:, None]])
+            self._bank_len = len(self.bank.policies)
+        else:
+            raise RuntimeError("IDS separation exceeded insertion limit")
+        self.record = {
+            "regret": d,
+            "information": g,
+            "ratio": 0.0 if d == 0 else (d * d / g if g > 0 else None),
+            "column_residual": residual,
+            "policy_count": len(self.bank.policies),
+            "prior_support": self.initial_support.tolist(),
+            "expected_regret_tolerance": self.regret_tolerance,
+            "posterior_underflow_entries": self.posterior_underflow_entries,
+            "solver_status": "expected_regret_below_tolerance" if d <= self.regret_tolerance else "ratio_certified",
+        }
+        self._cache = (key, distribution)
+        return distribution
+
+    def select(self, index):
+        del index
+        distribution = self.distribution()
+        p = self.bank.policies[int(self.rng.choice(len(distribution), p=distribution))]
+        return p, "ids", self._zero_prices
+
+
+class MultiStepActionIDS(BayesianIDS):
+    """Vectorized Multi-step IDS targeting optimal-action information across DAG horizons H >= 2."""
 
     def __init__(self, model, rng, prior: np.ndarray, target: str = "policy_tree"):
         super().__init__(model, rng, prior)
@@ -41,31 +200,46 @@ class MultiStepActionIDS(BayesianIDS):
             self.classes = [np.array(v, dtype=int) for v in groups.values()]
         else:
             self.classes = [np.array(v, dtype=int) for v in model.decision_classes()]
-        self._laws = {
-            (int(s), int(a)): np.array([[law[k] for k in model.laws[int(s), int(a)][0]] for law in model.laws[int(s), int(a)]], dtype=float)
-            for s, a in model._informative_pairs
-        }
+        self._reward_2d = _fast_reward_2d(model)
+        self._seen_sigs, self._bank_returns, self._bank_occ = _deduplicate_onpath_bank(
+            model, self.bank, self._reward_2d
+        )
+        self._mi_groups = _group_laws_by_k(model, model._informative_pairs)
+        self._class_mat = np.zeros((len(self.classes), model.num_models), dtype=float)
+        for idx_c, cls_m in enumerate(self.classes):
+            self._class_mat[idx_c, cls_m] = 1.0
+        self._bank_len = len(self.bank.policies)
+        self._zero_prices = np.zeros((model.num_models, model.num_models), dtype=float)
+        self._zero_prices.flags.writeable = False
+
+    def _sync_bank_caches(self):
+        cur_len = len(self.bank.policies)
+        if self._bank_len < cur_len:
+            new_pols = self.bank.policies[self._bank_len:]
+            new_occs = np.vstack([_base_policy_occ(self.model, p) for p in new_pols])
+            new_rets = self._reward_2d @ new_occs.T
+            self._bank_occ = np.vstack([self._bank_occ, new_occs])
+            self._bank_returns = np.hstack([self._bank_returns, new_rets])
+            self._bank_len = cur_len
 
     def action_information_stage(self, posterior: np.ndarray) -> np.ndarray:
         stage = np.zeros(self.model.mask.shape, dtype=float)
-        weighted = posterior[:, None] * self.model.density
-        for (s, a), probs in self._laws.items():
-            w_s = weighted[:, s]
-            tot = float(w_s.sum())
-            if tot <= 0.0:
+        weighted = posterior[:, None] * self.model.density  # (M, S)
+        for ss, aa, probs_grp in self._mi_groups:
+            w_mat = weighted[:, ss].T  # (P, M)
+            tots = w_mat.sum(axis=1)  # (P,)
+            pos = tots > 0.0
+            if not np.any(pos):
                 continue
-            belief = w_s / tot
-            mix = belief @ probs
-            c_masses = np.array([belief[c].sum() for c in self.classes], dtype=float)
-            active = c_masses > 1e-300
-            if np.sum(active) <= 1:
-                continue
-            cls_laws = np.array(
-                [(belief[c] @ probs[c]) / c_masses[idx] for idx, c in enumerate(self.classes) if active[idx]],
-                dtype=float,
-            )
-            mi_sa = float(c_masses[active] @ kl_div(cls_laws, mix[None, :]).sum(axis=1))
-            stage[s, a] = max(0.0, tot * mi_sa)
+            belief = np.where(pos[:, None], w_mat / np.maximum(tots[:, None], 1e-300), 0.0)  # (P, M)
+            mix = np.einsum("pm,pmk->pk", belief, probs_grp)  # (P, K)
+            P_n, M_n, K_n = probs_grp.shape
+            c_masses = belief @ self._class_mat.T  # (P, C) via BLAS dgemm
+            bp = (belief[:, :, None] * probs_grp).transpose(1, 0, 2).reshape(M_n, P_n * K_n)
+            cls_num = (self._class_mat @ bp).reshape(len(self.classes), P_n, K_n).transpose(1, 0, 2)  # (P, C, K) via BLAS dgemm
+            cls_laws = np.where(c_masses[:, :, None] > 1e-300, cls_num / np.maximum(c_masses[:, :, None], 1e-300), mix[:, None, :])
+            mi_p = np.einsum("pc,pck->p", c_masses, kl_div(cls_laws, mix[:, None, :]))
+            stage[ss[pos], aa[pos]] = np.maximum(0.0, tots[pos] * mi_p[pos])
         return stage
 
     def distribution(self) -> np.ndarray:
@@ -73,32 +247,55 @@ class MultiStepActionIDS(BayesianIDS):
         key = tuple(self.log_weights)
         if self._cache is not None and self._cache[0] == key:
             return self._cache[1]
+        self._sync_bank_caches()
+        regret = posterior @ np.maximum(0.0, self.model.optimal_returns[:, None] - self._bank_returns)
+        if regret.min() <= self.regret_tolerance:
+            distribution = np.zeros(len(regret))
+            distribution[int(np.argmin(regret))] = 1.0
+            self.record = {
+                "regret": float(distribution @ regret),
+                "information": 0.0,
+                "ratio": 0.0,
+                "column_residual": 0.0,
+                "policy_count": len(self.bank.policies),
+                "information_target": self.target,
+                "classes": len(self.classes),
+            }
+            self._cache = (key, distribution)
+            return distribution
         stage_mi = self.action_information_stage(posterior)
+        stage_flat = stage_mi.ravel()
         stage_return = np.einsum("m,ms,msa->sa", posterior, self.model.density, self.model.reward)
         for _ in range(128):
-            returns, _ = self.bank.arrays()
-            regret = posterior @ np.maximum(0.0, self.model.optimal_returns[:, None] - returns)
-            information = np.maximum(0.0, np.array([self.model.evaluate_stage(p, stage_mi) for p in self.bank.policies]))
+            self._sync_bank_caches()
+            regret = posterior @ np.maximum(0.0, self.model.optimal_returns[:, None] - self._bank_returns)
+            information = np.maximum(0.0, self._bank_occ @ stage_flat)
             if regret.min() <= self.regret_tolerance or not np.any(information > 0):
                 distribution = np.zeros(len(regret))
                 distribution[int(np.argmin(regret))] = 1.0
                 d, g, residual = float(distribution @ regret), float(distribution @ information), 0.0
                 break
-            distribution = best_pair(regret, information)
+            distribution = fast_best_pair(regret, information)
             d, g = float(distribution @ regret), float(distribution @ information)
             if d == 0.0:
                 residual = 0.0
                 break
             price = d / (2.0 * g)
             proposal, _ = self.model.response_stage(stage_return + price * stage_mi, f"ids-{self.target}-sep")
-            new_returns, _ = self.model.evaluate(proposal)
+            prop_occ = _base_policy_occ(self.model, proposal)
+            new_returns = self._reward_2d @ prop_occ
             new_d = float(posterior @ np.maximum(0.0, self.model.optimal_returns - new_returns))
-            new_g = max(0.0, float(self.model.evaluate_stage(proposal, stage_mi)))
+            new_g = max(0.0, float(prop_occ @ stage_flat))
             residual = max(0.0, d - new_d + price * (new_g - g))
             if residual <= 1e-7 * d:
                 break
-            if not self.bank.add(proposal):
-                raise RuntimeError("Multi-step optimal-action IDS certificate did not close")
+            sig = (tuple(np.round(new_returns, 11)), tuple(np.round(prop_occ, 12)))
+            if sig in self._seen_sigs or not self.bank.add(proposal):
+                break
+            self._seen_sigs.add(sig)
+            self._bank_occ = np.vstack([self._bank_occ, prop_occ[None, :]])
+            self._bank_returns = np.hstack([self._bank_returns, new_returns[:, None]])
+            self._bank_len = len(self.bank.policies)
         else:
             raise RuntimeError("Multi-step optimal-action IDS exceeded insertion limit")
         self.record = {
@@ -112,6 +309,12 @@ class MultiStepActionIDS(BayesianIDS):
         }
         self._cache = (key, distribution)
         return distribution
+
+    def select(self, index):
+        del index
+        distribution = self.distribution()
+        p = self.bank.policies[int(self.rng.choice(len(distribution), p=distribution))]
+        return p, "ids", self._zero_prices
 
 
 class PathDepGreedyCEAC(GreedyPricedCEAC):

@@ -33,12 +33,15 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import gzip
 import json
 import math
+import multiprocessing as mp
 from pathlib import Path
 import numpy as np
 
 from ceac.contracts import Episode, Transition
+from ceac_critic_diagnostics.evaluator import compile_outcome_tables, evaluate_heldout_critics_fast
 from ceac_pathologies.report import log_markevery, style_ceac_legend
 from ceac_pathologies.run import ROOT, atomic_json, digest, seed_for
+from .learners import _base_policy_occ, make_truth_return_vec
 from .study import (
     PATHDEP_COLORS,
     PATHDEP_KINDS,
@@ -288,6 +291,7 @@ def evaluate_heldout_critics(
 def run_critic_audit_cell(job) -> dict:
     kind, method, seed, dose, episodes = job
     cfg, model, env, truth, _ = build_pathdep_problem(kind, dose, task=1, seed=seed)
+    compiled = compile_outcome_tables(model, truth=truth)
     rng = np.random.default_rng(seed_for("pathdep", seed, kind, dose, 1, method, "learner"))
     action_rng = np.random.default_rng(seed_for("pathdep", seed, kind, dose, 1, method, "action"))
     learner = construct_pathdep_learner(kind, model, method, rng, episodes, truth)
@@ -298,11 +302,12 @@ def run_critic_audit_cell(job) -> dict:
     cumulative = 0.0
     last_pol = None
     expected = None
+    truth_r_vec = make_truth_return_vec(model, truth)
 
     for t in range(episodes):
         policy, behavior, prices = learner.select(t)
         if policy.identity != last_pol:
-            expected = float(model.returns(policy)[truth])
+            expected = float(truth_r_vec @ _base_policy_occ(model, policy))
             last_pol = policy.identity
         gap = max(0.0, float(model.optimal_returns[truth] - expected))
         obs, _ = env.reset()
@@ -318,32 +323,34 @@ def run_critic_audit_cell(job) -> dict:
                 break
         learner.observe(Episode(t, 0, policy.identity, behavior, tuple(trs)), policy, prices)
         if (t + 1) % 128 == 0 and hasattr(learner, "replay") and hasattr(learner.replay, "strata"):
-            for bucket in learner.replay.strata.values():
-                bucket.clear()
             if hasattr(learner.replay, "evidence") and hasattr(learner.replay.evidence, "strata"):
                 learner.replay.evidence.strata.clear()
             if method in {"ceac", "ceac_natural"} and hasattr(learner.replay, "statistics"):
                 keep = set(learner.bank._ids) | set(learner.candidates) | set(learner.frozen)
+                learner.replay.strata.clear()
                 for pid in [k_id for k_id in learner.replay.statistics if k_id not in keep]:
                     del learner.replay.statistics[pid]
+            elif method in {"ceac_ranked", "ceac_ranked_natural"} and hasattr(learner.replay, "statistics"):
+                keep = set(learner.bank._ids) | set(learner.replay.policies_by_id)
+                learner.replay.strata.clear()
+                for pid in [k_id for k_id in learner.replay.statistics if k_id not in keep]:
+                    del learner.replay.statistics[pid]
+            else:
+                for bucket in learner.replay.strata.values():
+                    bucket.clear()
         cumulative += gap
 
         if (t + 1) in cp_set:
-            if method in {"ceac", "ceac_natural", "ceac_ranked", "ceac_ranked_natural"}:
-                pol_eval = learner.actor.snapshot()
-                pr_eval = prices
-            else:
-                pol_eval = policy
-                pr_eval = prices
-            metrics = evaluate_heldout_critics(
+            metrics = evaluate_heldout_critics_fast(
+                suite_key="pathdep",
                 kind=kind,
                 method=method,
                 learner=learner,
                 model=model,
-                cfg=cfg,
+                compiled=compiled,
                 truth=truth,
-                policy=pol_eval,
-                prices=pr_eval,
+                policy=policy,
+                prices=prices,
                 checkpoint=t + 1,
                 seed=seed,
                 dose=dose,
@@ -360,8 +367,8 @@ def run_critic_audit_cell(job) -> dict:
     )
 
 
-def draw_critic_bellman_traces(audit_bundle: dict, dose: int = 3):
-    """Render 2x2 overlaid Held-Out Reward & Evidence Critic TD/Bellman Error time traces at k=3."""
+def draw_critic_bellman_traces(audit_bundle: dict, dose: int = 3, field: str = "evidence_critic_error"):
+    """Render clean 1x2 overlaid Held-Out Critic TD/Bellman Error time traces (Signalling Rewiring vs Canalized K562 GI)."""
     import matplotlib.pyplot as plt
 
     plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
@@ -371,62 +378,66 @@ def draw_critic_bellman_traces(audit_bundle: dict, dose: int = 3):
     xticks = [0.016, 0.064, 0.256, 1.024, 4.096, 16.384, 32.768]
     xticklabels = ["16", "64", "256", "1k", "4k", "16k", "33k"]
 
-    fig, axes = plt.subplots(2, 2, figsize=(13.6, 8.8), sharex=False)
+    is_ev = field == "evidence_critic_error"
+    title_sfx = "Held-Out Evidence Critic Error / Divergence ↓" if is_ev else "Held-Out Reward Critic Bellman Error ↓"
+    ylab = "Held-out Evidence Critic RMSE (log) ↓" if is_ev else "Held-out Reward Bellman RMSE (log) ↓"
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.6, 5.1), sharex=False, squeeze=False)
     for c_idx, kind in enumerate(kinds):
         short_kind = "Signalling Rewiring (H=3)" if kind == "signalling_rewiring" else "Canalized K562 Genetic Risk (H=3)"
-        for r_idx, (field, title_sfx, ylab) in enumerate([
-            ("reward_bellman_error", "Held-Out Reward Critic Bellman Error ↓", "Held-out Reward Bellman RMSE (log) ↓"),
-            ("evidence_critic_error", "Held-Out Evidence Critic Error / Divergence ↓", "Held-out Evidence Critic RMSE (log) ↓"),
-        ]):
-            ax = axes[r_idx, c_idx]
-            for m_idx, m in enumerate(methods):
-                grp = sorted([c for c in cells if c["kind"] == kind and c["method"] == m], key=lambda x: x["seed"])
-                if not grp:
-                    continue
-                xs = np.array([pt["episode"] for pt in grp[0]["checkpoints"]], dtype=float) / 1000.0
-                vals = np.array([[max(1e-5, pt[field]) for pt in g["checkpoints"]] for g in grp], dtype=float)
-                mean = vals.mean(axis=0)
-                sd = vals.std(axis=0, ddof=1) if len(grp) > 1 else np.zeros_like(mean)
-                col = PATHDEP_COLORS[m]
-                is_ceac = m.startswith("ceac")
-                is_ranked = m.startswith("ceac_ranked")
-                ls = "--" if m in {"ceac", "ceac_natural", "ids_product"} else "-"
-                lw = 3.2 if is_ranked else (2.5 if is_ceac else 1.6)
-                ms = 7.6 if is_ranked else (7.4 if m == "ceac" else (6.6 if is_ceac else 5.5))
-                zord = 10 if is_ranked else (8 if is_ceac else (5 if "ids_action" in m else 3))
-                ax.fill_between(xs, np.maximum(1e-5, mean - sd), mean + sd, color=col, alpha=0.13 if is_ceac else 0.08, linewidth=0)
-                ax.plot(
-                    xs, mean, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
-                    marker=PATHDEP_MARKERS[m], markersize=ms, markevery=list(range(0, len(xs), 2)),
-                    markeredgecolor="white", markeredgewidth=0.55, zorder=zord,
-                )
-            ax.set_xscale("log")
-            ax.set_yscale("log")
-            ax.set_xlim(0.014, 36.0)
-            ax.set_xticks(xticks)
-            ax.set_xticklabels(xticklabels)
-            ax.minorticks_off()
-            ax.set_title(f"{short_kind} · {title_sfx}", fontsize=10.4, pad=7)
-            ax.set_xlabel("Training episodes (log scale)", fontsize=9.6, labelpad=4)
-            if c_idx == 0:
-                ax.set_ylabel(ylab, fontsize=9.6)
-            ax.grid(alpha=0.2)
-            ax.spines[["top", "right"]].set_visible(False)
+        ax = axes[0, c_idx]
+        for m_idx, m in enumerate(methods):
+            grp = sorted([c for c in cells if c["kind"] == kind and c["method"] == m], key=lambda x: x["seed"])
+            if not grp:
+                continue
+            xs = np.array([pt["episode"] for pt in grp[0]["checkpoints"]], dtype=float) / 1000.0
+            vals = np.array([[max(1e-5, pt[field]) for pt in g["checkpoints"]] for g in grp], dtype=float)
+            mean = vals.mean(axis=0)
+            sd = vals.std(axis=0, ddof=1) if len(grp) > 1 else np.zeros_like(mean)
+            col = PATHDEP_COLORS[m]
+            is_ceac = m.startswith("ceac")
+            is_ranked = m.startswith("ceac_ranked")
+            ls = (
+                "--" if m in {"ceac", "ceac_ranked_natural", "ids_product"}
+                else (":" if m == "ids_null" else ("-." if m in {"ucb_q", "ids_action_tree"} else "-"))
+            )
+            lw = 3.25 if is_ranked else (2.75 if is_ceac else 1.75)
+            ms = 8.0 if is_ranked else (7.6 if is_ceac else 5.8)
+            zord = 11 if is_ranked else (9 if is_ceac else (5 if "ids_action" in m else 4))
+            ax.fill_between(xs, np.maximum(1e-5, mean - sd), mean + sd, color=col, alpha=0.13 if is_ceac else 0.08, linewidth=0)
+            ax.plot(
+                xs, mean, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
+                marker=PATHDEP_MARKERS[m], markersize=ms, markevery=list(range(m_idx % 2, len(xs), 2)),
+                markeredgecolor="white", markeredgewidth=0.55, zorder=zord,
+            )
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_xlim(0.014, 36.0)
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(xticklabels)
+        ax.minorticks_off()
+        ax.set_title(f"{short_kind} · {title_sfx}", fontsize=10.5, pad=8)
+        ax.set_xlabel("Training episodes (log scale)", fontsize=9.6, labelpad=4)
+        if c_idx == 0:
+            ax.set_ylabel(ylab, fontsize=9.6)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
 
+    kind_lbl = "Evidence Critic TD / Divergence" if is_ev else "Reward Critic Bellman Error"
     fig.suptitle(
-        f"Held-Out Reward & Evidence Critic TD / Bellman Error Trajectories (k = {dose}, 512 Held-Out Rollouts / Checkpoint)",
-        fontsize=12.8,
-        y=0.988,
+        f"Path-Dependent Signalling & K562 GI · Overlaid Held-Out {kind_lbl} Time Traces (k = {dose})",
+        fontsize=12.4,
+        y=0.985,
     )
-    fig.tight_layout(rect=(0.0, 0.145, 1.0, 0.948))
+    fig.tight_layout(rect=(0.0, 0.24, 1.0, 0.925))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.125), ncol=3, frameon=False, fontsize=8.7)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.22), ncol=3, frameon=False, fontsize=8.8)
     style_ceac_legend(leg)
     return fig
 
 
 def draw_critic_dose_scaling(audit_bundle: dict):
-    """Render 2x2 late-horizon Held-Out Reward & Stage-Epistemic Critic Error across k = 0..3."""
+    """Render clean 1x2 late-horizon Held-Out Evidence Critic Error across k = 0..3."""
     import matplotlib.pyplot as plt
 
     plt.rcParams.update({"pdf.fonttype": 42, "figure.facecolor": "white"})
@@ -435,55 +446,55 @@ def draw_critic_dose_scaling(audit_bundle: dict):
     methods = [m for m in AUDIT_METHODS if any(c["method"] == m for c in cells)]
     kinds = ["signalling_rewiring", "canalized_gi"]
 
-    fig, axes = plt.subplots(2, 2, figsize=(13.6, 8.8), squeeze=False)
-    for r_idx, kind in enumerate(kinds):
+    fig, axes = plt.subplots(1, 2, figsize=(13.6, 5.1), squeeze=False)
+    for c_idx, kind in enumerate(kinds):
         short_kind = "Signalling Rewiring (H=3)" if kind == "signalling_rewiring" else "Canalized K562 Genetic Risk (H=3)"
-        for c_idx, (field, title_sfx, ylab) in enumerate([
-            ("evidence_critic_error", "Final Evidence Critic Error vs. k (Native / LLR)", "Final Evidence Critic RMSE (log) ↓"),
-            ("stage_epistemic_error", "Final Stage-Epistemic / Bonus Critic Error vs. k", "Bounded Stage-Critic RMSE (log) ↓"),
-        ]):
-            ax = axes[r_idx, c_idx]
-            for m in methods:
-                xs, ys, sds = [], [], []
-                for d in doses:
-                    grp = [c for c in cells if c["kind"] == kind and c["method"] == m and c["dose"] == d]
-                    if not grp:
-                        continue
-                    v = np.array([max(1e-5, g["checkpoints"][-1][field]) for g in grp], dtype=float)
-                    xs.append(float(d))
-                    ys.append(float(v.mean()))
-                    sds.append(float(v.std(ddof=1)) if len(v) > 1 else 0.0)
-                if not xs:
+        ax = axes[0, c_idx]
+        for m in methods:
+            xs, ys, sds = [], [], []
+            for d in doses:
+                grp = [c for c in cells if c["kind"] == kind and c["method"] == m and c["dose"] == d]
+                if not grp:
                     continue
-                xs_a, ys_a, sds_a = np.array(xs), np.array(ys), np.array(sds)
-                col = PATHDEP_COLORS[m]
-                is_ceac = m.startswith("ceac")
-                is_ranked = m.startswith("ceac_ranked")
-                ls = "--" if m in {"ceac", "ceac_natural", "ids_product"} else "-"
-                lw = 3.2 if is_ranked else (2.5 if is_ceac else 1.6)
-                ms = 7.8 if is_ranked else (7.5 if m == "ceac" else (6.8 if is_ceac else 5.8))
-                zord = 10 if is_ranked else (8 if is_ceac else 4)
-                ax.fill_between(xs_a, np.maximum(1e-5, ys_a - sds_a), ys_a + sds_a, color=col, alpha=0.13 if is_ceac else 0.08, linewidth=0)
-                ax.plot(
-                    xs_a, ys_a, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
-                    marker=PATHDEP_MARKERS[m], markersize=ms, markeredgecolor="white", markeredgewidth=0.55, zorder=zord,
-                )
-            ax.set_yscale("log")
-            ax.set_xticks(doses)
-            ax.set_title(f"{short_kind} · {title_sfx}", fontsize=10.4, pad=7)
-            ax.set_xlabel("Path-dependent confounding modules k", fontsize=9.6, labelpad=4)
-            ax.set_ylabel(ylab, fontsize=9.6)
-            ax.grid(alpha=0.2)
-            ax.spines[["top", "right"]].set_visible(False)
+                v = np.array([max(1e-5, g["checkpoints"][-1]["evidence_critic_error"]) for g in grp], dtype=float)
+                xs.append(float(d))
+                ys.append(float(v.mean()))
+                sds.append(float(v.std(ddof=1)) if len(v) > 1 else 0.0)
+            if not xs:
+                continue
+            xs_a, ys_a, sds_a = np.array(xs), np.array(ys), np.array(sds)
+            col = PATHDEP_COLORS[m]
+            is_ceac = m.startswith("ceac")
+            is_ranked = m.startswith("ceac_ranked")
+            ls = (
+                "--" if m in {"ceac", "ceac_ranked_natural", "ids_product"}
+                else (":" if m == "ids_null" else ("-." if m in {"ucb_q", "ids_action_tree"} else "-"))
+            )
+            lw = 3.25 if is_ranked else (2.75 if is_ceac else 1.75)
+            ms = 8.0 if is_ranked else (7.6 if is_ceac else 5.8)
+            zord = 11 if is_ranked else (9 if is_ceac else 4)
+            ax.fill_between(xs_a, np.maximum(1e-5, ys_a - sds_a), ys_a + sds_a, color=col, alpha=0.13 if is_ceac else 0.08, linewidth=0)
+            ax.plot(
+                xs_a, ys_a, label=PATHDEP_LABELS[m], color=col, lw=lw, linestyle=ls,
+                marker=PATHDEP_MARKERS[m], markersize=ms, markeredgecolor="white", markeredgewidth=0.55, zorder=zord,
+            )
+        ax.set_yscale("log")
+        ax.set_xticks(doses)
+        ax.set_title(f"{short_kind} · Final Evidence Critic Error vs. k", fontsize=10.5, pad=8)
+        ax.set_xlabel("Path-dependent confounding modules k", fontsize=9.6, labelpad=4)
+        if c_idx == 0:
+            ax.set_ylabel("Final Evidence Critic RMSE (log) ↓", fontsize=9.6)
+        ax.grid(alpha=0.2)
+        ax.spines[["top", "right"]].set_visible(False)
 
     fig.suptitle(
-        "Evidence Critic Scaling Across Path-Dependent Confounding k = 0 → 3 (Native LLR & Bounded Stage-Critic Views)",
-        fontsize=12.8,
-        y=0.988,
+        "Held-Out Evidence Critic Scaling Across Path-Dependent Confounding k = 0 → 3",
+        fontsize=12.4,
+        y=0.985,
     )
-    fig.tight_layout(rect=(0.0, 0.145, 1.0, 0.948))
+    fig.tight_layout(rect=(0.0, 0.24, 1.0, 0.925))
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.125), ncol=3, frameon=False, fontsize=8.7)
+    leg = fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.22), ncol=3, frameon=False, fontsize=8.8)
     style_ceac_legend(leg)
     return fig
 
@@ -600,10 +611,10 @@ def main():
         for m in AUDIT_METHODS
         for seed in (0, 1, 2)
     ]
+    ctx = mp.get_context("spawn")
     cells = []
-    with ProcessPoolExecutor(max_workers=args.workers, max_tasks_per_child=1) as pool:
-        for fut in as_completed([pool.submit(run_critic_audit_cell, j) for j in jobs]):
-            res = fut.result()
+    with ctx.Pool(processes=args.workers, maxtasksperchild=1) as pool:
+        for res in pool.imap_unordered(run_critic_audit_cell, jobs, chunksize=1):
             cells.append(res)
             last = res["checkpoints"][-1]
             print(

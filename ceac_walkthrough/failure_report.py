@@ -3,7 +3,37 @@ import numpy as np
 from ceac_hardness.report import endpoints, LABELS, KINDS
 from ceac_walkthrough.mechanisms import occupancy_ratio, population_nuisance
 
-DOSE_COLORS = ['#7da9c7', '#4c8bb5', '#235e8c', '#092f58', '#43245a']
+DOSE_COLORS = ['#9CA3AF', '#6B7280', '#4B5563', '#1F2937', '#111827']
+
+WALKTHROUGH_COLORS = {
+    'idac': '#15803D',           # Emerald / Forest Green (IDAC)
+    'pomd': '#FF1493',           # Deep Hot Pink (Optimistic POMD)
+    'ucb_q': '#C026D3',          # Vivid Fuchsia-Magenta (UCB-Q)
+    'ids_correlated': '#7F1D1D', # Dark Wine Red (misspecified correlated IDS)
+    'ids_product': '#DC2626',    # Vivid Scarlet Red (full-support IDS)
+    'ceac': '#0047AB',           # Canonical CEAC = Cobalt Blue
+    'oracle': '#374151',         # Charcoal Grey
+}
+
+WALKTHROUGH_MARKERS = {
+    'idac': 'D',
+    'pomd': 'h',
+    'ucb_q': '>',
+    'ids_correlated': '<',
+    'ids_product': '^',
+    'ceac': '*',
+    'oracle': 'x',
+}
+
+WALKTHROUGH_LINESTYLES = {
+    'idac': '-',
+    'pomd': '-',
+    'ucb_q': '-.',
+    'ids_correlated': ':',
+    'ids_product': '--',
+    'ceac': '-',
+    'oracle': ':',
+}
 
 
 def seed_curve(cells, getter):
@@ -67,24 +97,219 @@ def draw_failure_fans(bundle):
     return fig
 
 
+def draw_false_beacon_prior_reversal(prior):
+    """Single-environment 1x2 False Beacon Prior Reversal: Final Gap vs d (left) & Overlaid Time Traces at d=1.0 (right)."""
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import MaxNLocator
+
+    plt.rcParams.update({'pdf.fonttype': 42, 'figure.facecolor': 'white'})
+    methods = [m for m in ('ids_correlated', 'ids_product', 'ceac') if any(r['method'] == m for r in prior['runs'])]
+    rows = endpoints(prior)
+    doses = sorted({r['dose'] for r in rows})
+    max_dose = doses[-1]
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.0), squeeze=False)
+    ax0 = axes[0, 0]
+    for m in methods:
+        grp = sorted([r for r in rows if r['task'] == 1 and r['method'] == m], key=lambda x: x['dose'])
+        if not grp:
+            continue
+        xs = np.array([g['dose'] for g in grp], dtype=float)
+        ys = np.array([g['late_gap_mean'] for g in grp], dtype=float)
+        sds = np.array([g['late_gap_sd'] for g in grp], dtype=float)
+        col = WALKTHROUGH_COLORS[m]
+        is_ceac = m == 'ceac'
+        ax0.fill_between(xs, np.maximum(0, ys - sds), ys + sds, color=col, alpha=.13 if is_ceac else .08, lw=0)
+        ax0.plot(xs, ys, color=col, lw=3.25 if is_ceac else 2.0, ls=WALKTHROUGH_LINESTYLES[m], marker=WALKTHROUGH_MARKERS[m], markersize=8.2 if is_ceac else 6.2, markeredgecolor='white', markeredgewidth=0.55, label=LABELS.get(m, m), zorder=10 if is_ceac else 4)
+    ax0.set_xticks(doses)
+    ax0.set_ylim(-0.02, 0.48)
+    ax0.set_title('False Beacon Cue Reversal · Final Policy Gap vs. d ↓', fontsize=10.6, pad=8)
+    ax0.set_xlabel('Cue correlation reversal d', fontsize=9.6)
+    ax0.set_ylabel('Final expected policy gap (Task 1) ↓', fontsize=9.8)
+    style_axis(ax0)
+
+    ax1 = axes[0, 1]
+    for m_i, m in enumerate(methods):
+        cells = [r for r in prior['runs'] if (r['task'], r['method'], r['dose']) == (1, m, max_dose)]
+        if not cells:
+            continue
+        x, y, sd = seed_curve(cells, lambda t: t['cumulative_regret'])
+        col = WALKTHROUGH_COLORS[m]
+        is_ceac = m == 'ceac'
+        step_mk = max(1, len(x) // 8)
+        mk_idx = list(range((m_i * 2) % step_mk, len(x), step_mk)) or [0]
+        ax1.fill_between(x, np.maximum(0, y - sd), y + sd, color=col, alpha=.13 if is_ceac else .08, lw=0)
+        ax1.plot(x, y, color=col, lw=3.25 if is_ceac else 2.0, ls=WALKTHROUGH_LINESTYLES[m], marker=WALKTHROUGH_MARKERS[m], markersize=8.2 if is_ceac else 6.2, markevery=mk_idx, markeredgecolor='white', markeredgewidth=0.55, label=LABELS.get(m, m), zorder=10 if is_ceac else 4)
+    ax1.set_xlim(0, x[-1])
+    ax1.set_ylim(bottom=0)
+    ax1.xaxis.set_major_locator(MaxNLocator(5))
+    ax1.set_title(f'False Beacon Cue Reversal (d = {max_dose:g}, Task 1) · Linear Regret ↓', fontsize=10.6, pad=8)
+    ax1.set_xlabel('Physical training interactions (thousands)', fontsize=9.6)
+    ax1.set_ylabel('Cumulative expected regret ↓', fontsize=9.8)
+    style_axis(ax1)
+
+    fig.suptitle('Controlled False Beacon Cue-Reversal Junction · Prior Misspecification vs. Confounder Elimination', fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0, .20, 1, .925))
+    handles, labels = ax0.get_legend_handles_labels()
+    leg = fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(.5, .18), ncol=3, frameon=False, fontsize=9.0)
+    for txt in leg.get_texts():
+        if 'CEAC' in txt.get_text():
+            txt.set_fontweight('bold')
+            txt.set_color('#0047AB')
+    return fig
+
+
+def draw_single_junction_burden(bundle, kind: str):
+    """Single-environment 1x2 Controlled Junction Burden: Dose Scaling vs B (left) & Overlaid Time Traces at B=64 (right)."""
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import MaxNLocator
+
+    plt.rcParams.update({'pdf.fonttype': 42, 'figure.facecolor': 'white'})
+    methods = [m for m in ('idac', 'ucb_q', 'pomd', 'ids_product', 'ceac', 'oracle') if any(r['method'] == m for r in bundle['runs'])]
+    rows = endpoints(bundle)
+    doses = sorted({r['dose'] for r in rows if r['kind'] == kind})
+    max_dose = doses[-1]
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.0), squeeze=False)
+    # Left panel: Cumulative Regret vs B
+    ax0 = axes[0, 0]
+    for m in methods:
+        grp = sorted([r for r in rows if r['kind'] == kind and r['task'] == 1 and r['method'] == m], key=lambda x: x['dose'])
+        if not grp:
+            continue
+        xs = np.array([g['dose'] for g in grp], dtype=float)
+        ys = np.array([g['regret_mean'] for g in grp], dtype=float)
+        sds = np.array([g['regret_sd'] for g in grp], dtype=float)
+        col = WALKTHROUGH_COLORS[m]
+        is_ceac = m == 'ceac'
+        mk_kw = dict(markeredgecolor='white', markeredgewidth=0.55) if WALKTHROUGH_MARKERS[m] != 'x' else {}
+        ax0.fill_between(xs, np.maximum(0, ys - sds), ys + sds, color=col, alpha=.13 if is_ceac else .08, lw=0)
+        ax0.plot(xs, ys, color=col, lw=3.25 if is_ceac else 1.85, ls=WALKTHROUGH_LINESTYLES[m], marker=WALKTHROUGH_MARKERS[m], markersize=8.2 if is_ceac else 6.0, label=LABELS.get(m, m), zorder=10 if is_ceac else 4, **mk_kw)
+    ax0.set_yscale('symlog', linthresh=10.0)
+    ax0.set_ylim(bottom=0)
+    ax0.set_xticks(doses)
+    ax0.set_title(f'{KINDS[kind]} · Cumulative Regret vs. Breadth B ↓', fontsize=10.6, pad=8)
+    ax0.set_xlabel('Nuisance opportunities B', fontsize=9.6)
+    ax0.set_ylabel('Cumulative expected regret (symlog) ↓', fontsize=9.8)
+    style_axis(ax0)
+
+    # Right panel: Overlaid Time Traces at B = max_dose
+    ax1 = axes[0, 1]
+    for m_i, m in enumerate(methods):
+        cells = [r for r in bundle['runs'] if (r['kind'], r['task'], r['method'], r['dose']) == (kind, 1, m, max_dose)]
+        if not cells:
+            continue
+        x, y, sd = seed_curve(cells, lambda t: t['cumulative_regret'])
+        col = WALKTHROUGH_COLORS[m]
+        is_ceac = m == 'ceac'
+        step_mk = max(1, len(x) // 8)
+        mk_idx = list(range((m_i * 2) % step_mk, len(x), step_mk)) or [0]
+        mk_kw = dict(markeredgecolor='white', markeredgewidth=0.55) if WALKTHROUGH_MARKERS[m] != 'x' else {}
+        ax1.fill_between(x, np.maximum(0, y - sd), y + sd, color=col, alpha=.13 if is_ceac else .08, lw=0)
+        ax1.plot(x, y, color=col, lw=3.25 if is_ceac else 1.85, ls=WALKTHROUGH_LINESTYLES[m], marker=WALKTHROUGH_MARKERS[m], markersize=8.2 if is_ceac else 6.0, markevery=mk_idx, label=LABELS.get(m, m), zorder=10 if is_ceac else 4, **mk_kw)
+    ax1.set_yscale('symlog', linthresh=10.0)
+    ax1.set_ylim(bottom=0)
+    ax1.set_xlim(0, x[-1])
+    ax1.xaxis.set_major_locator(MaxNLocator(5))
+    ax1.set_title(f'{KINDS[kind]} (B = {max_dose:g}, Task 1) · Overlaid Time Traces ↓', fontsize=10.6, pad=8)
+    ax1.set_xlabel('Physical training interactions (thousands)', fontsize=9.6)
+    ax1.set_ylabel('Cumulative expected regret (symlog) ↓', fontsize=9.8)
+    style_axis(ax1)
+
+    fig.suptitle(f'Controlled Two-Step {KINDS[kind]} · Breadth Scaling & Overlaid Regret Time Traces', fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0, .20, 1, .925))
+    handles, labels = ax0.get_legend_handles_labels()
+    leg = fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(.5, .18), ncol=3, frameon=False, fontsize=9.0)
+    for txt in leg.get_texts():
+        if 'CEAC' in txt.get_text():
+            txt.set_fontweight('bold')
+            txt.set_color('#0047AB')
+    return fig
+
+
+def draw_overlaid_failure_traces(bundle):
+    """Clean 1x2 overlaid method time traces at maximum pathology dose (replaces small-multiple grids)."""
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import MaxNLocator
+
+    plt.rcParams.update({'pdf.fonttype': 42, 'figure.facecolor': 'white'})
+    protocol = bundle['registration']['protocol']
+    max_dose = max(r['dose'] for r in bundle['runs'])
+    if protocol == 'burden':
+        methods = [m for m in ('idac', 'ucb_q', 'pomd', 'ids_product', 'ceac', 'oracle') if any(r['method'] == m for r in bundle['runs'])]
+        panels = [
+            ('undertow_junction', 1, f'Undertow Junction (B = {max_dose:g}, Task 1) · Overlaid Regret'),
+            ('false_beacon_junction', 1, f'False Beacon Junction (B = {max_dose:g}, Task 1) · Overlaid Regret'),
+        ]
+        suptitle = f'Controlled Physical Burden (B = {max_dose:g}) · Overlaid Cumulative Regret Time Traces'
+    else:
+        methods = [m for m in ('ids_correlated', 'ids_product', 'ceac') if any(r['method'] == m for r in bundle['runs'])]
+        panels = [
+            ('false_beacon_junction', 1, f'Cue Reversal (d = {max_dose:g}, Task 1: Risky Optimal) · Overlaid Regret'),
+            ('false_beacon_junction', 0, f'Cue Reversal (d = {max_dose:g}, Task 0: Safe Optimal) · Overlaid Regret'),
+        ]
+        suptitle = f'Bayesian Prior Misspecification (Cue Reversal d = {max_dose:g}) · Overlaid Time Traces'
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.0), sharex=True, sharey=True, squeeze=False)
+    for col, (kind, task, title) in enumerate(panels):
+        ax = axes[0, col]
+        for m_i, method in enumerate(methods):
+            cells = [r for r in bundle['runs'] if (r['kind'], r['task'], r['method'], r['dose']) == (kind, task, method, max_dose)]
+            if not cells:
+                continue
+            x, y, sd = seed_curve(cells, lambda t: t['cumulative_regret'])
+            color = WALKTHROUGH_COLORS[method]
+            is_ceac = method == 'ceac'
+            lw = 3.25 if is_ceac else 1.85
+            ms = 8.4 if is_ceac else 6.0
+            step_mk = max(1, len(x) // 8)
+            mk_idx = list(range((m_i * 2) % step_mk, len(x), step_mk)) or [0]
+            mk_kw = dict(markeredgecolor='white', markeredgewidth=0.55) if WALKTHROUGH_MARKERS[method] != 'x' else {}
+            ax.fill_between(x, np.maximum(0, y - sd), y + sd, color=color, alpha=.13 if is_ceac else .08, lw=0)
+            ax.plot(
+                x, y, color=color, lw=lw, ls=WALKTHROUGH_LINESTYLES[method],
+                marker=WALKTHROUGH_MARKERS[method], markersize=ms, markevery=mk_idx,
+                label=LABELS.get(method, method), zorder=10 if is_ceac else 4, **mk_kw,
+            )
+        ax.set_title(title, fontsize=10.6, pad=8)
+        ax.set_xlim(0, x[-1])
+        ax.set_yscale('symlog', linthresh=10.0)
+        ax.set_ylim(bottom=0)
+        ax.xaxis.set_major_locator(MaxNLocator(5))
+        ax.set_xlabel('Physical training interactions (thousands)', fontsize=9.6)
+        if col == 0:
+            ax.set_ylabel('Cumulative expected regret (symlog) ↓', fontsize=9.8)
+        style_axis(ax)
+
+    fig.suptitle(suptitle, fontsize=12.4, y=0.985)
+    fig.tight_layout(rect=(0, .20, 1, .925))
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    leg = fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(.5, .18), ncol=min(3, len(methods)), frameon=False, fontsize=9.0)
+    for txt in leg.get_texts():
+        if 'CEAC' in txt.get_text():
+            txt.set_fontweight('bold')
+            txt.set_color('#0047AB')
+    return fig
+
+
 def draw_objective_diagnostics(burden, prior):
     import matplotlib.pyplot as plt
     fig, axes = plt.subplots(1,3,figsize=(12.5,3.8))
     p = np.linspace(0,1,301)
-    for b, color in zip((4,16,64), DOSE_COLORS[1:4]):
+    for b, color in zip((4,16,64), ('#4ADE80', '#16A34A', '#14532D')):
         axes[0].plot(p,occupancy_ratio(p,b),color=color,label=f'B={b}')
         opt = population_nuisance(b)
         axes[0].scatter([opt],[occupancy_ratio(opt,b)],color=color,s=30,zorder=4)
     axes[0].set(xlabel='Probability of irrelevant excursion',ylabel='Population cost / (entropy + 0.1)',title='IDAC: coverage can improve the wrong objective')
     axes[0].legend(frameon=False,fontsize=8)
     rows = endpoints(burden)
-    for kind, marker in [('undertow_junction','o'),('false_beacon_junction','s')]:
+    for (kind, marker), col in zip([('undertow_junction','o'),('false_beacon_junction','s')], ('#FF1493', '#C026D3')):
         r = sorted([r for r in rows if r['kind']==kind and r['method']=='pomd'],key=lambda r:r['dose'])
-        axes[1].plot([x['dose'] for x in r],[x['pomd_zero_fraction'] for x in r],marker=marker,label=KINDS[kind])
+        axes[1].plot([x['dose'] for x in r],[x['pomd_zero_fraction'] for x in r],marker=marker,color=col,label=KINDS[kind])
     axes[1].set(xlabel='Irrelevant opportunities B',ylabel='Fraction of all-zero optimistic Q iterates',title='POMD: clipped optimism can stay flat',ylim=(-.03,1.05))
     axes[1].legend(frameon=False,fontsize=8)
     d = np.linspace(0,1,201); q = .9-.8*d
-    axes[2].plot(d,(2*q-1)*np.log(9),color='#9b2948',label='Correlated-prior cue evidence')
+    axes[2].plot(d,(2*q-1)*np.log(9),color='#7F1D1D',label='Correlated-prior cue evidence')
     axes[2].axhline(0,color='#444444',lw=.8);axes[2].axvline(.5,color='#aaaaaa',ls=':')
     axes[2].set(xlabel='Cue reversal d',ylabel='Expected log odds added per cue (task 1)',title='IDS: more cues can strengthen the wrong belief')
     for ax in axes:style_axis(ax);ax.title.set_fontsize(10)
@@ -98,24 +323,24 @@ def draw_critic_mechanism(data):
     if len(cells)!=3:raise ValueError('Expected every registered B=64 Undertow CEAC seed')
     fig, axes = plt.subplots(1,3,figsize=(12.8,3.7))
     x = np.arange(4); k = cells[0]['action_task_kl']+[0.]
-    axes[0].bar(x,k,color=['#aaaaaa','#2477a8','#744b9b','#b7b7b7'])
+    axes[0].bar(x,k,color=['#9CA3AF','#0047AB','#6C7CFA','#CBD5E1'])
     axes[0].set_xticks(x,['Safe','Risky','Probe','Undertow'])
     axes[0].set(ylabel='Expected task log-likelihood ratio (nats)',title='1. What distinguishes the task?')
     for i,val in enumerate(k):axes[0].text(i,val+.04,f'{val:.2f}',ha='center',fontsize=9)
     axes[0].set_ylim(0,2.1)
-    for key,label,color,ls in [('reward_contrast','Reward TD contribution','#2477a8','-'),('evidence_contrast','Evidence TD contribution','#9b3c79','-'),('logit_contrast','Their sum','#333333','--')]:
+    for key,label,color,ls in [('reward_contrast','Reward TD contribution','#0047AB','-'),('evidence_contrast','Evidence TD contribution','#6C7CFA','-'),('logit_contrast','Their sum','#1F2937','--')]:
         t,y,sd = seed_curve(cells,lambda r:r[key]['risky_vs_nuisance'])
-        axes[1].plot(t,y,label=label,color=color,ls=ls,lw=1.8)
+        axes[1].plot(t,y,label=label,color=color,ls=ls,lw=2.1)
         axes[1].fill_between(t,y-sd,y+sd,color=color,alpha=.12,lw=0)
-    axes[1].set(title='2. How did the actor actually move?',xlabel='Physical interactions (thousands)',ylabel='Cumulative risky − mean-dead-end logit update')
+    axes[1].set(title='2. How did the CEAC actor move?',xlabel='Physical interactions (thousands)',ylabel='Cumulative risky − mean-dead-end logit update')
     axes[1].legend(frameon=False,fontsize=8)
-    for key,label,color in [('risky','Risky route','#2477a8'),('probe','Diagnostic probe','#744b9b'),('nuisance','All 64 dead ends','#ae672e')]:
+    for key,label,color in [('risky','Risky route','#0047AB'),('probe','Diagnostic probe','#6C7CFA'),('nuisance','All 64 dead ends','#6B7280')]:
         t,y,sd=seed_curve(cells,lambda r:r['actor_probabilities'][key])
-        axes[2].plot(t,y,label=label,color=color,lw=1.8)
+        axes[2].plot(t,y,label=label,color=color,lw=2.1)
         axes[2].fill_between(t,np.maximum(0,y-sd),np.minimum(1,y+sd),color=color,alpha=.12,lw=0)
     timing=[2*c['first_actor_episode']/1000 for c in cells]
     axes[2].axvspan(min(timing),max(timing)+.1,color='#dddddd',alpha=.8)
-    axes[2].set(title='3. What did the learned actor choose?',xlabel='Physical interactions (thousands)',ylabel='Current actor probability',ylim=(-.03,1.05),xlim=(0,12))
+    axes[2].set(title='3. What did the learned CEAC actor choose?',xlabel='Physical interactions (thousands)',ylabel='Current actor probability',ylim=(-.03,1.05),xlim=(0,12))
     axes[2].text(.97,.6,'First 12k interactions\nReference/design before actor',ha='right',transform=axes[2].transAxes,fontsize=8)
     axes[2].legend(frameon=False,fontsize=8,loc='center right',bbox_to_anchor=(1,.32))
     for ax in axes:style_axis(ax);ax.title.set_fontsize(10)
@@ -221,8 +446,8 @@ def render_curated(burden, prior, audit, output, stability=None):
     text=narrative(burden,prior,audit)
     if stability:
         text['opening']+='\n\n**Fresh optimizer confirmation:** the separate stability section adds five new seeds and reveals additional original-CEAC actor failures at maximum Undertow burden. A guarded natural update reduces these errors while preserving both critics and evidence-priced replay. The earlier comparison figures below retain their original optimizer and three-seed slate.'
-    figures=[('junctions',draw_junctions()),('burden_fans',draw_failure_fans(burden)),
-        ('prior_fans',draw_failure_fans(prior)),('critic_mechanism',draw_critic_mechanism(audit)),
+    figures=[('junctions',draw_junctions()),('burden_fans',draw_overlaid_failure_traces(burden)),
+        ('prior_fans',draw_overlaid_failure_traces(prior)),('critic_mechanism',draw_critic_mechanism(audit)),
         ('objective_diagnostics',draw_objective_diagnostics(burden,prior))]
     captions={
         'junctions':'Each episode has two physical steps; useful rewards and task information remain fixed as B grows.',

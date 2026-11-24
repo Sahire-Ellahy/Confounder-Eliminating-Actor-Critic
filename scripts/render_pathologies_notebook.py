@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Build, execute, and SHA-256-audit notebooks/Pathological_Search_Suite.ipynb from portable evidence."""
+"""Build, execute, and SHA-256-audit notebooks/Pathological_Search_Suite.ipynb organized strictly by environment family:
+Part I: Sequential & Bidirectional Combination Locks (`locks`)
+Part II: Oncogenic Signalling Pathway Family (`epistatic_signalling` -> Multi-Step Path-Dependent `signalling_rewiring`)
+Part III: Human K562 Genetic Interaction Family (`gi_arrayed`/`gi_multiplexed` -> Multi-Step Canalized `canalized_gi`)
+Part IV: Consolidated Summary Tables & Reproducible CLI Entrypoints
+"""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -14,8 +19,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import nbformat as nbf
-from nbclient import NotebookClient
-from jupyter_client import KernelManager
 from ceac_pathologies.report import load_export as load_pathology_export
 from ceac_ranked.study import load_gi_ranked_export
 from ceac_pathdep.study import load_pathdep_export
@@ -38,16 +41,14 @@ def build_notebook() -> nbf.NotebookNode:
 
     md(
         "pathologies-intro",
-        """# Pathological Search Suite: Sequential Locks, Signalling Activation & Pairwise Interaction Screens
+        """# Pathological Search Suite — Organized by Domain Family
 
-This notebook loads, verifies, and renders all three benchmark families extending Confounder-Eliminating Actor-Critic (CEAC) beyond two-step junctions:
+This notebook organizes every multi-step lock, signalling pathway, and K562 genetic interaction benchmark **strictly by domain family**, pairing each single-decision screen (where Russo–Van Roy Optimal-Action IDS `ids_action` survives) directly with its **multi-step path-dependent counterpart** (where **both** policy-tree Optimal-Action IDS `ids_action_tree` and quotiented on-path Optimal-Action IDS `ids_action_onpath` break across $k = 0 \\to 3$ while periwinkle `ceac_ranked` stays flat):
 
-1. **Sequential Combination Lock & Bidirectional ("Diabolical") Combination Lock (`ceac_pathologies`, `locks`)** — Sweeps gated lock horizon $L \\in \\{1, 2, 3, 4\\}$ ($H = L + 1$) with anti-shaped step costs, a 3-lane diffusing dead-end sink, and an opposing $0.50$ decoy chain while holding route returns and diagnostic KL strictly invariant across depth.
-2. **Epistatic Signalling / Protein Activation under Pleiotropic Confounding (`ceac_pathologies`, `epistasis`)** — Tests discovery of a $1$-in-$128$ rare synthetic-rescue responder amidst $k \\in \\{0, 1, 2, 3\\}$ non-causal passenger-omics channels ($M = 128 \\cdot 2^k \\in \\{128, 256, 512, 1024\\}$) and $4^k - 1 \\in \\{0, 3, 15, 63\\}$ zero-reward off-pathway pleiotropic states.
-3. **Pairwise Interaction Screen on the Published Horlbeck 2018 K562 Matrix + Greedy Price-Ranked CEAC (`ceac_gi` & `ceac_ranked`)** — Evaluates sequential pairwise discovery on a verified 10-variable / 45-pair human K562 interaction score panel (`FDPS–PPP2R1A`, $\\text{GI} = -5.24$) under $k \\in \\{0, 1, 2, 3\\}$ non-causal single-variable main-effect confounders, comparing certified Section-3 `ceac` against the **greedy maximally-disagreeing + dynamic evidence-price ranked replay** extension (`ceac_ranked`) and Russo–Van Roy optimal-action-MI IDS (`ids_action`).
-4. **Path-Dependent Signalling Rewiring & Canalized K562 Genetic Risk (`ceac_pathdep`, $H = 3$)** — Tests multi-step state-contingent optimal interventions (`signalling_rewiring` EGFR/MEK priming and `canalized_gi` K562 `PPP2R1A` hub de-canalization), separating CEAC's additive pairwise KL evidence critic $Q_I(s, a; \\beta)$ from **both** Russo–Van Roy optimal-policy MI $I(\\Pi^\\star; Z)$ (`ids_action_tree`) and quotiented on-path class MI $I(C_{\\text{on-path}}^\\star; Z)$ (`ids_action_onpath`).
-
-All figures are rendered live from compact, SHA-256-verified portable exports under `notebooks/evidence/`; raw `/runs` trajectories are never required and no training is launched when executing the notebook.""",
+1. **Part I — Combination Lock Family (`combination_lock` & `bidirectional_lock`, $L \\in \\{1, 2, 3, 4\\}$)**
+2. **Part II — Signalling Pathway Family (`epistatic_signalling` $\\to$ Path-Dependent `signalling_rewiring`, $H = 3$)**
+3. **Part III — Human K562 Genetic Interaction Family (`gi_arrayed` / `gi_multiplexed` $\\to$ Path-Dependent `canalized_gi`, $H = 3$)**
+4. **Part IV — Consolidated Summary Tables & Reproducible CLI Entrypoints**""",
     )
 
     code(
@@ -72,18 +73,16 @@ from ceac_pathologies.report import (
     draw_architecture,
     draw_epistasis_discovery_traces,
     draw_epistasis_overlaid_performance,
-    draw_learning,
+    draw_locks_overlaid_performance,
     draw_mechanisms,
     draw_response,
     endpoints,
     load_export,
-    paired_ceac_comparisons,
 )
 from ceac_ranked.study import (
     RANKED_LABELS,
     draw_gi_discovery_traces,
     draw_gi_overlaid_performance,
-    draw_gi_ranked_learning,
     draw_gi_ranked_mechanisms,
     draw_gi_ranked_response,
     load_gi_ranked_export,
@@ -93,308 +92,234 @@ from ceac_pathdep.study import (
     PATHDEP_LABELS,
     draw_pathdep_architecture,
     draw_pathdep_discovery_traces,
-    draw_pathdep_dose_response,
-    draw_pathdep_overlaid_performance,
+    draw_single_pathdep_scaling,
+    draw_single_pathdep_traces,
     load_pathdep_export,
 )
-from ceac_pathdep.critic_audit import (
-    draw_critic_bellman_traces,
-    draw_critic_dose_scaling,
-    load_critic_audit,
+from ceac_pathdep.critic_audit import AUDIT_METHODS as PATHDEP_AUDIT_METHODS, load_critic_audit
+from ceac_critic_diagnostics import (
+    draw_suite_critic_dose_scaling,
+    draw_suite_critic_traces,
+    load_suite_critic_audit,
 )
+from ceac_critic_diagnostics.run_pathologies_audit import SUITE_SPECS
 
 locks = load_export(ROOT / "notebooks/evidence/pathologies_locks")
 epistasis = load_export(ROOT / "notebooks/evidence/pathologies_epistasis")
 gi_ranked = load_gi_ranked_export(ROOT / "notebooks/evidence/pathologies_gi_ranked")
 pathdep = load_pathdep_export(ROOT / "notebooks/evidence/pathologies_pathdep")
+
+locks_critic = load_suite_critic_audit(ROOT / "notebooks/evidence/pathologies_locks")
+epistasis_critic = load_suite_critic_audit(ROOT / "notebooks/evidence/pathologies_epistasis")
+gi_critic = load_suite_critic_audit(ROOT / "notebooks/evidence/pathologies_gi_ranked")
 critic_audit = load_critic_audit(ROOT / "notebooks/evidence/pathologies_pathdep")
 
 print(
     f"Verified portable exports: {len(locks['runs'])} lock cells, "
-    f"{len(epistasis['runs'])} signalling-activation cells, "
-    f"{len(gi_ranked['sweep_rows'])} GI sweep + {len(gi_ranked['calibration_rows'])} GI calibration cells, and "
-    f"{len(pathdep['sweep_rows'])} path-dependent sweep + {len(pathdep['calibration_rows'])} calibration cells. "
-    "No training launched."
+    f"{len(epistasis['runs'])} epistasis cells, {len(gi_ranked['sweep_rows'])} K562 GI cells, and "
+    f"{len(pathdep['sweep_rows'])} path-dependent signalling/GI cells. No training launched."
 )""",
     )
 
+    # =========================================================================
+    # PART I: COMBINATION LOCKS
+    # =========================================================================
     md(
-        "locks-section",
-        """## 1. Sequential Combination Lock & Bidirectional ("Diabolical") Lock (`locks`)
+        "part1-locks-md",
+        """---
+## Part I — Combination Lock Family (`combination_lock` & `bidirectional_lock`, $L \\in \\{1, 2, 3, 4\\}$)
 
-Both lock families share the calibrated $L = 1$ easy baseline (`seeds 1001, 1002`, `tasks 0, 1`, `late_gap <= 0.025`). Increasing $L \\in \\{1, 2, 3, 4\\}$ adds gated key steps with step tension $-0.004$ (rebated at the terminal gate so route returns remain identically $0.50$, $0.10/0.90$, and $0.48$) while wrong keys drop irreversibly into a 3-lane zero-cost dead sink. In `bidirectional_lock`, an opposing left chain unlocks deterministic $0.50$ under key $0$ while the right target chain requires key $1$.""",
+Sweeps gated lock depth $L \\in \\{1, 2, 3, 4\\}$ ($H = L + 1$) with anti-shaped step tension $-0.004$ (rebated at the terminal gate so route returns remain identically $0.50$, $0.10/0.90$, and $0.48$), a 3-lane diffusing dead-end sink, and an opposing $0.50$ decoy chain in `bidirectional_lock`.""",
     )
 
     code(
-        "locks-architecture",
+        "part1-locks-plots",
         """fig = draw_architecture("locks")
-plt.show()""",
+plt.show()
+fig = draw_response(locks)
+plt.show()
+fig = draw_locks_overlaid_performance(locks, dose=4, task=1, metric="cumulative_regret")
+plt.show()
+spec_locks = SUITE_SPECS["locks"]
+for k_key, k_title in spec_locks["kinds"]:
+    fig = draw_suite_critic_traces(
+        locks_critic["cells"],
+        [(k_key, k_title)],
+        target_dose=spec_locks["target_dose"],
+        suptitle=f"{k_title} (Depth L = 4, Task 1) · Overlaid Held-Out Reward & Evidence Critic Error",
+        method_order=spec_locks["methods"],
     )
-
-    code(
-        "locks-dose-response",
-        """fig = draw_response(locks)
-plt.show()""",
-    )
-
-    code(
-        "locks-mechanisms",
-        """fig = draw_mechanisms(locks)
-plt.show()""",
-    )
-
-    code(
-        "locks-learning-fans",
-        """for metric in ("cumulative_regret", "window_gap"):
-    fig = draw_learning(locks, "bidirectional_lock", task=1, metric=metric)
     plt.show()""",
     )
 
-    code(
-        "locks-summary-table",
-        """lock_rows = [r for r in endpoints(locks) if r["task"] == 1 and r["dose"] in (1, 4)]
-print(f"{'Environment':32s} | {'Algorithm':34s} | {'L=1 Regret':>11s} | {'L=4 Regret':>11s} | {'L=4 Gap':>8s}")
-print("-" * 108)
-for kind in ("bidirectional_lock", "combination_lock"):
-    by_m = { (r["method"], r["dose"]): r for r in lock_rows if r["kind"] == kind }
-    for m in ("idac", "pomd", "ucb_q", "ids_decoy", "ids_product", "ceac", "ceac_natural", "oracle"):
-        r1, r4 = by_m[(m, 1)], by_m[(m, 4)]
-        print(f"{KINDS[kind]:32s} | {LABELS[m]:34s} | {r1['regret_mean']:11,.1f} | {r4['regret_mean']:11,.1f} | {r4['late_gap_mean']:8.4f}")""",
-    )
-
+    # =========================================================================
+    # PART II: SIGNALLING PATHWAY FAMILY (SINGLE-STEP -> PATH-DEPENDENT)
+    # =========================================================================
     md(
-        "epistasis-section",
-        """## 2. Signalling Pathway / Protein Activation under Off-Pathway Pleiotropy (`epistasis`)
+        "part2-signalling-md",
+        """---
+## Part II — Signalling Pathway Family (`epistatic_signalling` $\\to$ `signalling_rewiring`)
 
-Models discovering a rare $1$-in-$128$ synthetic-rescue signalling subtype (`K1 ∧ K2` synergy pays $0.90$ vs. $0.10$ in $127$ non-responders; baseline care pays $0.50$; phospho-probe pays $0.48$) as $k \\in \\{0, 1, 2, 3\\}$ non-causal passenger modules ($\\eta \\in \\{0, 1\\}^k$, $M = 128 \\cdot 2^k$) and $4^k - 1$ zero-reward off-pathway pleiotropic arms are added.
+### 2.1 Single-Stage Epistatic Signalling under Off-Pathway Pleiotropy (`epistatic_signalling`)
 
-- **Whole-model MI (`ids_product`) vs. Optimal-action MI (`ids_action`)**: Whole-model mutual information $I((\\theta, \\eta); Z^\\pi)$ spends early episodes profiling decision-irrelevant passenger-omics channels, whereas Russo–Van Roy optimal-action MI $I(A^\\star; Z^\\pi)$ and CEAC's coordinate-free row dominance assign **zero** value to passenger channels.
-- **Model-free coverage / bonus collapse**: `IDAC`, `Optimistic POMD`, and `UCB-Q` are drawn into the $4^k - 1$ off-pathway states as $k$ increases.""",
+Tests discovery of a $1$-in-$128$ synthetic-rescue subtype (`K1 ∧ K2` pays $0.90$ vs. $0.10$) amidst $k \\in \\{0, 1, 2, 3\\}$ non-causal passenger-omics channels ($M = 128 \\cdot 2^k$) and $4^k - 1$ off-pathway pleiotropic states. Because the optimal action is **not** multi-step path-dependent here, whole-model MI `ids_product` wastes episodes profiling passengers while single-step Russo–Van Roy Optimal-Action IDS (`ids_action`, ruby red) and `ceac` (cobalt) ignore passenger channels.""",
     )
 
     code(
-        "epistasis-architecture",
+        "part2-epistasis-plots",
         """fig = draw_architecture("epistasis")
+plt.show()
+fig = draw_response(epistasis)
+plt.show()
+fig = draw_epistasis_overlaid_performance(epistasis, task=1, dose=3)
+plt.show()
+fig = draw_epistasis_discovery_traces(epistasis, dose=3, task=1)
+plt.show()
+spec_epi = SUITE_SPECS["epistasis"]
+fig = draw_suite_critic_traces(
+    epistasis_critic["cells"],
+    spec_epi["kinds"],
+    target_dose=spec_epi["target_dose"],
+    suptitle=spec_epi["traces_title"],
+    method_order=spec_epi["methods"],
+)
 plt.show()""",
-    )
-
-    code(
-        "epistasis-dose-response",
-        """fig = draw_response(epistasis)
-plt.show()""",
-    )
-
-    code(
-        "epistasis-mechanisms",
-        """fig = draw_mechanisms(epistasis)
-plt.show()""",
-    )
-
-    code(
-        "epistasis-overlaid-performance",
-        """fig = draw_epistasis_overlaid_performance(epistasis, task=1)
-plt.show()""",
-    )
-
-    code(
-        "epistasis-discovery-traces",
-        """fig = draw_epistasis_discovery_traces(epistasis, dose=3, task=1)
-plt.show()""",
-    )
-
-    code(
-        "epistasis-learning-fans",
-        """for metric in ("window_gap", "cumulative_regret"):
-    fig = draw_learning(epistasis, "epistatic_signalling", task=1, metric=metric)
-    plt.show()""",
-    )
-
-    code(
-        "epistasis-summary-table",
-        """epi_rows = { (r["method"], r["dose"]): r for r in endpoints(epistasis) if r["task"] == 1 }
-print(f"{'Algorithm':38s} | {'k=0 Regret':>10s} | {'k=3 Regret':>10s} | {'k=3 Gap':>8s} | {'Omics%':>7s} | {'OffPath%':>8s}")
-print("-" * 96)
-for m in ("idac", "pomd", "ucb_q", "ids_canonical", "ids_product", "ids_action", "ceac", "ceac_natural", "oracle"):
-    r0, r3 = epi_rows[(m, 0)], epi_rows[(m, 3)]
-    print(
-        f"{LABELS[m]:38s} | {r0['regret_mean']:10,.1f} | {r3['regret_mean']:10,.1f} | "
-        f"{r3['late_gap_mean']:8.4f} | {100*r3['passenger_omics_fraction']:6.2f}% | {100*r3['pleiotropic_fraction']:7.1f}%"
-    )""",
     )
 
     md(
-        "gi-section",
-        """## 3. Pairwise Interaction Screen (Horlbeck 2018 K562 Matrix) & Greedy Price-Ranked CEAC (`gi_screen` + `ceac_ranked`)
+        "part2-signalling-pathdep-md",
+        """### 2.2 Multi-Step Path-Dependent Signalling Rewiring (`signalling_rewiring`, $H = 3$) — Breaking Optimal-Action IDS
 
-Grounded in the verified Horlbeck et al. (2018, *Cell*) K562 pairwise interaction score matrix (`data/external/horlbeck2018/GI_map_treeview.zip`, SHA-256 verified offline), `select_panel(10)` selects a 10-variable panel (`45` pairs) containing one strong interaction (`FDPS–PPP2R1A`, $\\text{GI} = -5.2413$) with all other 44 pairs $> -2.5$, permuted per seed to eliminate index tie-break artifacts.
-
-### Why Greedy Disagreement + Dynamic Evidence-Price Buffer Ranking (`ceac_ranked`) Matters
-1. **Eliminating uniform $\\binom{G}{2}$ seed-bank floors**: Certified Section-3 `ceac` pre-registers `control` + all `45` pair arms (`46` columns $\\times 513$ replay-floor episodes $\\approx 23,600$ startup episodes on `gi_arrayed`). `GreedyPricedCEAC` (`ceac_ranked`) starts with `bank_size = 1` (`control`) and acquires candidate columns lazily via coordinate-free confounder-projected disagreement $\\min_{j' \\in C'} I^m(\\pi; j')$, certifying `Task 1` with an active bank of **~2 columns** instead of `46`.
-2. **Dynamic evidence-price replay ranking & KKT price attenuation**: `PriceRankedReplay` re-scores stored strata in $O(|\\mathcal{B}_t|)$ whenever $\\beta_t$ shifts, promoting informative strata with zero new environment steps, while attenuating effective actor exploration prices as $\\rho_t = \\min(1, \\text{scale}(t)/(1 + t_{\\text{actor}}))$ so `Task 0` (null panel) converges cleanly to `control` instead of perpetually probing low-reward pair arms.""",
+When the optimal intervention becomes **state-contingent across steps** — requiring Step-1 `EGFR/MEK` priming ($-0.015$, $0$ immediate KL) to relieve negative feedback and unlock $R = 8$ post-translational bypass co-targets ($0.92$ vs. $0.10$), while unprimed Step-1 co-targeting fails ($0.25$) — **both** multi-step Optimal-Action IDS formulations break as confounding complexity $k \\in \\{0, 1, 2, 3\\}$ increases:
+- **`ids_action_tree` ($I(\\Pi^\\star; Z)$, coral red)**: $(3^k - 1)$ off-path stress states carry $\\xi$-dependent local rescues, splitting Bellman optimal policy trees $\\Pi^\\star(\\theta, \\xi)$ by $2^k$.
+- **`ids_action_onpath` ($I(C_{\\text{on-path}}^\\star; Z)$, ruby red)**: $6k$ coarse mRNA echo clades ($0.49999$) carry positive scalar MI about marginal peripheral clades ($0.5004$) while yielding **zero KL** on the post-translational bypass responder.
+- **Periwinkle `ceac_ranked`**: Stays flat near `~40` regret and `0.0001` gap across all $k = 0 \\to 3$, with Held-Out Evidence Critic RMSE converging smoothly to `0.0000`.""",
     )
 
     code(
-        "gi-architecture",
-        """fig = draw_architecture("gi_screen")
-plt.show()""",
-    )
-
-    code(
-        "gi-dose-response",
-        """fig = draw_gi_ranked_response(gi_ranked["summary_rows"])
-plt.show()""",
-    )
-
-    code(
-        "gi-mechanisms",
-        """fig = draw_gi_ranked_mechanisms(gi_ranked["summary_rows"])
-plt.show()""",
-    )
-
-    code(
-        "gi-overlaid-performance",
-        """fig = draw_gi_overlaid_performance(gi_ranked, dose=3)
-plt.show()""",
-    )
-
-    code(
-        "gi-discovery-traces",
-        """fig = draw_gi_discovery_traces(gi_ranked, dose=3)
-plt.show()""",
-    )
-
-    code(
-        "gi-learning-fans",
-        """for kind in ("gi_arrayed", "gi_multiplexed"):
-    for metric in ("window_gap", "cumulative_regret"):
-        fig = draw_gi_ranked_learning(gi_ranked, kind, metric=metric)
-        plt.show()""",
-    )
-
-    code(
-        "gi-summary-tables",
-        """from collections import defaultdict
-
-cal_by_key = defaultdict(list)
-for r in gi_ranked["calibration_rows"]:
-    cal_by_key[(r["kind"], r["task"], r["method"])].append(r)
-
-print("=== Easy-Case Calibration Diagnostic (dose k=0, seeds 1001 & 1002, 65,536 episodes) ===")
-print(f"{'Screen Variant':38s} | {'Task':>4s} | {'Method':46s} | {'Bank':>5s} | {'Gap':>7s} | {'Regret':>9s}")
-print("-" * 122)
-for (kind, task, m), grp in sorted(cal_by_key.items()):
-    bank_s = f"{np.mean([x['bank_policies'] for x in grp]):5.1f}" if grp[0].get("bank_policies") is not None else "   — "
-    print(
-        f"{KINDS[kind][:38]:38s} | {task:4d} | {RANKED_LABELS[m][:46]:46s} | {bank_s} | "
-        f"{np.mean([x['late_gap'] for x in grp]):7.4f} | {np.mean([x['cumulative_regret'] for x in grp]):9,.1f}"
-    )
-
-print("\\n=== Held-Out Sweep Summary (Task 1, k=0 -> k=3, seeds 0, 1, 2) ===")
-gi_map = { (r["kind"], r["method"], r["dose"]): r for r in gi_ranked["summary_rows"] if r["task"] == 1 }
-print(f"{'Screen Variant':38s} | {'Method':46s} | {'k=0 Reg':>9s} | {'k=3 Reg':>9s} | {'k=3 Gap':>7s} | {'Omics%':>6s}")
-print("-" * 128)
-for kind in ("gi_arrayed", "gi_multiplexed"):
-    for m in ("idac", "pomd", "ucb_q", "ids_additive", "ids_product", "ids_empirical", "ids_action", "ceac", "ceac_natural", "ceac_ranked", "ceac_ranked_natural", "oracle"):
-        r0, r3 = gi_map[(kind, m, 0)], gi_map[(kind, m, 3)]
-        print(
-            f"{KINDS[kind][:38]:38s} | {RANKED_LABELS[m][:46]:46s} | {r0['regret_mean']:9,.1f} | "
-            f"{r3['regret_mean']:9,.1f} | {r3['late_gap_mean']:7.4f} | {r3['profiling_pct']:5.2f}%"
-        )""",
-    )
-
-    md(
-        "pathdep-section",
-        """## 4. Path-Dependent Signalling Rewiring & Canalized K562 Genetic Risk (`ceac_pathdep`, $H = 3$)
-
-Evaluates two $H = 3$ multi-step problems where the **optimal action is strictly path-dependent** (requiring a Step-1 priming or capacitor-hub de-canalization action at cost $-0.015$ with zero immediate KL before selecting the optimal Step-2 co-target or K562 modifier inside the primed state):
-
-1. **`signalling_rewiring` ($H = 3$)**: Time-staggered `EGFR/MEK` priming unlocks $R = 8$ primary post-translational bypass rescues ($0.92$ vs. $0.10$), while unprimed Step-1 co-targeting fails ($0.25$) due to intact feedback.
-2. **`canalized_gi` ($H = 3$, Horlbeck 2018 K562 `PPP2R1A` Hub)**: Step-1 `PPP2R1A` hub de-canalization unlocks second-step K562 risk-modifier interactions (`FDPS`, $\\text{GI} = -5.2413$, hit $\\approx 0.96$), while reverse-order single knockdowns under an intact hub are buffered ($0.4999$).
-
-Both benchmarks test CEAC (`ceac`, `ceac_ranked`) head-to-head against **two** multi-step Optimal-Action IDS controls:
-- **`ids_action_tree` ($I(\\Pi^\\star; Z)$)**: Full MDP Bellman optimal policies $\\Pi^\\star(\\theta, \\xi)$ split by $2^k$ across off-path stress/non-hub rescue rules $\\xi \\in \\{0, 1\\}^k$, trapping policy-tree IDS on non-causal modifier assays.
-- **`ids_action_onpath` ($I(C_{\\text{on-path}}^\\star; Z)$)**: Even after quotienting out all off-path differences, scalar MI over-weights cheap peripheral clade / eQTL expression reporters ($0.49998$ return) that reduce tail entropy on peripheral candidates while providing **zero KL** between `Null` and the realized responder.""",
-    )
-
-    code(
-        "pathdep-architecture",
+        "part2-signalling-pathdep-plots",
         """fig = draw_pathdep_architecture()
+plt.show()
+fig = draw_single_pathdep_scaling(pathdep["summary_rows"], "signalling_rewiring")
+plt.show()
+fig = draw_single_pathdep_traces(pathdep, "signalling_rewiring", dose=3)
+plt.show()
+fig = draw_suite_critic_traces(
+    critic_audit["cells"],
+    [("signalling_rewiring", "Signalling Rewiring (H = 3)")],
+    target_dose=3,
+    suptitle="Path-Dependent Signalling Rewiring (k = 3, Task 1) · Overlaid Held-Out Reward & Evidence Critic Error",
+    method_order=list(PATHDEP_AUDIT_METHODS),
+    ranked_ceac_present=True,
+)
 plt.show()""",
     )
 
-    code(
-        "pathdep-dose-response",
-        """fig = draw_pathdep_dose_response(pathdep["summary_rows"])
-plt.show()""",
+    # =========================================================================
+    # PART III: K562 GENETIC INTERACTION FAMILY (SINGLE-STEP -> PATH-DEPENDENT)
+    # =========================================================================
+    md(
+        "part3-gi-md",
+        """---
+## Part III — Human K562 Genetic Interaction Family (Horlbeck et al., 2018)
+
+### 3.1 Pairwise K562 Interaction Screens (`gi_arrayed` & `gi_multiplexed`) & Greedy Price-Ranked CEAC
+
+Evaluates sequential pair discovery on a verified 10-variable / 45-pair K562 GI panel (`FDPS–PPP2R1A`, $\\text{GI} = -5.2413$) under $k \\in \\{0, 1, 2, 3\\}$ non-causal single-variable main-effect confounders ($M = 46 \\cdot 2^k$). Periwinkle `ceac_ranked` eliminates the uniform 46-column seed-bank floor (`~2` active bank columns vs. `46`). Because the pairwise screen is single-stage, `ids_action` also remains low-regret here.""",
     )
 
     code(
-        "pathdep-overlaid-performance",
-        """fig = draw_pathdep_overlaid_performance(pathdep, dose=3)
+        "part3-gi-plots",
+        """fig = draw_architecture("gi_screen")
+plt.show()
+fig = draw_gi_ranked_response(gi_ranked["summary_rows"])
+plt.show()
+fig = draw_gi_ranked_mechanisms(gi_ranked["summary_rows"])
+plt.show()
+fig = draw_gi_overlaid_performance(gi_ranked, dose=3, metric="cumulative_regret")
+plt.show()
+fig = draw_gi_discovery_traces(gi_ranked, dose=3)
+plt.show()
+spec_gi = SUITE_SPECS["gi_ranked"]
+fig = draw_suite_critic_traces(
+    gi_critic["cells"],
+    [("gi_arrayed", "K562 GI Arrayed Screen")],
+    target_dose=spec_gi["target_dose"],
+    suptitle="Horlbeck 2018 K562 Arrayed Screen (k = 3, Task 1) · Overlaid Held-Out Reward & Evidence Critic Error",
+    method_order=spec_gi["methods"],
+    ranked_ceac_present=True,
+)
 plt.show()""",
     )
 
-    code(
-        "pathdep-discovery-traces",
-        """fig = draw_pathdep_discovery_traces(pathdep, dose=3)
-plt.show()""",
+    md(
+        "part3-canalized-gi-md",
+        """### 3.2 Multi-Step Canalized K562 Genetic Risk Screen (`canalized_gi`, `PPP2R1A` Hub, $H = 3$) — Breaking Optimal-Action IDS
+
+Models **phenotypic canalization** on the real K562 `PPP2R1A` phosphatase hub ($H = 3$, `32,768` episodes): single-gene knockdowns under an intact `PPP2R1A` hub are buffered ($0.4999$), whereas Step-1 `PPP2R1A` de-canalization ($-0.015$, $0$ immediate KL) exposes second-step K562 synthetic-lethal modifiers (`FDPS`, hit $\\approx 0.96$). Adding $6k$ peripheral eQTL-echoed modifiers and $(3^k - 1)$ off-path complexes breaks `ids_product`, Russo–Van Roy `ids_action_tree` ($I(\\Pi^\\star; Z)$), **and** quotiented `ids_action_onpath` ($I(C_{\\text{on-path}}^\\star; Z)$) across $k = 0 \\to 3$, while periwinkle `ceac_ranked` stays flat near `~38` regret with `0.0001` Held-Out Evidence Critic RMSE.""",
     )
 
     code(
-        "pathdep-critic-bellman-traces",
-        """fig = draw_critic_bellman_traces(critic_audit, dose=3)
+        "part3-canalized-gi-plots",
+        """fig = draw_single_pathdep_scaling(pathdep["summary_rows"], "canalized_gi")
+plt.show()
+fig = draw_single_pathdep_traces(pathdep, "canalized_gi", dose=3)
+plt.show()
+fig = draw_pathdep_discovery_traces(pathdep, dose=3)
+plt.show()
+fig = draw_suite_critic_traces(
+    critic_audit["cells"],
+    [("canalized_gi", "Canalized K562 Genetic Risk (H = 3)")],
+    target_dose=3,
+    suptitle="Canalized K562 Genetic Risk Screen (k = 3, Task 1) · Overlaid Held-Out Reward & Evidence Critic Error",
+    method_order=list(PATHDEP_AUDIT_METHODS),
+    ranked_ceac_present=True,
+)
 plt.show()""",
     )
 
-    code(
-        "pathdep-critic-dose-scaling",
-        """fig = draw_critic_dose_scaling(critic_audit)
-plt.show()""",
+    # =========================================================================
+    # PART IV: CONSOLIDATED TABLES & REPRODUCIBLE CLI
+    # =========================================================================
+    md(
+        "part4-tables-md",
+        """---
+## Part IV — Consolidated Summary Tables & Reproducible CLI Entrypoints""",
     )
 
     code(
-        "pathdep-summary-table",
-        """pd_map = { (r["kind"], r["method"], r["dose"]): r for r in pathdep["summary_rows"] if r["task"] == 1 }
-print(f"{'Benchmark':36s} | {'Method':48s} | {'k=0 Reg':>8s} | {'k=3 Reg':>8s} | {'k=3 Gap':>7s} | {'Echo%':>6s} | {'Mod%':>6s}")
-print("-" * 134)
+        "part4-summary-tables",
+        """pd_map = {(r["kind"], r["method"], r["dose"]): r for r in pathdep["summary_rows"] if r["task"] == 1}
+print("=== Multi-Step Path-Dependent Signalling & K562 Genetic Risk (Task 1, k = 0 -> k = 3) ===")
+print(f"{'Benchmark':36s} | {'Method':48s} | {'k=0 Reg':>8s} | {'k=3 Reg':>8s} | {'k=3 Gap':>7s}")
+print("-" * 118)
 for kind in ("signalling_rewiring", "canalized_gi"):
     for m in ("idac", "pomd", "ucb_q", "ids_null", "ids_product", "ids_action_tree", "ids_action_onpath", "ceac", "ceac_natural", "ceac_ranked", "ceac_ranked_natural", "oracle"):
         r0, r3 = pd_map[(kind, m, 0)], pd_map[(kind, m, 3)]
         print(
             f"{PATHDEP_KINDS[kind][:36]:36s} | {PATHDEP_LABELS[m][:48]:48s} | {r0['regret_mean']:8,.1f} | "
-            f"{r3['regret_mean']:8,.1f} | {r3['late_gap_mean']:7.4f} | {r3['echo_pct']:5.1f}% | {r3['offpath_omics_pct']:5.1f}%"
-        )""",
-    )
+            f"{r3['regret_mean']:8,.1f} | {r3['late_gap_mean']:7.4f}"
+        )
 
-    md(
-        "runners-section",
-        """## 5. Experimental Runners & Reproducible CLI Entrypoints
-
-All studies and portable evidence bundles can be reproduced from the repository root or invoked programmatically via the entrypoints below (disabled by default during notebook verification so rendering remains instantaneous and deterministic):""",
-    )
-
-    code(
-        "runners-entrypoints",
-        """RUNNER_COMMANDS = {
+RUNNER_COMMANDS = {
     "unit_tests": ".venv/bin/python -m unittest discover -s tests/pathologies -v",
-    "locks_and_epistasis_suite": ".venv/bin/python scripts/run_pathologies_suite.py --tag repro_v1 --workers 10 --protocols locks epistasis",
-    "gi_ranked_study": ".venv/bin/python -m ceac_ranked.study --tag repro_ranked_v1 --workers 10",
-    "pathdep_signalling_and_gi_study": ".venv/bin/python -m ceac_pathdep.study --tag 20261122_pathdep_v1 --workers 10 --episodes 32768",
+    "pathdep_signalling_and_gi_study": ".venv/bin/python -m ceac_pathdep.study --tag 20261124_pathdep_v3 --workers 4 --episodes 32768",
+    "pathdep_critic_bellman_audit": ".venv/bin/python -m ceac_pathdep.critic_audit --workers 4 --episodes 32768",
     "rebuild_this_notebook": ".venv/bin/python scripts/render_pathologies_notebook.py --execute",
 }
+print("\\n=== Reproducible CLI Entrypoints ===")
 for name, cmd in RUNNER_COMMANDS.items():
-    print(f"[{name}]\\n  {cmd}")""",
+    print(f"[{name}]  {cmd}")""",
     )
 
-    nb = nbf.v4.new_notebook(
+    return nbf.v4.new_notebook(
         cells=cells,
         metadata={
             "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
             "language_info": {"name": "python", "version": "3.11"},
-            "pathologies_suite_schema": 1,
+            "pathologies_suite_schema": 2,
         },
     )
-    return nb
 
 
 def execute_and_audit(nb_path: Path):
@@ -407,15 +332,13 @@ def execute_and_audit(nb_path: Path):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    # Verify all three portable evidence exports before executing notebook
-    locks_dir = ROOT / "notebooks/evidence/pathologies_locks"
-    epi_dir = ROOT / "notebooks/evidence/pathologies_epistasis"
-    gi_dir = ROOT / "notebooks/evidence/pathologies_gi_ranked"
-    pd_dir = ROOT / "notebooks/evidence/pathologies_pathdep"
-    load_pathology_export(locks_dir)
-    load_pathology_export(epi_dir)
-    load_gi_ranked_export(gi_dir)
-    load_pathdep_export(pd_dir)
+    for fn, d in [
+        (load_pathology_export, ROOT / "notebooks/evidence/pathologies_locks"),
+        (load_pathology_export, ROOT / "notebooks/evidence/pathologies_epistasis"),
+        (load_gi_ranked_export, ROOT / "notebooks/evidence/pathologies_gi_ranked"),
+        (load_pathdep_export, ROOT / "notebooks/evidence/pathologies_pathdep"),
+    ]:
+        fn(d)
 
     notebook = nbf.read(nb_path, as_version=4)
     nbf.validate(notebook)

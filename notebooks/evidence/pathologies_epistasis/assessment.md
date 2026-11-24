@@ -89,3 +89,22 @@ Verified **108** completed cells (3 held-out seeds per condition, 65,536 episode
 | Epistatic Signalling Pathway | 1 | UCB Q-learning | 1 | 0.0056 ± 0.0072 | 4,208.4 ± 58.5 |
 | Epistatic Signalling Pathway | 1 | UCB Q-learning | 2 | 0.0622 ± 0.0016 | 16,196.6 ± 85.8 |
 | Epistatic Signalling Pathway | 1 | UCB Q-learning | 3 | 0.4967 ± 0.1287 | 49,277.5 ± 114.6 |
+
+## Held-Out Reward & Evidence Critic TD / Bellman Diagnostics
+
+Evaluated all **96** non-oracle `Task 1` sweep cells across log-spaced checkpoints `t ∈ {16 .. 65,536}` on independent held-out rollouts (`512` on-policy + `256` uniform-probe episodes per checkpoint; bit-exact cumulative-regret parity verified `< 1e-6` against `evidence.json.gz`).
+
+![Held-out critic Bellman trajectories](epistasis_critic_bellman_traces.png)
+
+![Held-out critic dose scaling](epistasis_critic_dose_scaling.png)
+
+| Environment | Algorithm | Reward Bellman RMSE (k=3, t=65,536) | Evidence Critic RMSE (k=0 → 3) | Active / Stage Critic RMSE (k=0 → 3) |
+|---|---|---:|---:|---:|
+| Epistatic Signalling | IDAC · occupancy ratio | 0.0556 | 7.0087 → 1.2746 | 7.0087 → 1.2746 |
+| Epistatic Signalling | UCB Q-learning | 0.4140 | 0.1214 → 0.4068 | 0.1214 → 0.4068 |
+| Epistatic Signalling | Optimistic POMD | 0.9832 | 0.2474 → 5.5634 | 0.2474 → 5.5634 |
+| Epistatic Signalling | IDS · canonical additive prior | 0.0338 | 54,210.8809 → 11,171.5950 | 0.8272 → 0.1705 |
+| Epistatic Signalling | IDS · model-MI, uniform prior | 0.0077 | 10,129.8957 → 9,770.0031 | 0.0000 → 0.0015 |
+| Epistatic Signalling | IDS · optimal-action MI (Russo–Van Roy) | 0.0048 | 10,130.7984 → 10,121.6419 | 0.0000 → 0.0034 |
+| Epistatic Signalling | CEAC · reward + evidence critics | 0.0317 | 0.0310 → 0.1877 | 0.2024 → 0.2009 |
+| Epistatic Signalling | CEAC · guarded natural | 0.0148 | 0.0089 → 0.0064 | 0.2270 → 0.2492 |

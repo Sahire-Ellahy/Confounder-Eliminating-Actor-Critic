@@ -52,13 +52,16 @@ class SignallingRewiringConfig:
     prime_cost: float = 0.015
     unprimed_reward: float = 0.25
     synergy_probabilities: tuple[float, float] = (0.10, 0.92)
+    peripheral_synergy_probabilities: tuple[float, float] = (0.12, 0.5004)
     probe_reward: float = 0.26
     probe_target_prob: float = 0.36
-    echo_reward: float = 0.49998
-    echo_halfwidth: float = 0.022
-    modifier_reward: float = 0.49992
-    modifier_halfwidth: float = 0.042
-    responder_prior_mass: float = 0.16
+    echo_subclades_per_module: int = 6
+    echo_reward: float = 0.49999
+    echo_halfwidth: float = 0.0115
+    echo_prior_per_subclade: float = 0.048
+    modifier_reward: float = 0.49998
+    modifier_halfwidth: float = 0.0110
+    responder_prior_mass: float = 0.0055
 
     def __post_init__(self):
         if self.kind != "signalling_rewiring":
@@ -77,8 +80,12 @@ class SignallingRewiringConfig:
         return 3
 
     @property
+    def echo_count(self) -> int:
+        return self.echo_subclades_per_module * self.complexity
+
+    @property
     def total_pathways(self) -> int:
-        return self.primary_pathways + self.complexity
+        return self.primary_pathways + self.echo_count
 
     @property
     def stress_branches(self) -> int:
@@ -108,15 +115,16 @@ class SignallingRewiringEnv:
     def _build_layout(self):
         c = self.config
         k = c.complexity
+        n_echo = c.echo_count
         R_tot = c.total_pathways
         # Root actions at t = 0:
         # 0: cytostatic_care
         # 1: prime_cascade
         # 2: unprimed_simultaneous (reversed-order control)
-        # 3 .. 3+k-1: echo_reporter_0 .. k-1
-        # 3+k .. 3+2k-1: modifier_assay_0 .. k-1
-        # 3+2k .. 3+2k+(3^k-1)-1: off_path_stress_b
-        self.n_root_actions = 3 + 2 * k + c.stress_branches
+        # 3 .. 3+n_echo-1: echo_reporter_0 .. n_echo-1
+        # 3+n_echo .. 3+n_echo+k-1: modifier_assay_0 .. k-1
+        # 3+n_echo+k .. 3+n_echo+k+(3^k-1)-1: off_path_stress_b
+        self.n_root_actions = 3 + n_echo + k + c.stress_branches
         # Inside primed_state (t = 1):
         # 0: recover_care, 1..R_tot: co_target_1..R_tot, R_tot+1: primed_phospho_panel
         self.n_primed_actions = R_tot + 2
@@ -127,7 +135,7 @@ class SignallingRewiringEnv:
         descriptors.append((1, "safe_hold", 0))
         descriptors.append((1, "primed", 0))
         descriptors.append((1, "unprimed_hold", 0))
-        for i in range(k):
+        for i in range(n_echo):
             descriptors.append((1, "echo_stage", i))
         for i in range(k):
             descriptors.append((1, "modifier_hold", i))
@@ -184,18 +192,19 @@ class SignallingRewiringEnv:
             return {(self.TERMINAL, 0.0, True): 1.0}
 
         if t == 0:
+            n_echo = c.echo_count
             if action == 0:
                 return {(self._code_of[(1, "safe_hold", 0)], c.safe_reward, False): 1.0}
             if action == 1:
                 return {(self._code_of[(1, "primed", 0)], -c.prime_cost, False): 1.0}
             if action == 2:
                 return {(self._code_of[(1, "unprimed_hold", 0)], c.unprimed_reward, False): 1.0}
-            if action < 3 + k:
+            if action < 3 + n_echo:
                 e_i = action - 3
                 nxt = self._code_of[(1, "echo_stage", e_i)]
                 return {(nxt, 0.0, False): 1.0}
-            if action < 3 + 2 * k:
-                m_i = action - (3 + k)
+            if action < 3 + n_echo + k:
+                m_i = action - (3 + n_echo)
                 nxt = self._code_of[(1, "modifier_hold", m_i)]
                 bit = (self.modifier >> m_i) & 1
                 d = c.modifier_halfwidth
@@ -205,7 +214,7 @@ class SignallingRewiringEnv:
                     (nxt, round(c.modifier_reward, 10), False): q,
                     (nxt, round(c.modifier_reward + 0.02, 10), False): (1.0 - q) / 2.0,
                 }
-            b = action - (3 + 2 * k)
+            b = action - (3 + n_echo + k)
             return {(self._code_of[(1, "stress_branch", b)], 0.06, False): 1.0}
 
         # t == 1 transitions
@@ -224,16 +233,18 @@ class SignallingRewiringEnv:
                 return {(gate, round(0.485 + rebate, 10), False): 1.0}
             if 1 <= action <= R_tot:
                 active = int(self.pathway == action)
-                p = c.synergy_probabilities[active]
+                pair_p = c.synergy_probabilities if action <= c.primary_pathways else c.peripheral_synergy_probabilities
+                p = pair_p[active]
                 return {
                     (gate, round(0.0 + rebate, 10), False): 1.0 - p,
                     (gate, round(1.0 + rebate, 10), False): p,
                 }
-            # action == R_tot + 1: primed_phospho_panel (R_tot + 1 distinct phospho-signature levels)
-            n_out = R_tot + 1
+            # action == R_tot + 1: primed_phospho_panel (post-translational phosphorylation panel over 0..R_primary)
+            n_out = c.primary_pathways + 1
             hi = c.probe_target_prob
             lo = (1.0 - hi) / (n_out - 1)
-            probs = [hi if j == self.pathway else lo for j in range(n_out)]
+            eff_pw = self.pathway if self.pathway <= c.primary_pathways else 0
+            probs = [hi if j == eff_pw else lo for j in range(n_out)]
             # Center rewards symmetrically around c.probe_reward + rebate so mean == c.probe_reward + rebate
             # regardless of which outcome has mass hi! Wait: if rewards differ across j, mean shifts slightly
             # unless pair-symmetric around self.pathway OR we pair outcomes (j, -j)!
@@ -273,15 +284,16 @@ class SignallingRewiringEnv:
         if done:
             event = "finish"
         elif t == 0:
+            n_echo = c.echo_count
             if action == 0:
                 event = "safe"
             elif action == 1:
                 event = "prime"
             elif action == 2:
                 event = "unprimed"
-            elif action < 3 + k:
+            elif action < 3 + n_echo:
                 event = "echo_reporter"
-            elif action < 3 + 2 * k:
+            elif action < 3 + n_echo + k:
                 event = "passenger_omics"
             else:
                 event = "pleiotropic"
@@ -331,7 +343,8 @@ class SignallingRewiringModel(DAGProductModel):
         out = []
         # Root actions other than prime_cascade (1) and stress branches
         k = self.cfg.complexity
-        for a0 in [0, 2] + list(range(3, 3 + 2 * k)):
+        n_echo = self.cfg.echo_count
+        for a0 in [0, 2] + list(range(3, 3 + n_echo + k)):
             p = np.zeros(self.mask.shape, dtype=float)
             p[:, 0] = 1.0
             p[self.initial, :] = 0.0
@@ -349,7 +362,7 @@ class SignallingRewiringModel(DAGProductModel):
         # Off-path stress branches (2 sub-actions each)
         for b in range(self.cfg.stress_branches):
             sb = self.index[env0._code_of[(1, "stress_branch", b)]]
-            a0 = 3 + 2 * k + b
+            a0 = 3 + n_echo + k + b
             for a1 in (0, 1):
                 p = np.zeros(self.mask.shape, dtype=float)
                 p[:, 0] = 1.0
@@ -386,12 +399,17 @@ class SignallingRewiringModel(DAGProductModel):
             w = np.array([1.0 if pw == 0 else 0.0 for pw, _ in self.hypotheses], dtype=float)
             return w / w.sum()
         if treatment in {"product", "reference", "empirical"}:
-            resp_mass = self.cfg.responder_prior_mass
-            null_mass = 1.0 - resp_mass
-            n_pw = self.cfg.total_pathways
+            n_echo = self.cfg.echo_count
+            echo_each = self.cfg.echo_prior_per_subclade
+            rem = 1.0 - n_echo * echo_each
+            resp_mass = self.cfg.responder_prior_mass * rem
+            null_mass = rem - resp_mass
+            n_prim = self.cfg.primary_pathways
             w = np.array(
                 [
-                    (null_mass / m_states) if pw == 0 else (resp_mass / (n_pw * m_states))
+                    (null_mass / m_states)
+                    if pw == 0
+                    else ((resp_mass / (n_prim * m_states)) if pw <= n_prim else (echo_each / m_states))
                     for pw, _ in self.hypotheses
                 ],
                 dtype=float,
@@ -411,7 +429,7 @@ class SignallingRewiringModel(DAGProductModel):
 # Experiment 2: Canalized Genetic Risk Factors on Horlbeck 2018 K562 GI Matrix
 # ============================================================================
 
-def select_canalized_panel(primary_modifiers: int = 10, max_echo_modifiers: int = 3, seed: int = 2026) -> dict:
+def select_canalized_panel(primary_modifiers: int = 10, max_echo_modifiers: int = 18, seed: int = 2026) -> dict:
     """Select capacitor hub PPP2R1A + 1 strong K562 partner + neutral K562 candidates."""
     from ceac_gi.data import SOURCE, load_k562_map
 
@@ -471,11 +489,15 @@ class CanalizedGIConfig:
     assay_floor: float = 0.01
     control_reward: float = 0.50
     hub_cost: float = 0.015
-    buffered_single_reward: float = 0.4999
-    modifier_halfwidth: float = 0.055
-    echo_reward: float = 0.49998
-    echo_halfwidth: float = 0.018
-    panel_active_rate: float = 0.16
+    buffered_single_reward: float = 0.49998
+    modifier_halfwidth: float = 0.0110
+    echo_subclades_per_module: int = 6
+    echo_reward: float = 0.49999
+    echo_halfwidth: float = 0.0115
+    echo_inactive_gi: float = -1.60
+    echo_active_gi: float = -3.0012
+    echo_prior_per_subclade: float = 0.048
+    panel_active_rate: float = 0.0055
     source: str = ""
 
     def __post_init__(self):
@@ -483,12 +505,16 @@ class CanalizedGIConfig:
             raise ValueError(f"Unknown canalized GI kind: {self.kind}")
         if not 0 <= self.complexity <= 3:
             raise ValueError("Complexity k must lie in {0..3}")
-        if len(self.modifier_genes) != self.primary_count + self.complexity:
-            raise ValueError("Modifier gene tuple must equal primary_count + complexity")
+        if len(self.modifier_genes) != self.primary_count + self.echo_count:
+            raise ValueError("Modifier gene tuple must equal primary_count + echo_count")
         if len(self.hub_gi_values) != len(self.modifier_genes):
             raise ValueError("Hub GI score length mismatch")
         if not 0 <= self.sl_modifier_index < self.primary_count:
             raise ValueError("SL modifier index out of primary range")
+
+    @property
+    def echo_count(self) -> int:
+        return self.echo_subclades_per_module * self.complexity
 
     @property
     def horizon(self) -> int:
@@ -513,9 +539,10 @@ class CanalizedGIConfig:
 
 def build_canalized_gi_config(complexity: int = 0) -> CanalizedGIConfig:
     k = int(complexity)
-    panel = select_canalized_panel(primary_modifiers=10, max_echo_modifiers=3)
-    genes = panel["primary_genes"] + panel["echo_pool_genes"][:k]
-    gis = panel["primary_gi"] + panel["echo_pool_gi"][:k]
+    n_echo = 6 * k
+    panel = select_canalized_panel(primary_modifiers=10, max_echo_modifiers=18)
+    genes = panel["primary_genes"] + panel["echo_pool_genes"][:n_echo]
+    gis = panel["primary_gi"] + panel["echo_pool_gi"][:n_echo]
     return CanalizedGIConfig(
         complexity=k,
         hub_gene=panel["hub_gene"],
@@ -561,10 +588,12 @@ class CanalizedGIEnv:
         self.passenger = int(passenger)
 
         vals = np.array(c.hub_gi_values, dtype=float)
+        if c.echo_count > 0:
+            vals[c.primary_count :] = c.echo_inactive_gi
         if self.active_modifier != c.sl_modifier_index:
             vals[c.sl_modifier_index] = c.neutral_value
         if self.active_modifier >= 0:
-            vals[self.active_modifier] = c.strong_value
+            vals[self.active_modifier] = c.strong_value if self.active_modifier < c.primary_count else c.echo_active_gi
         self.gi = vals
 
         self._build_layout()
@@ -574,18 +603,9 @@ class CanalizedGIEnv:
 
     def _build_layout(self):
         c = self.config
-        k = c.complexity
+        n_echo = c.echo_count
         G = c.total_modifiers
-        # Root actions at t = 0:
-        # 0: control (0.50)
-        # 1: decanalize_hub (-0.015 at t=0 -> enters decanalized_state at t=1)
-        # 2 .. 2+G-1: buffered_single_ko (reversed-order / intact-hub knockdown: 0.4999;
-        #             k nuisance indices reveal counterfactual modifier bit xi)
-        # 2+G .. 2+G+k-1: echo_eqtl_0 .. k-1 (two-step echoed expression proxy for peripheral genes p_n..p_n+k-1)
-        # 2+G+k .. 2+G+k+(3^k-1)-1: offpath_complex_b (enters off-path stressed state with xi-dependent step-2 rescue)
-        self.n_root_actions = 2 + G + k + c.offpath_branches
-        # Inside decanalized_state (t = 1):
-        # 0: recover_control (0.485 + rebate), 1..G: test_decanalized_modifier_m (hit from K562 GI + rebate)
+        self.n_root_actions = 2 + G + n_echo + c.offpath_branches
         self.n_decanalized_actions = 1 + G
         n_actions = max(self.n_root_actions, self.n_decanalized_actions, 2)
         self.action_space = SimpleNamespace(n=n_actions)
@@ -594,7 +614,7 @@ class CanalizedGIEnv:
         descriptors.append((1, "control_hold", 0))
         descriptors.append((1, "decanalized", 0))
         descriptors.append((1, "buffered_hold", 0))
-        for i in range(k):
+        for i in range(n_echo):
             descriptors.append((1, "echo_eqtl", i))
         for b in range(c.offpath_branches):
             descriptors.append((1, "offpath_complex", b))
@@ -668,11 +688,12 @@ class CanalizedGIEnv:
                         (nxt, round(c.buffered_single_reward + 0.02, 10), False): (1.0 - q) / 2.0,
                     }
                 return {(nxt, c.buffered_single_reward, False): 1.0}
-            if action < 2 + G + k:
+            n_echo = c.echo_count
+            if action < 2 + G + n_echo:
                 e_i = action - (2 + G)
                 nxt = self._code_of[(1, "echo_eqtl", e_i)]
                 return {(nxt, 0.0, False): 1.0}
-            b = action - (2 + G + k)
+            b = action - (2 + G + n_echo)
             return {(self._code_of[(1, "offpath_complex", b)], 0.06, False): 1.0}
 
         # t == 1 transitions
@@ -730,7 +751,7 @@ class CanalizedGIEnv:
             elif action < 2 + G:
                 g_i = action - 2
                 event = "passenger_omics" if g_i in c.nuisance_indices else "buffered_ko"
-            elif action < 2 + G + k:
+            elif action < 2 + G + c.echo_count:
                 event = "echo_reporter"
             else:
                 event = "pleiotropic"
@@ -767,10 +788,10 @@ class CanalizedGIModel(DAGProductModel):
     def canonical_path_policies(self) -> list[Policy]:
         env0 = self._models[0]
         dec_s = self.index[env0._code_of[(1, "decanalized", 0)]]
-        k = self.cfg.complexity
+        n_echo = self.cfg.echo_count
         G = self.cfg.total_modifiers
         out = []
-        for a0 in [0] + list(range(2, 2 + G + k)):
+        for a0 in [0] + list(range(2, 2 + G + n_echo)):
             p = np.zeros(self.mask.shape, dtype=float)
             p[:, 0] = 1.0
             p[self.initial, :] = 0.0
@@ -786,7 +807,7 @@ class CanalizedGIModel(DAGProductModel):
             out.append(Policy(p, f"decanalized-{a1}"))
         for b in range(self.cfg.offpath_branches):
             sb = self.index[env0._code_of[(1, "offpath_complex", b)]]
-            a0 = 2 + G + k + b
+            a0 = 2 + G + n_echo + b
             for a1 in (0, 1):
                 p = np.zeros(self.mask.shape, dtype=float)
                 p[:, 0] = 1.0
@@ -822,11 +843,17 @@ class CanalizedGIModel(DAGProductModel):
         if treatment == "product":
             return np.ones(self.num_models, dtype=float) / self.num_models
         if treatment in {"empirical", "reference"}:
-            null_mass = 1.0 - self.cfg.panel_active_rate
-            n_mod = self.cfg.total_modifiers
+            n_echo = self.cfg.echo_count
+            echo_each = self.cfg.echo_prior_per_subclade
+            rem = 1.0 - n_echo * echo_each
+            act_mass = self.cfg.panel_active_rate * rem
+            null_mass = rem - act_mass
+            n_prim = self.cfg.primary_count
             w = np.array(
                 [
-                    (null_mass / e_states) if q < 0 else (self.cfg.panel_active_rate / (n_mod * e_states))
+                    (null_mass / e_states)
+                    if q < 0
+                    else ((act_mass / (n_prim * e_states)) if q < n_prim else (echo_each / e_states))
                     for q, _ in self.hypotheses
                 ],
                 dtype=float,

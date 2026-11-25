@@ -12,98 +12,24 @@ import json
 import math
 from pathlib import Path
 import numpy as np
-from ceac_pathologies.report import style_ceac_legend
+from ceac_bench.reporting.theme import (
+    METHOD_COLORS,
+    METHOD_LABELS,
+    METHOD_LINESTYLES,
+    METHOD_MARKERS,
+    style_ceac_legend,
+)
 from ceac_pathologies.run import atomic_json, digest, seed_for
 
 
-SUITE_COLORS = {
-    "idac": "#15803D",                # Emerald / Forest Green (IDAC)
-    "pomd": "#FF1493",                # Deep Hot Pink (Optimistic POMD)
-    "ucb_q": "#C026D3",               # Vivid Fuchsia-Magenta (UCB-Q)
-    "ids_zero": "#7F1D1D",            # Dark Wine Red (restricted/misspecified IDS)
-    "ids_decoy": "#7F1D1D",
-    "ids_canonical": "#7F1D1D",
-    "ids_additive": "#7F1D1D",
-    "ids_correlated": "#7F1D1D",
-    "ids_null": "#7F1D1D",
-    "ids": "#DC2626",                 # Vivid Scarlet Red (full-model MI IDS)
-    "ids_product": "#DC2626",
-    "ids_empirical": "#FB7185",       # Coral / Rose Red (empirical / policy-tree IDS)
-    "ids_action_tree": "#FB7185",
-    "ids_rare": "#FB7185",
-    "ids_action": "#B91C1C",          # Ruby / Firebrick Red (optimal-action / on-path IDS)
-    "ids_action_onpath": "#B91C1C",
-    "ceac": "#0047AB",                # Canonical CEAC = Cobalt Blue
-    "ceac_natural": "#1D4ED8",        # Canonical CEAC (guarded natural) = Royal Cobalt Blue
-    "ceac_ranked": "#6C7CFA",         # Improved / Ranked CEAC = Periwinkle
-    "ceac_ranked_natural": "#96A2FF", # Improved / Ranked CEAC (natural) = Lavender Periwinkle
-}
-
-SUITE_LINESTYLES = {
-    "idac": "-",
-    "pomd": "-",
-    "ucb_q": "-.",
-    "ids_zero": ":",
-    "ids_decoy": ":",
-    "ids_canonical": ":",
-    "ids_additive": ":",
-    "ids_correlated": ":",
-    "ids_null": ":",
-    "ids": "--",
-    "ids_product": "--",
-    "ids_empirical": "-.",
-    "ids_action_tree": "-.",
-    "ids_rare": "-.",
-    "ids_action": "-",
-    "ids_action_onpath": "-",
-    "ceac": "-",
-    "ceac_natural": "--",
-    "ceac_ranked": "-",
-    "ceac_ranked_natural": "--",
-}
-
-SUITE_MARKERS = {
-    "idac": "D",
-    "ucb_q": ">",
-    "pomd": "h",
-    "ids_zero": "<",
-    "ids_decoy": "<",
-    "ids_canonical": "<",
-    "ids_additive": "<",
-    "ids_correlated": "<",
-    "ids_null": "<",
-    "ids": "^",
-    "ids_product": "^",
-    "ids_empirical": "v",
-    "ids_action": "s",
-    "ids_action_tree": "v",
-    "ids_action_onpath": "s",
-    "ceac": "*",
-    "ceac_natural": "X",
-    "ceac_ranked": "o",
-    "ceac_ranked_natural": "P",
-}
-
+SUITE_COLORS = dict(METHOD_COLORS)
+SUITE_LINESTYLES = dict(METHOD_LINESTYLES)
+SUITE_MARKERS = dict(METHOD_MARKERS)
 SUITE_LABELS = {
-    "idac": "IDAC · occupancy ratio",
-    "ucb_q": "UCB Q-learning",
-    "pomd": "Optimistic POMD",
-    "ids": "IDS · full-support prior",
-    "ids_zero": "IDS · restricted (zero-mode) prior",
-    "ids_decoy": "IDS · decoy-lock prior",
-    "ids_canonical": "IDS · canonical additive prior",
-    "ids_additive": "IDS · no-interaction prior",
-    "ids_correlated": "IDS · frozen correlated prior",
-    "ids_null": "IDS · null prior",
+    **METHOD_LABELS,
     "ids_product": "IDS · model-MI, uniform prior",
-    "ids_empirical": "IDS · model-MI, empirical prior",
-    "ids_action": "IDS · optimal-action MI (Russo–Van Roy)",
     "ids_action_tree": "IDS · optimal-policy MI I(Π*; Z)",
     "ids_action_onpath": "IDS · on-path quotient MI I(C*; Z)",
-    "ceac": "CEAC · reward + evidence critics",
-    "ceac_natural": "CEAC · guarded natural",
-    "ceac_ranked": "CEAC · greedy disagreement + price-ranked replay",
-    "ceac_ranked_natural": "CEAC · greedy + price-ranked (guarded natural)",
 }
 
 

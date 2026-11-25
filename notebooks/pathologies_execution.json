@@ -7,17 +7,17 @@
     "pathologies_pathdep": "afcfa99db7f107e27f6d1fb5f4e6317c8c348db2b975b7d5eba1c65e5b7d028e"
   },
   "notebook": "notebooks/Pathological_Search_Suite.ipynb",
-  "notebook_sha256": "146a7101ed3f875abab66162e489e010f3c3214fa645aa8a84a0e0b5c0b70ddd",
+  "notebook_sha256": "85396800b18448c29776ad8d5f45542ce02e8f83e5a0da8fd2a8c5a2728b2b3b",
   "packages": {
-    "ipykernel": "7.4.0",
     "matplotlib": "3.11.2",
-    "nbclient": "0.11.0",
+    "nbformat": "5.11.1",
     "numpy": "2.4.6",
     "scipy": "1.17.1"
   },
   "python": "3.11.13",
   "rendered_figures": 24,
-  "schema": 1,
+  "schema": 2,
+  "spec_digest": "d9c1614a52622ef38580870d7a3b77f1268c1e1a3624e308b2fa473453c0cec8",
   "status": "complete",
   "training_launched": false
 }

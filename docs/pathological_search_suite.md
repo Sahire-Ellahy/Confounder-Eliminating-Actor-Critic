@@ -76,7 +76,7 @@ Tests multi-step environments where the **optimal intervention is strictly path-
 
 Both studies compare `ceac` and `ceac_ranked` (`PathDepGreedyCEAC`) against **two** multi-step generalizations of Russo–Van Roy Optimal-Action IDS (`MultiStepActionIDS`):
 - **`ids_action_tree` ($I(\Pi^\star; Z)$)**: Full MDP optimal-policy classes $\Pi^\star(\theta, \xi)$ split by $2^k$ due to counterfactual local rescue rules $\xi \in \{0, 1\}^k$ inside unvisited off-path stress/non-hub branches, trapping policy-tree IDS into profiling non-causal modifier assays.
-- **`ids_action_onpath` ($I(C_{\text{on-path}}^\star; Z)$)**: Even after quotienting out all off-path differences via `model.decision_classes()`, scalar mutual information assigns low information ratios to cheap peripheral clade / eQTL expression reporters ($0.49998$ return) that reduce tail entropy on peripheral candidates while providing **zero KL** between `Null` and the realized responder. CEAC's vector-valued pairwise log-likelihood constraints and backward Bellman evidence critic $Q_I(s, a; \beta)$ avoid both traps.
+- **`ids_action_onpath` ($I(C_{\text{on-path}}^\star; Z)$)**: Even after quotienting out all off-path differences via `model.decision_classes()`, scalar mutual information assigns low information ratios to cheap $6k$ peripheral clade / eQTL expression reporters ($0.49999$ return) that reduce tail entropy on peripheral candidates while providing **zero KL** between `Null` and the realized responder. CEAC's vector-valued pairwise log-likelihood constraints and backward Bellman evidence critic $Q_I(s, a; \beta)$ avoid both traps.
 
 ---
 

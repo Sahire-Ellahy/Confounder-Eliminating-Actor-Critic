@@ -18,33 +18,17 @@ from pathlib import Path
 import time
 import numpy as np
 
-from ceac.contracts import Episode, Transition
-from ceac.primitives import IDAC, IDACConfig, OptimisticPOMD, POMDConfig, PrimitiveSpec, UCBQ, UCBQConfig
+from ceac_bench.core import ConditionKey
+from ceac_bench.problems import GridPathDepProblemBuilder
+from ceac_bench.reporting.theme import style_ceac_legend
+from ceac_bench.suites import SUITES
 from ceac_critic_diagnostics.evaluator import (
-    SUITE_COLORS,
-    SUITE_MARKERS,
-    compile_outcome_tables,
     draw_suite_critic_dose_scaling,
     draw_suite_critic_traces,
-    evaluate_heldout_critics_fast,
     save_suite_critic_audit,
 )
-from ceac_hardness.agents import CEACConfig, LaiGravesOracle
-from ceac_pathdep.learners import FastPathDepBayesianIDS, MultiStepActionIDS, PathDepGreedyCEAC, _base_policy_occ, make_truth_return_vec
-from ceac_pathdep.study import PATHDEP_COLORS, PATHDEP_LABELS, PATHDEP_MARKERS, PATHDEP_ORDER, PathDepCertifiedCEAC
-from ceac_pathologies.agent import PathologiesCEACConfig
-from ceac_pathologies.report import style_ceac_legend
-from ceac_pathologies.run import ROOT, atomic_json, digest, seed_for
-from ceac_ranked.agent import RankedCEACConfig
-from .environments import (
-    PathDepFalseBeaconConfig,
-    PathDepFalseBeaconEnv,
-    PathDepFalseBeaconModel,
-    PathDepUndertowConfig,
-    PathDepUndertowEnv,
-    PathDepUndertowModel,
-    relabel_grid_pathdep,
-)
+from ceac_pathdep.study import PATHDEP_COLORS, PATHDEP_LABELS, PATHDEP_MARKERS, PATHDEP_ORDER
+from ceac_pathologies.run import ROOT, atomic_json, digest
 
 GRID_PATHDEP_KINDS = [
     ("undertow_pathdep", "Path-Dependent Undertow DeepSea (Thermocline Lock, H = 3)"),
@@ -58,155 +42,60 @@ CHECKPOINTS_32K = (16, 64, 256, 1024, 4096, 16384, 32768)
 AUDIT_METHODS = [m for m in PATHDEP_ORDER if m != "oracle"]
 
 
-def build_grid_pathdep_problem(kind: str, dose: int, task: int, seed: int):
-    if kind == "undertow_pathdep":
-        cfg = relabel_grid_pathdep(PathDepUndertowConfig(complexity=int(dose)), int(seed))
-        model = PathDepUndertowModel(cfg)
-        pas_rng = np.random.default_rng(seed_for("grid_pathdep_pas", kind, seed, dose))
-        pas = int(pas_rng.integers(cfg.modifier_states)) if cfg.complexity > 0 else 0
-        truth = model.true_index(task, passenger=pas)
-        ch, mod = model.hypotheses[truth]
-        env = PathDepUndertowEnv(cfg, channel=ch, modifier=mod)
-        return cfg, model, env, truth, pas
-    if kind == "false_beacon_pathdep":
-        cfg = relabel_grid_pathdep(PathDepFalseBeaconConfig(complexity=int(dose)), int(seed))
-        model = PathDepFalseBeaconModel(cfg)
-        pas_rng = np.random.default_rng(seed_for("grid_pathdep_pas", kind, seed, dose))
-        pas = int(pas_rng.integers(cfg.modifier_states)) if cfg.complexity > 0 else 0
-        truth = model.true_index(task, passenger=pas)
-        ch, mod = model.hypotheses[truth]
-        env = PathDepFalseBeaconEnv(cfg, channel=ch, modifier=mod)
-        return cfg, model, env, truth, pas
-    raise ValueError(kind)
-
-
-def construct_grid_pathdep_learner(model, method: str, rng, episodes: int, truth: int):
-    if method == "ceac":
-        return PathDepCertifiedCEAC(model, rng, PathologiesCEACConfig(mass_bound=64.0, normalization=64.0, optimizer="reference"))
-    if method == "ceac_natural":
-        return PathDepCertifiedCEAC(model, rng, PathologiesCEACConfig(mass_bound=64.0, normalization=64.0, optimizer="guarded_natural"))
-    if method == "ceac_ranked":
-        return PathDepGreedyCEAC(model, rng, RankedCEACConfig(optimizer="reference"))
-    if method == "ceac_ranked_natural":
-        return PathDepGreedyCEAC(model, rng, RankedCEACConfig(optimizer="guarded_natural"))
-    if method == "oracle":
-        return LaiGravesOracle(model, truth, CEACConfig(mass_bound=64.0, normalization=64.0))
-    if method == "ids_null":
-        return FastPathDepBayesianIDS(model, rng, model.prior("null"))
-    if method == "ids_product":
-        return FastPathDepBayesianIDS(model, rng, model.prior("reference"))
-    if method == "ids_action_tree":
-        return MultiStepActionIDS(model, rng, model.prior("reference"), target="policy_tree")
-    if method == "ids_action_onpath":
-        return MultiStepActionIDS(model, rng, model.prior("reference"), target="onpath_class")
-    elapsed = np.zeros(model.n, dtype=int)
-    for t, sts in enumerate(model.levels):
-        elapsed[sts] = t
-    spec = PrimitiveSpec(model.mask, elapsed, model.horizon, model.initial, -0.02, 1.02)
-    if method == "idac":
-        return IDAC(spec, rng, IDACConfig())
-    if method == "ucb_q":
-        return UCBQ(spec, rng, episodes, UCBQConfig())
-    if method == "pomd":
-        return OptimisticPOMD(spec, episodes, POMDConfig())
-    raise ValueError(method)
-
-
 def run_grid_pathdep_cell(job) -> dict:
-    """Single-pass execution returning BOTH performance trace AND held-out critic Bellman audit."""
+    """Delegate single-pass execution + held-out critic Bellman auditing directly to `ceac_bench`."""
     kind, method, seed, task, dose, episodes = job
-    t0 = time.monotonic()
-    cfg, model, env, truth, pas = build_grid_pathdep_problem(kind, dose, task, seed)
-    compiled = compile_outcome_tables(model, truth=truth) if method != "oracle" else None
+    suite = SUITES["grid_pathdep"]
+    builder = GridPathDepProblemBuilder(kind)
+    factory = next(f for f in suite.learner_factories if f.method_id == method)
+    cond = ConditionKey(
+        suite_id="grid_pathdep",
+        family_id=builder.metadata.family_id,
+        variant_id=kind,
+        dose=int(dose),
+        task=int(task),
+        seed=int(seed),
+    )
+    rec = suite.runner.run_cell(builder, factory, cond, int(episodes))
 
-    rng = np.random.default_rng(seed_for("grid_pathdep", seed, kind, dose, task, method, "learner"))
-    action_rng = np.random.default_rng(seed_for("grid_pathdep", seed, kind, dose, task, method, "action"))
-    learner = construct_grid_pathdep_learner(model, method, rng, episodes, truth)
-    env.reset(seed=seed_for("grid_pathdep", seed, kind, dose, task, "shared_environment"))
+    ep_tr = rec.trace.get("episode", ())
+    gap_tr = rec.trace.get("window_gap", ())
+    reg_tr = rec.trace.get("cumulative_regret", ())
+    tgt_tr = rec.trace.get("event_rate_target_route", tuple(0.0 for _ in ep_tr))
+    ech_tr = rec.trace.get("event_rate_echo_reporter", tuple(0.0 for _ in ep_tr))
+    pas_tr = rec.trace.get("event_rate_passenger_omics", tuple(0.0 for _ in ep_tr))
+    edd_tr = rec.trace.get("event_rate_eddy_trap", tuple(0.0 for _ in ep_tr))
+    trace = [
+        dict(
+            episode=int(ep),
+            window_gap=float(wg),
+            cumulative_regret=float(cr),
+            target_fraction=float(tf),
+            echo_fraction=float(ef),
+            vane_fraction=round(float(pf + edf), 5),
+        )
+        for ep, wg, cr, tf, ef, pf, edf in zip(ep_tr, gap_tr, reg_tr, tgt_tr, ech_tr, pas_tr, edd_tr)
+    ]
 
-    cumulative = 0.0
-    window = deque(maxlen=256)
-    events = dict(safe=0, stage=0, unstaged=0, target_route=0, wrong_route=0, probe=0, echo_reporter=0, passenger_omics=0, eddy_trap=0)
-    last_pol = None
-    expected = None
-    truth_r_vec = make_truth_return_vec(model, truth)
-    trace = []
-    cp_rows = []
-    cp_set = set(c for c in CHECKPOINTS_32K if c <= episodes)
-    log_every = 512
+    cp_eps = rec.critic_audit.get("episode", ())
+    cp_rw = rec.critic_audit.get("reward_bellman_error", ())
+    cp_ev = rec.critic_audit.get("evidence_critic_error", ())
+    cp_st = rec.critic_audit.get("stage_epistemic_error", ())
+    cp_rows = [
+        dict(
+            episode=int(e),
+            reward_bellman_error=float(rw),
+            evidence_critic_error=float(ev),
+            stage_epistemic_error=float(st),
+        )
+        for e, rw, ev, st in zip(cp_eps, cp_rw, cp_ev, cp_st)
+    ]
 
-    for t in range(episodes):
-        policy, behavior, prices = learner.select(t)
-        if policy.identity != last_pol:
-            expected = float(truth_r_vec @ _base_policy_occ(model, policy))
-            last_pol = policy.identity
-        gap = max(0.0, float(model.optimal_returns[truth] - expected))
-        obs, _ = env.reset()
-        trs = []
-        ep_ev = set()
-        for _ in range(model.horizon):
-            s = model.index[obs]
-            a = int(action_rng.choice(model.actions, p=policy.probabilities[s]))
-            nxt, rew, done, _, info = env.step(a)
-            ll = model.log_likelihood(s, a, nxt, rew, done)
-            trs.append(Transition(s, a, rew, -1 if done else model.index[nxt], done, ll))
-            if info["event"] in events:
-                ep_ev.add(info["event"])
-            obs = nxt
-            if done:
-                break
-        for ev in ep_ev:
-            events[ev] += 1
-        learner.observe(Episode(t, 0, policy.identity, behavior, tuple(trs)), policy, prices)
-
-        if (t + 1) % 128 == 0 and hasattr(learner, "replay") and hasattr(learner.replay, "strata"):
-            if hasattr(learner.replay, "evidence") and hasattr(learner.replay.evidence, "strata"):
-                learner.replay.evidence.strata.clear()
-            if method in {"ceac", "ceac_natural"} and hasattr(learner.replay, "statistics"):
-                keep = set(learner.bank._ids) | set(learner.candidates) | set(learner.frozen)
-                learner.replay.strata.clear()
-                for pid in [k_id for k_id in learner.replay.statistics if k_id not in keep]:
-                    del learner.replay.statistics[pid]
-            elif method in {"ceac_ranked", "ceac_ranked_natural"} and hasattr(learner.replay, "statistics"):
-                keep = set(learner.bank._ids) | set(learner.replay.policies_by_id)
-                learner.replay.strata.clear()
-                for pid in [k_id for k_id in learner.replay.statistics if k_id not in keep]:
-                    del learner.replay.statistics[pid]
-            else:
-                for bucket in learner.replay.strata.values():
-                    bucket.clear()
-
-        cumulative += gap
-        window.append(gap)
-        ep_num = t + 1
-        if t == 0 or ep_num % log_every == 0 or ep_num == episodes:
-            trace.append(dict(
-                episode=ep_num,
-                window_gap=round(float(np.mean(window)), 6),
-                cumulative_regret=round(float(cumulative), 4),
-                target_fraction=round(events["target_route"] / ep_num, 5),
-                echo_fraction=round(events["echo_reporter"] / ep_num, 5),
-                vane_fraction=round((events["passenger_omics"] + events["eddy_trap"]) / ep_num, 5),
-            ))
-        if method != "oracle" and ep_num in cp_set:
-            diag = evaluate_heldout_critics_fast(
-                suite_key="grid_pathdep",
-                kind=kind,
-                method=method,
-                learner=learner,
-                model=model,
-                compiled=compiled,
-                truth=truth,
-                policy=policy,
-                prices=prices,
-                checkpoint=ep_num,
-                seed=seed,
-                dose=dose,
-            )
-            diag["episode"] = ep_num
-            cp_rows.append(diag)
-
-    bank_sz = len(learner.bank.policies) if hasattr(learner, "bank") and method.startswith("ceac") else None
+    events = {
+        name: int(rec.scalars.get(f"event_{name}", 0))
+        for name in builder.metadata.event_names
+    }
+    bank_sz = rec.scalars.get("bank_policies") if method.startswith("ceac") else None
     return dict(
         kind=kind,
         method=method,
@@ -214,11 +103,11 @@ def run_grid_pathdep_cell(job) -> dict:
         task=int(task),
         dose=int(dose),
         episodes=int(episodes),
-        late_gap=float(np.mean(window)),
-        cumulative_regret=float(cumulative),
+        late_gap=rec.late_gap,
+        cumulative_regret=rec.cumulative_regret,
         bank_policies=bank_sz,
         events=events,
-        elapsed_seconds=round(time.monotonic() - t0, 2),
+        elapsed_seconds=round(float(rec.scalars.get("elapsed_seconds", 0.0)), 2),
         trace=trace,
         checkpoints=cp_rows,
     )

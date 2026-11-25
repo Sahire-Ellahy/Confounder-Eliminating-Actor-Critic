@@ -19,7 +19,13 @@ from pathlib import Path
 import time
 import numpy as np
 from ceac.contracts import Episode, Transition
-from ceac_pathologies.report import LABELS as BASE_LABELS, KINDS, log_markevery, style_ceac_legend
+from ceac_bench.reporting.theme import (
+    METHOD_COLORS,
+    METHOD_MARKERS,
+    log_markevery,
+    style_ceac_legend,
+)
+from ceac_pathologies.report import LABELS as BASE_LABELS, KINDS
 from ceac_pathologies.run import (
     ROOT,
     _sanitize_diagnostics,
@@ -33,42 +39,6 @@ from ceac_pathologies.run import (
 )
 from .agent import GreedyPricedCEAC, RankedCEACConfig
 
-
-RANKED_LABELS = {
-    **BASE_LABELS,
-    "ceac_ranked": "CEAC · greedy disagreement + price-ranked replay",
-    "ceac_ranked_natural": "CEAC · greedy + price-ranked (guarded natural)",
-}
-
-RANKED_COLORS = {
-    "idac": "#15803D",                # Emerald / Forest Green (IDAC)
-    "pomd": "#FF1493",                # Deep Hot Pink (Optimistic POMD)
-    "ucb_q": "#C026D3",               # Vivid Fuchsia-Magenta (UCB-Q)
-    "ids_additive": "#7F1D1D",        # Dark Wine Red (restricted/no-interaction IDS)
-    "ids_product": "#DC2626",         # Vivid Scarlet Red (full-model MI IDS)
-    "ids_empirical": "#FB7185",       # Coral / Rose Red (empirical MI IDS)
-    "ids_action": "#B91C1C",          # Ruby / Firebrick Red (optimal-action MI IDS)
-    "ceac": "#0047AB",                # Canonical CEAC = Cobalt Blue
-    "ceac_natural": "#1D4ED8",        # Canonical CEAC (guarded natural) = Royal Cobalt Blue
-    "ceac_ranked": "#6C7CFA",         # Improved / Ranked CEAC = Periwinkle
-    "ceac_ranked_natural": "#96A2FF", # Improved / Ranked CEAC (natural) = Lavender Periwinkle
-    "oracle": "#374151",              # Charcoal Grey
-}
-
-RANKED_MARKERS = {
-    "idac": "D",
-    "ucb_q": ">",
-    "pomd": "h",
-    "ids_additive": "<",
-    "ids_product": "^",
-    "ids_empirical": "v",
-    "ids_action": "s",
-    "ceac": "*",
-    "ceac_natural": "X",
-    "ceac_ranked": "o",
-    "ceac_ranked_natural": "P",
-    "oracle": "x",
-}
 
 RANKED_ORDER = [
     "idac",
@@ -84,6 +54,14 @@ RANKED_ORDER = [
     "ceac_ranked_natural",
     "oracle",
 ]
+
+RANKED_LABELS = {
+    **BASE_LABELS,
+    "ceac_ranked": "CEAC · greedy disagreement + price-ranked replay",
+    "ceac_ranked_natural": "CEAC · greedy + price-ranked (guarded natural)",
+}
+RANKED_COLORS = {m: METHOD_COLORS[m] for m in RANKED_ORDER}
+RANKED_MARKERS = {m: METHOD_MARKERS[m] for m in RANKED_ORDER}
 
 
 def ranked_source_identity() -> dict[str, str]:

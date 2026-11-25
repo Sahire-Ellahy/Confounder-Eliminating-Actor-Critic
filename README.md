@@ -153,6 +153,7 @@ studies remain local and keep their original source identities.
 
 | Path | Responsibility |
 |---|---|
+| `ceac_bench/` | **Unified four-layer benchmark engine** (`core`, `problems`, `runner`, `metrics`, `store`, `reporting`, `suites`, `cli`; see [architecture guide](docs/swe_architecture.md)) |
 | `ceac/` | Problems, learners, runner, immutable evidence and report rendering |
 | `ceac_pseudocode/` | Primary two-critic CEAC, replay master, calibration and studies |
 | `ceac_hardness/` | Junction variants, finite model compiler, IDS, primitive controls and reports |

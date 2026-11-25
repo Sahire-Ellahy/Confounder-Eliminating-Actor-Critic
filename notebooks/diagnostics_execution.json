@@ -1,0 +1,23 @@
+{
+  "code_cells": 13,
+  "evidence_manifests": {
+    "critic_bellman_earlier": "164a4359e19f00608d028d7f3a64cacdf78b13503389e0e9fc3a2adc0368a402",
+    "hardness_burden": "f6fe39e07fd03f82ca9a084355848dc31813dc1445a30b81656695ffc78aad51",
+    "hardness_prior": "fc97413c9e3c94de00814efba2e063bd0a2fcef1e80cb8b1432b8e11cd7d5274",
+    "pathdep_undertow_falsebeacon": "befd7605b34739d5bf045b077425399a5fcdd4fa078df7922782989fb9011b92"
+  },
+  "notebook": "notebooks/Undertow_FalseBeacon_Diagnostics.ipynb",
+  "notebook_sha256": "302a79846421aaece8c9c044aab638a90cddf88e3ddd069176616ccddb4325f6",
+  "packages": {
+    "matplotlib": "3.11.2",
+    "nbformat": "5.11.1",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "python": "3.11.13",
+  "rendered_figures": 22,
+  "schema": 2,
+  "spec_digest": "88d3720fc4fdd36482bb80385ed4ba1472a847388859030fd102f1f00073286d",
+  "status": "complete",
+  "training_launched": false
+}

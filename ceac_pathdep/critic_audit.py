@@ -57,312 +57,52 @@ CHECKPOINTS = (16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768)
 AUDIT_METHODS = tuple(m for m in PATHDEP_ORDER if m != "oracle")
 
 
-def _sample_heldout_stats(eval_env, model, probs: np.ndarray, n_episodes: int, rng: np.random.Generator):
-    """Roll out `n_episodes` independent held-out episodes without touching training state."""
-    S, A = model.n, model.actions
-    sa_counts = np.zeros((S, A), dtype=int)
-    sa_rew_sum = np.zeros((S, A), dtype=float)
-    sa_next_counts = np.zeros((S, A, S + 1), dtype=int)  # index S denotes terminal done
-    sa_ll_sum = np.zeros((S, A, model.num_models), dtype=float)
-
-    for _ in range(n_episodes):
-        obs, _ = eval_env.reset()
-        for _ in range(model.horizon):
-            s = model.index[obs]
-            a = int(rng.choice(A, p=probs[s]))
-            nxt, rew, done, _, _ = eval_env.step(a)
-            ll = model.log_likelihood(s, a, nxt, rew, done)
-            sa_counts[s, a] += 1
-            sa_rew_sum[s, a] += rew
-            dest = S if done else model.index[nxt]
-            sa_next_counts[s, a, dest] += 1
-            sa_ll_sum[s, a] += ll
-            obs = nxt
-            if done:
-                break
-    return sa_counts, sa_rew_sum, sa_next_counts, sa_ll_sum
-
-
-def evaluate_heldout_critics(
-    kind: str,
-    method: str,
-    learner,
-    model,
-    cfg,
-    truth: int,
-    policy,
-    prices: np.ndarray,
-    checkpoint: int,
-    seed: int,
-    dose: int,
-    n_onpolicy: int = 256,
-    n_probe: int = 256,
-) -> dict[str, float]:
-    """Evaluate Reward and Evidence Critic TD/Bellman residuals on independent held-out rollouts."""
-    S, A = model.n, model.actions
-    eval_rng = np.random.default_rng(seed_for("heldout_eval_rng", kind, dose, seed, method, checkpoint))
-    hyp = model.hypotheses[truth]
-    eval_cls = type(model._models[0])
-    eval_env = eval_cls(cfg, *hyp)
-    eval_env.reset(seed=seed_for("heldout_eval_env", kind, dose, seed, method, checkpoint))
-
-    probs_on = policy.probabilities
-    probs_pr = model.mask / model.mask.sum(axis=1, keepdims=True)
-
-    c_on, r_on, nx_on, ll_on = _sample_heldout_stats(eval_env, model, probs_on, n_onpolicy, eval_rng)
-    c_pr, r_pr, nx_pr, ll_pr = _sample_heldout_stats(eval_env, model, probs_pr, n_probe, eval_rng)
-
-    c_mix = c_on + c_pr
-    r_mix = r_on + r_pr
-    nx_mix = nx_on + nx_pr
-    ll_mix = ll_on + ll_pr
-
-    tot_on = max(1, int(c_on.sum()))
-    tot_pr = max(1, int(c_pr.sum()))
-    tot_mix = max(1, int(c_mix.sum()))
-
-    # State-level empirical held-out expectations for state-value critics V(s)
-    s_counts_on = c_on.sum(axis=1)
-    s_counts_mix = c_mix.sum(axis=1)
-
-    if method in {"ceac", "ceac_natural", "ceac_ranked", "ceac_ranked_natural"}:
-        vr = np.r_[learner.actor.reward_value[:S], 0.0]
-        vi = np.r_[learner.actor.evidence_value(prices)[:S], 0.0]
-        # On-policy held-out Reward Bellman residual: |E_hat[r + V_R(s') | s] - V_R(s)|
-        rew_sq = 0.0
-        for s in np.flatnonzero(s_counts_on > 0):
-            n_s = float(s_counts_on[s])
-            mean_r = float(r_on[s].sum()) / n_s
-            next_dist = nx_on[s].sum(axis=0) / n_s
-            target_r = mean_r + float(next_dist @ vr)
-            rew_sq += (n_s / tot_on) * ((target_r - vr[s]) ** 2)
-
-        # Held-out Evidence Critic Bellman residual across mixed held-out rollouts (against post-id 0 causal target + live priced TD)
-        nz_i, nz_j = np.nonzero(prices)
-        has_b = len(nz_i) > 0
-        bw = prices[nz_i, nz_j] if has_b else None
-        ev_td_sq = 0.0
-        ev_stage_sq = 0.0
-        for s in np.flatnonzero(s_counts_mix > 0):
-            n_s = float(s_counts_mix[s])
-            next_dist = nx_mix[s].sum(axis=0) / n_s
-            if has_b:
-                ll_avg = ll_mix[s].sum(axis=0) / n_s
-                ev_r = float(bw @ (ll_avg[nz_i] - ll_avg[nz_j]))
-            else:
-                ev_r = 0.0
-            td_err = (ev_r + float(next_dist @ vi)) - vi[s]
-            # Total discrepancy vs post-identification zero-confounder equilibrium + internal Bellman error
-            ev_td_sq += (n_s / tot_mix) * (td_err ** 2 + vi[s] ** 2)
-            ev_stage_sq += (n_s / tot_mix) * (vi[s] ** 2 + td_err ** 2)
-        return dict(
-            reward_bellman_error=float(math.sqrt(rew_sq)),
-            evidence_critic_error=float(math.sqrt(ev_td_sq)),
-            stage_epistemic_error=float(math.sqrt(ev_stage_sq)),
-        )
-
-    if method == "idac":
-        w = learner.spec.width
-        hi = learner.spec.reward_upper
-        cf = learner.config.cost_floor
-        vc = learner.cost_value[:S]
-        vs = learner.shadow_value[:S]
-        rew_sq = 0.0
-        ev_sq = 0.0
-        for s in np.flatnonzero(s_counts_mix > 0):
-            n_s = float(s_counts_mix[s])
-            mean_r = float(r_mix[s].sum()) / n_s
-            mean_c = (hi - mean_r) / w + cf
-            nx_vec = nx_mix[s].sum(axis=0) / n_s
-            # Terminal resets to initial state in IDAC's continuing representation
-            v_next_c = float(nx_vec[:S] @ vc + nx_vec[S] * vc[model.initial])
-            v_next_s = float(nx_vec[:S] @ vs + nx_vec[S] * vs[model.initial])
-            td_c = w * (mean_c - learner.mu_cost + v_next_c - vc[s])
-            p_hat_s = max(n_s / tot_mix, 1e-6)
-            sh_s = -math.log(p_hat_s)
-            td_s = sh_s - learner.mu_entropy + v_next_s - vs[s]
-            rew_sq += (n_s / tot_mix) * (td_c ** 2)
-            ev_sq += (n_s / tot_mix) * (td_s ** 2 + vs[s] ** 2)
-        return dict(
-            reward_bellman_error=float(math.sqrt(rew_sq)),
-            evidence_critic_error=float(math.sqrt(ev_sq)),
-            stage_epistemic_error=float(math.sqrt(ev_sq)),
-        )
-
-    if method == "ucb_q":
-        w = learner.spec.width
-        lo = learner.spec.reward_lower
-        n_vis = np.maximum(1, learner.counts[:S])
-        bonus = w * learner.config.bonus_constant * np.sqrt((learner.spec.horizon ** 3) * learner.log_factor / n_vis)
-        q_tot = lo + w * learner.q[:S]
-        q_rew = q_tot - bonus
-        v_rew_next = np.zeros(S + 1)
-        for s_i in range(S):
-            v_rew_next[s_i] = float(q_rew[s_i, model.mask[s_i]].max())
-        rew_sq = 0.0
-        ev_sq = 0.0
-        for s, a in zip(*np.nonzero(c_mix > 0)):
-            cnt = float(c_mix[s, a])
-            mean_r = float(r_mix[s, a]) / cnt
-            nx_dist = nx_mix[s, a] / cnt
-            bell_r = (mean_r + float(nx_dist @ v_rew_next)) - q_rew[s, a]
-            rew_sq += (cnt / tot_mix) * (bell_r ** 2)
-            ev_sq += (cnt / tot_mix) * (bonus[s, a] ** 2)
-        return dict(
-            reward_bellman_error=float(math.sqrt(rew_sq)),
-            evidence_critic_error=float(math.sqrt(ev_sq)),
-            stage_epistemic_error=float(math.sqrt(ev_sq)),
-        )
-
-    if method == "pomd":
-        w = learner.spec.width
-        hi = learner.spec.reward_upper
-        cb, tb = learner.bonuses()
-        bonus = w * (cb[:S] + tb[:S])
-        q_tot = hi - w * learner.q[:S]
-        v_tot_next = np.r_[np.sum(probs_on * q_tot, axis=1), 0.0]
-        rew_sq = 0.0
-        ev_sq = 0.0
-        for s, a in zip(*np.nonzero(c_mix > 0)):
-            cnt = float(c_mix[s, a])
-            mean_r = float(r_mix[s, a]) / cnt
-            nx_dist = nx_mix[s, a] / cnt
-            bell_r = (mean_r + float(nx_dist @ v_tot_next)) - q_tot[s, a]
-            rew_sq += (cnt / tot_mix) * (bell_r ** 2)
-            ev_sq += (cnt / tot_mix) * (bonus[s, a] ** 2)
-        return dict(
-            reward_bellman_error=float(math.sqrt(rew_sq)),
-            evidence_critic_error=float(math.sqrt(ev_sq)),
-            stage_epistemic_error=float(math.sqrt(ev_sq)),
-        )
-
-    if method.startswith("ids_"):
-        post = learner.posterior
-        stage_r = np.einsum("m,ms,msa->sa", post, model.density, model.reward)
-        stage_i = (
-            learner.action_information_stage(post)
-            if hasattr(learner, "action_information_stage")
-            else model.mutual_information_stage(post)
-        )
-        p_next = model._nonterm_op if model._shared_nonterm else np.einsum("m,msan->san", post, model._nonterm_op)
-        qr = np.zeros((S, A), dtype=float)
-        vr = np.zeros(S + 1, dtype=float)
-        for lvl in range(model.horizon - 1, -1, -1):
-            sts = model.levels[lvl]
-            cont = p_next[sts] @ vr[:S] if lvl < model.horizon - 1 else np.zeros((len(sts), A))
-            qr[sts] = stage_r[sts] + cont
-            vr[sts] = np.sum(probs_on[sts] * qr[sts], axis=1)
-
-        rew_sq = 0.0
-        st_ep_sq = 0.0
-        surprise_sq = 0.0
-        for s, a in zip(*np.nonzero(c_mix > 0)):
-            cnt = float(c_mix[s, a])
-            mean_r = float(r_mix[s, a]) / cnt
-            nx_dist = nx_mix[s, a] / cnt
-            bell_r = (mean_r + float(nx_dist @ vr)) - qr[s, a]
-            rew_sq += (cnt / tot_mix) * (bell_r ** 2)
-
-        for s, a in zip(*np.nonzero(c_pr > 0)):
-            cnt = float(c_pr[s, a])
-            st_ep_sq += (cnt / tot_pr) * (stage_i[s, a] ** 2)
-            ll_avg = ll_pr[s, a] / cnt
-            # KL surprise between IDS posterior predictive log-likelihood and realized m* log-likelihood
-            surp = float(ll_avg[truth] - float(post @ ll_avg))
-            surprise_sq += (cnt / tot_pr) * (surp ** 2)
-
-        # Unpruned cumulative log-likelihood ratio accumulator spread across supported hypotheses
-        supp_lw = learner.log_weights[learner.initial_support]
-        finite_lw = supp_lw[np.isfinite(supp_lw)]
-        llr_div = float(np.std(finite_lw)) if len(finite_lw) > 1 else 0.0
-        # For misspecified single-class support (e.g. ids_null), cumulative held-out KL surprise grows O(t)
-        if not bool(learner.initial_support[truth]):
-            llr_div = float(checkpoint) * math.sqrt(max(surprise_sq, 1e-12))
-
-        return dict(
-            reward_bellman_error=float(math.sqrt(rew_sq)),
-            evidence_critic_error=float(math.sqrt(llr_div ** 2 + st_ep_sq)),
-            stage_epistemic_error=float(math.sqrt(st_ep_sq + surprise_sq)),
-        )
-
-    raise ValueError(f"Unsupported method in critic audit: {method}")
-
-
 def run_critic_audit_cell(job) -> dict:
+    """Delegate single-pass training + held-out Reward/Evidence Critic Bellman audit directly to `ceac_bench`."""
+    from ceac_bench.core import ConditionKey
+    from ceac_bench.metrics import HeldOutBellmanObserver, PerformanceTraceObserver
+    from ceac_bench.problems import CanalizedGIProblemBuilder, SignallingRewiringProblemBuilder
+    from ceac_bench.runner import CellRunner
+    from ceac_bench.suites import SUITES
+
     kind, method, seed, dose, episodes = job
-    cfg, model, env, truth, _ = build_pathdep_problem(kind, dose, task=1, seed=seed)
-    compiled = compile_outcome_tables(model, truth=truth)
-    rng = np.random.default_rng(seed_for("pathdep", seed, kind, dose, 1, method, "learner"))
-    action_rng = np.random.default_rng(seed_for("pathdep", seed, kind, dose, 1, method, "action"))
-    learner = construct_pathdep_learner(kind, model, method, rng, episodes, truth)
-    env.reset(seed=seed_for("pathdep", seed, kind, dose, 1, "shared_environment"))
-
-    cp_set = set(c for c in CHECKPOINTS if c <= episodes)
-    records = []
-    cumulative = 0.0
-    last_pol = None
-    expected = None
-    truth_r_vec = make_truth_return_vec(model, truth)
-
-    for t in range(episodes):
-        policy, behavior, prices = learner.select(t)
-        if policy.identity != last_pol:
-            expected = float(truth_r_vec @ _base_policy_occ(model, policy))
-            last_pol = policy.identity
-        gap = max(0.0, float(model.optimal_returns[truth] - expected))
-        obs, _ = env.reset()
-        trs = []
-        for _ in range(model.horizon):
-            s = model.index[obs]
-            a = int(action_rng.choice(model.actions, p=policy.probabilities[s]))
-            nxt, rew, done, _, _ = env.step(a)
-            ll = model.log_likelihood(s, a, nxt, reward=rew, done=done)
-            trs.append(Transition(s, a, rew, -1 if done else model.index[nxt], done, ll))
-            obs = nxt
-            if done:
-                break
-        learner.observe(Episode(t, 0, policy.identity, behavior, tuple(trs)), policy, prices)
-        if (t + 1) % 128 == 0 and hasattr(learner, "replay") and hasattr(learner.replay, "strata"):
-            if hasattr(learner.replay, "evidence") and hasattr(learner.replay.evidence, "strata"):
-                learner.replay.evidence.strata.clear()
-            if method in {"ceac", "ceac_natural"} and hasattr(learner.replay, "statistics"):
-                keep = set(learner.bank._ids) | set(learner.candidates) | set(learner.frozen)
-                learner.replay.strata.clear()
-                for pid in [k_id for k_id in learner.replay.statistics if k_id not in keep]:
-                    del learner.replay.statistics[pid]
-            elif method in {"ceac_ranked", "ceac_ranked_natural"} and hasattr(learner.replay, "statistics"):
-                keep = set(learner.bank._ids) | set(learner.replay.policies_by_id)
-                learner.replay.strata.clear()
-                for pid in [k_id for k_id in learner.replay.statistics if k_id not in keep]:
-                    del learner.replay.statistics[pid]
-            else:
-                for bucket in learner.replay.strata.values():
-                    bucket.clear()
-        cumulative += gap
-
-        if (t + 1) in cp_set:
-            metrics = evaluate_heldout_critics_fast(
-                suite_key="pathdep",
-                kind=kind,
-                method=method,
-                learner=learner,
-                model=model,
-                compiled=compiled,
-                truth=truth,
-                policy=policy,
-                prices=prices,
-                checkpoint=t + 1,
-                seed=seed,
-                dose=dose,
-            )
-            records.append(dict(episode=t + 1, **metrics))
-
+    builder = SignallingRewiringProblemBuilder(kind) if kind == "signalling_rewiring" else CanalizedGIProblemBuilder(kind)
+    factory = next(f for f in SUITES["bio_pathdep"].learner_factories if f.method_id == method)
+    runner = CellRunner(
+        observers=(
+            PerformanceTraceObserver(window_size=256, log_every=512),
+            HeldOutBellmanObserver(checkpoints=CHECKPOINTS, n_onpolicy=512, n_probe=256, compat_suite_key="pathdep"),
+        ),
+        compact_every=128,
+    )
+    cond = ConditionKey(
+        suite_id="bio_pathdep",
+        family_id=builder.metadata.family_id,
+        variant_id=kind,
+        dose=int(dose),
+        task=1,
+        seed=int(seed),
+    )
+    rec = runner.run_cell(builder, factory, cond, int(episodes))
+    cp_eps = rec.critic_audit.get("episode", ())
+    cp_rw = rec.critic_audit.get("reward_bellman_error", ())
+    cp_ev = rec.critic_audit.get("evidence_critic_error", ())
+    cp_st = rec.critic_audit.get("stage_epistemic_error", ())
+    records = [
+        dict(
+            episode=int(e),
+            reward_bellman_error=float(rw),
+            evidence_critic_error=float(ev),
+            stage_epistemic_error=float(st),
+        )
+        for e, rw, ev, st in zip(cp_eps, cp_rw, cp_ev, cp_st)
+    ]
     return dict(
         kind=kind,
         dose=int(dose),
         method=method,
         seed=int(seed),
-        cumulative_regret=round(float(cumulative), 6),
+        cumulative_regret=round(float(rec.cumulative_regret), 6),
         checkpoints=records,
     )
 

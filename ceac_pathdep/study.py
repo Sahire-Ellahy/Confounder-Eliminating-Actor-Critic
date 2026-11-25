@@ -22,10 +22,16 @@ import numpy as np
 
 from ceac.contracts import Episode, Transition
 from ceac.primitives import IDAC, IDACConfig, OptimisticPOMD, POMDConfig, PrimitiveSpec, UCBQ, UCBQConfig
+from ceac_bench.reporting.theme import (
+    METHOD_COLORS,
+    METHOD_LABELS,
+    METHOD_MARKERS,
+    log_markevery,
+    style_ceac_legend,
+)
 from ceac_hardness.agents import CEACConfig, LaiGravesOracle
 from ceac_hardness.ids import BayesianIDS
 from ceac_pathologies.agent import ConfounderEliminatingAC, PathologiesCEACConfig
-from ceac_pathologies.report import log_markevery, style_ceac_legend
 from ceac_pathologies.run import (
     ROOT,
     _sanitize_diagnostics,
@@ -55,51 +61,6 @@ PATHDEP_KINDS = {
     "canalized_gi": "Canalized Genetic Risk Screen (K562 PPP2R1A Hub, H = 3)",
 }
 
-PATHDEP_LABELS = {
-    "idac": "IDAC · occupancy ratio",
-    "ucb_q": "UCB Q-learning",
-    "pomd": "Optimistic POMD",
-    "ids_null": "IDS · null / no-rewiring prior",
-    "ids_product": "IDS · full-model MI I(θ,ξ; Z)",
-    "ids_action_tree": "IDS · optimal-policy MI I(Π*; Z) (Russo–Van Roy)",
-    "ids_action_onpath": "IDS · on-path quotient MI I(C*_onpath; Z)",
-    "ceac": "CEAC · reward + evidence critics",
-    "ceac_natural": "CEAC · guarded natural",
-    "ceac_ranked": "CEAC · greedy disagreement + price-ranked replay",
-    "ceac_ranked_natural": "CEAC · greedy + price-ranked (guarded natural)",
-    "oracle": "Oracle Graves–Lai",
-}
-
-PATHDEP_COLORS = {
-    "idac": "#15803D",                # Emerald / Forest Green (IDAC)
-    "pomd": "#FF1493",                # Deep Hot Pink (Optimistic POMD)
-    "ucb_q": "#C026D3",               # Vivid Fuchsia-Magenta (UCB-Q)
-    "ids_null": "#7F1D1D",            # Dark Wine Red (restricted/null IDS)
-    "ids_product": "#DC2626",         # Vivid Scarlet Red (full-model MI IDS)
-    "ids_action_tree": "#FB7185",     # Coral / Rose Red (optimal-policy tree MI IDS)
-    "ids_action_onpath": "#B91C1C",   # Ruby / Firebrick Red (quotiented on-path MI IDS)
-    "ceac": "#0047AB",                # Canonical CEAC = Cobalt Blue
-    "ceac_natural": "#1D4ED8",        # Canonical CEAC (guarded natural) = Royal Cobalt Blue
-    "ceac_ranked": "#6C7CFA",         # Improved / Ranked CEAC = Periwinkle
-    "ceac_ranked_natural": "#96A2FF", # Improved / Ranked CEAC (natural) = Lavender Periwinkle
-    "oracle": "#374151",              # Charcoal Grey
-}
-
-PATHDEP_MARKERS = {
-    "idac": "D",
-    "ucb_q": ">",
-    "pomd": "h",
-    "ids_null": "<",
-    "ids_product": "^",
-    "ids_action_tree": "v",
-    "ids_action_onpath": "s",
-    "ceac": "*",
-    "ceac_natural": "X",
-    "ceac_ranked": "o",
-    "ceac_ranked_natural": "P",
-    "oracle": "x",
-}
-
 PATHDEP_ORDER = [
     "idac",
     "ucb_q",
@@ -114,6 +75,10 @@ PATHDEP_ORDER = [
     "ceac_ranked_natural",
     "oracle",
 ]
+
+PATHDEP_LABELS = {m: METHOD_LABELS[m] for m in PATHDEP_ORDER}
+PATHDEP_COLORS = {m: METHOD_COLORS[m] for m in PATHDEP_ORDER}
+PATHDEP_MARKERS = {m: METHOD_MARKERS[m] for m in PATHDEP_ORDER}
 
 
 def pathdep_source_identity() -> dict[str, str]:
@@ -945,7 +910,7 @@ def export_pathdep_study(sweep_dir: Path, cal_dir: Path | None, out_dir: Path, e
         "## Why CEAC Separates from Both Optimal-Policy MI `I(Π*; Z)` and On-Path Quotient MI `I(C*_onpath; Z)`",
         "",
         "- **`ids_action_tree` (`I(Π*; Z)`, Russo–Van Roy MDP optimal-policy MI)**: Off-path stress/non-hub states carry local rescue rules governed by latent modifiers `ξ ∈ {0, 1}^k`, splitting `Π*(θ, ξ)` by `2^k` and trapping policy-tree IDS into profiling non-causal modifier assays (`0%` on-path return impact).",
-        "- **`ids_action_onpath` (`I(C*_onpath; Z)`, quotiented on-path class MI)**: Even after manually gifting IDS CEAC's on-path return quotient, scalar mutual information rewards cheap peripheral clade/eQTL reporters (`0.49998` return) that reduce tail entropy on peripheral candidates while providing **zero KL** between `Null` and the realized responder.",
+        "- **`ids_action_onpath` (`I(C*_onpath; Z)`, quotiented on-path class MI)**: Even after manually gifting IDS CEAC's on-path return quotient, scalar mutual information rewards cheap `6k` peripheral clade/eQTL reporters (`0.49999` return) that reduce tail entropy on peripheral candidates while providing **zero KL** between `Null` and the realized responder.",
         "- **`ceac_ranked` & `ceac`**: Track vector-valued pairwise log-likelihood ratios across undefeated on-path alternatives and propagate dual evidence prices `β` across the `-0.015` Step-1 priming / `PPP2R1A` hub-decanalization gate via `Q_I(s, a; β)`.",
         "",
         "## Architecture",

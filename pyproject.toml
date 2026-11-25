@@ -17,7 +17,8 @@ gym = ["gymnasium>=0.29"]
 [project.scripts]
 ceac-run = "ceac.run:main"
 ceac-report = "ceac.report:main"
+ceac-bench = "ceac_bench.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["ceac", "ceac.*", "ceac_walkthrough", "ceac_walkthrough.*", "ceac_hardness", "ceac_hardness.*", "ceac_pseudocode", "ceac_pseudocode.*", "ceac_stability", "ceac_stability.*"]
+include = ["ceac", "ceac.*", "ceac_bench", "ceac_bench.*", "ceac_walkthrough", "ceac_walkthrough.*", "ceac_hardness", "ceac_hardness.*", "ceac_pseudocode", "ceac_pseudocode.*", "ceac_stability", "ceac_stability.*", "ceac_pathologies", "ceac_pathologies.*", "ceac_gi", "ceac_gi.*", "ceac_ranked", "ceac_ranked.*", "ceac_pathdep", "ceac_pathdep.*", "ceac_pathdep_grids", "ceac_pathdep_grids.*", "ceac_critic_diagnostics", "ceac_critic_diagnostics.*"]
 exclude = ["legacy*", "tests*", "notebooks*", "runs*"]
